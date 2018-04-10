@@ -1,0 +1,5 @@
+<apex:page id="communitiesLandingPage" controller="ODS_CustomLandingController" action="{!PageRedirect}" title="{!$Label.site.site_login}">
+   <apex:form >
+       <c:ODS_HeaderComponent />
+   </apex:form>
+</apex:page>

@@ -1,0 +1,123 @@
+<aura:component controller="pi.EHMailAppController">
+	<aura:dependency resource="markup://pi:EngagementHistoryMailRecordSelect" type="COMPONENT" />
+
+	<aura:attribute name="people" type="Object[]" access="public" default="[]"/>
+	<aura:attribute name="selected" type="Object" access="public" />
+	<aura:attribute name="handler" type="Aura.Component" access="public"/>
+	<aura:attribute name="recordDetailLink" type="String" access="public" />
+	<aura:attribute name="optionComponents" type="Aura.Component" access="public" />
+
+	<aura:handler name="render" value="{!this}" action="{!c.onRender}"/>
+
+	<aura:handler name="EngagementHistoryPersonSelected" event="pi:EngagementHistoryPersonSelected"
+			action="{!c.handleOptionSelected}"/>
+
+	<aura:method name="setPeople" action="{!c.handleSetPeople}" access="public">
+		<aura:attribute name="people" type="Object[]"/>
+	</aura:method>
+
+	<aura:if isTrue="{!v.selected != null}">
+		<aura:if isTrue="{!v.people.length > 1}">
+			<div class="slds-form-element slds-p-right_small slds-p-left_small slds-p-bottom_small">
+				<div class="slds-form-element__control">
+					<div class="slds-combobox_container slds-has-inline-listbox">
+						<div aura:id="eh-record-select" role="combobox"
+							 class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+							<div onclick="{!c.handleSearchBoxClicked}"
+								 class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right">
+								<ui:inputText class="slds-input slds-combobox__input"
+											placeholder="Search Recipients"
+											aura:id="ehm-search-term"
+											updateOn="keyup"
+											keyup="{!c.handleSearchBoxChange}"/>
+								<lightning:icon iconName="utility:search" size="x-small"
+												class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right"/>
+							</div>
+
+							<div role="listbox">
+								<ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-scrollable">
+									{!v.optionComponents}
+								</ul>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</aura:if>
+		<article class="slds-tile slds-media slds-p-right_small slds-p-left_small">
+			<div class="slds-media__figure">
+				<aura:if isTrue="{!v.selected.PhotoUrl}">
+					<span class="slds-avatar slds-avatar_circle slds-avatar_medium">
+						<img alt="" src="{!v.selected.PhotoUrl}"
+							 title="{!v.selected.Name}" />
+					</span>
+					<aura:set attribute="else">
+						<lightning:icon iconName="standard:avatar"
+										size="medium"
+										class="slds-avatar slds-avatar_circle slds-avatar_medium eh-avatar"
+										alternativeText="{!v.selected.Name}"/>
+					</aura:set>
+				</aura:if>
+			</div>
+			<div class="slds-media__body">
+				<h3 class="slds-truncate" title="{!v.selected.Name}">
+					{!v.selected.Name}
+					<aura:if isTrue="{!v.recordDetailLink}">
+						<a href="{!v.recordDetailLink}" target="_blank">
+							<lightning:icon iconName="utility:salesforce1"
+											size="xx-small" class="slds-p-left_small"/>
+						</a>
+					</aura:if>
+				</h3>
+				<h6>{!v.selected.Type}</h6>
+				<div class="slds-tile__detail slds-text-body_small">
+					<dl class="slds-list_horizontal slds-wrap">
+						<aura:if isTrue="{!v.selected.Company}">
+							<dt class="slds-item_label slds-text-color_weak slds-truncate"
+								title="Company">Company:</dt>
+							<dd class="slds-item_detail slds-truncate"
+								title="{!v.selected.Company}">
+								{!v.selected.Company}
+							</dd>
+						</aura:if>
+						<aura:if isTrue="{!v.selected.Title}">
+							<dt class="slds-item_label slds-text-color_weak slds-truncate"
+								title="Title">Title:</dt>
+							<dd class="slds-item_detail slds-truncate"
+								title="{!v.selected.Title}">
+								{!v.selected.Title}
+							</dd>
+						</aura:if>
+						<aura:if isTrue="{!v.selected.Phone || v.selected.MobilePhone}">
+							<dt class="slds-item_label slds-text-color_weak slds-truncate"
+								title="Phone">Phone:</dt>
+							<dd class="slds-item_detail slds-truncate"
+								title="{!v.selected.Phone || v.selected.MobilePhone}">
+								{!v.selected.Phone || v.selected.MobilePhone}
+							</dd>
+						</aura:if>
+						<aura:if isTrue="{!v.selected.pi__last_activity__c}">
+							<dt class="slds-item_label slds-text-color_weak slds-truncate"
+								title="Last Active">Last Active:</dt>
+							<dd class="slds-item_detail slds-truncate"
+								title="{!v.selected.pi__last_activity__c}">
+								<lightning:formattedDateTime value="{!v.selected.pi__last_activity__c}"
+															 year="numeric"
+															 month="numeric" day="numeric"
+															 hour="2-digit" minute="2-digit" timeZoneName="short" />
+							</dd>
+						</aura:if>
+					</dl>
+				</div>
+			</div>
+		</article>
+
+		<aura:if isTrue="{!v.selected.pi__score__c}">
+			<h6 class="slds-p-left_small slds-p-top_small">
+				Pardot Score: {!v.selected.pi__score__c}
+			</h6>
+		</aura:if>
+	</aura:if>
+
+</aura:component>

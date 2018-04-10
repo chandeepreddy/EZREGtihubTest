@@ -1,0 +1,532 @@
+<apex:page controller="SFSSDupeCatcher.DCDataQualityController">
+<apex:form >
+   <apex:pageBlock ID="PB">
+   <apex:pageMessages />
+    <html xmlns="http://w<w.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+        <head>
+            <meta charset="utf-8" />
+            <title>Data Quality Layout</title>
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <apex:stylesheet value="{!URLFOR($Resource.SFSSDupeCatcher__Styles, 'assets/styles/salesforce-lightning-design-system.min.css')}" />
+            <!-- All these styles can be moved into a css -->                             
+            <style>
+                .dingoBkWhite{ background-color: #ffffff; }
+                .dingoGray{ color: #b8c3ce; }
+                .dingoLiGray:before{ color: #b8c3ce; }
+                .dingoBkGray{ background-color: #b8c3ce; }                
+                .dingoA{ background-color: #5a9cdd; }
+                .dingoBlue{ color: #5a9cdd; }                
+                .dingoLiBlue:before{ color: #5a9cdd; }
+                .dingoBkBlue{ background-color: #5a9cdd; }                
+                .dingoB{ background-color: #00c6b7; }
+                .dingoLightBlue{ color: #00c6b7; }                
+                .dingoLiLightBlue:before{ color: #00c6b7; }
+                .dingoBkLightBlue{ background-color: #00c6b7; }                
+                .dingoC{ background-color: #88c651; }
+                .dingoGreen{ color: #88c651; }                
+                .dingoLiGreen:before{ color: #88c651; }
+                .dingoBkGreen{ background-color: #88c651; }                
+                .dingoD{ background-color: #f39e58; }
+                .dingoPurple{ color: #9370DB; } 
+                .dingoBkPurple{ background-color: #9370DB; }  
+                .dingoOrange{ color: #f39e58; }                
+                .dingoLiOrange:before{ color: #f39e58; }
+                .dingoBkOrange{ background-color: #f39e58; }                
+                .dingoF{ background-color: #00c6b7; }
+                .dingoRed{ color: #ef6e64; }                
+                .dingoLiRed:before{ color: #ef6e64; }
+                .dingoBkRed{ background-color: #ef6e64; }
+                .dingoRedAlt{ color: rgb(194, 57, 52); }                
+                .dingoLiRedAlt:before{ color: rgb(194, 57, 52); }
+                .dingoBkRedAlt{ background-color: rgb(194, 57, 52); }
+                #dingoSuggestions li:before {
+                    content: "• ";
+                    font-size: 2em;
+                    position: relative;
+                    top: 0.15em;
+                    padding: 0px;
+                    margin: 0px;
+                }                   
+                .dingoSuggestionWarning:after {
+                    content: "HIGH PRIORITY";
+                    background-color: rgb(194, 57, 52);
+                    margin-left: 10px;
+                    border-radius: .25em;
+                    color: #ffffff;
+                    padding: 5px;
+                }                              
+                .dingoGradeContainer{
+                    float:left; 
+                    margin: 30px; 
+                    border-radius: .25rem; 
+                    width: 150px;
+                    height: 150px; 
+                    position: relative;
+                }
+                .dingoGrade{
+                    text-transform: uppercase; 
+                    font-size: 80px; 
+                    color: #FFFFFF; 
+                    font-weight: 600; 
+                    position: absolute; 
+                    left: 50px; 
+                    top: 15px;
+                }
+                .dingoCardImgContainer{
+                    border-radius: .125rem;  
+                    width: 75px; 
+                    height: 75px; 
+                    position: relative;
+                }
+                .dingoCardImg{
+                     font-size: 40px; 
+                     color: #FFFFFF; 
+                     font-weight: 300; 
+                     position: absolute; 
+                     top: 5px;
+                }
+                .dingoProgressHldr{
+                    border-radius: .25rem; 
+                    height: 15px; 
+                    margin-right: 15px; 
+                    margin-left: 15px; 
+                    margin-bottom:15px;
+                }
+                .dingoProgress{
+                    border-radius: .25rem; 
+                    height: 15px; 
+                    margin-right: 15px; 
+                    margin-left: 15px; 
+                    margin-bottom:15px; 
+                    position: absolute; 
+                    bottom: -15px; 
+                }   
+                .dingoWarning {
+                    background-color: rgb(194, 57, 52);
+                    border-radius: .25em;
+                    color: #ffffff;           
+                    padding: 25px;
+                    margin: 25px;
+                    display: inline-block;
+                    text-align: left;
+                    width: 95%;
+                    position: relative;
+                }      
+                .dingoTryContainer{
+                    float: left; 
+                    padding: 0; 
+                    top: 50px; 
+                    margin-left: 25px; 
+                    position: absolute; 
+                    right: 40px;
+                }      
+                .dingoTry{
+                    color: #000000; 
+                    background-color: #fbb439; 
+                    padding: 5px; 
+                    border-radius: .25em; 
+                    font-size: 1.5em; 
+                    font-weight: 600;
+                }  
+
+                .dingoInactive{
+                    background-color: rgb(194, 57, 52);
+                }                
+                .dingoActive{
+                    background-color: rgb(75, 202, 129)
+                }
+                .dingoState {                    
+                    border-radius: .25em;
+                    color: #ffffff;
+                    padding: 25px;
+                    margin: 25px;
+                    display: inline-block;
+                    text-align: left;
+                    width: 250px;
+                    position: relative;
+                    float:left;
+                    height: 200px;
+                } 
+                .dingoStatusHldr{
+                    border-radius: .25em;
+                    padding: 25px;
+                    margin: 25px;
+                    display: inline-block;
+                    text-align: left;
+                    width: 250px;
+                    position: relative;
+                    float:left;                    
+                }
+                .dingoStatusLine{
+                    float:left;
+                    border-radius: .125rem;
+                    height: 10px;
+                    margin-right: 5px;
+                    margin-left: 5px;
+                    margin-bottom: 5px;
+                    margin-top: 18px;
+                    width: 50px;
+                }
+                .dingoCurrentState {                    
+                    float:left;
+                    border-radius: 50%;
+                    padding: 15px;
+                } 
+                .dingoCard{
+                    background-color: rgb(244, 246, 249);
+                    border: 1px solid rgb(216, 221, 230);
+                }
+                .dingoWorkList{
+
+                }
+                .dingoWorkList li{
+                    height: 50px;
+                    padding-top: 15px;
+                }
+                #help p{                    
+                    height: 30px;
+                    margin-bottom: 5px;
+                    border-bottom:  1px solid rgb(216, 221, 230);
+                }
+                .cloudingoLink {
+                    text-decoration: none !important;
+                    font-weight: bold;
+                }
+                .cloudingoAgentStatusContainer{
+                    text-align:center; 
+                    float:left; 
+                    min-width: 775px;
+                }
+                .cloudingoActiveHeading{
+                    margin-bottom: 10px; 
+                    margin-top: 10px;
+                }
+                .cloudingoAgentIcon{
+                    float:left; 
+                    top: 100px; 
+                    left: 3px; 
+                    position: relative;
+                }
+                .cloudingoWork{
+                    float:left; 
+                    top: 25px; 
+                    position: relative;
+                    border: 1px solid rgb(216, 221, 230);
+                    border-radius: .25em;
+                }
+                .cloudingoWork .slds-panel{
+                    min-height: 200px;
+                }
+                .cloudingoWorkLiImg{
+                    float:left;
+                    margin-top:-10px;
+                    padding-right:10px;
+                }
+                .cloudingoSyncMode{
+                    margin-top: 50px; 
+                    width: 50%; 
+                    min-width: 625px; 
+                    text-align: left; 
+                    display: inline-block;
+                    border: 1px solid rgb(216, 221, 230);
+                    border-radius: .25em;
+                }
+                .cloudingoSyncModeList{
+                    float:left; 
+                    padding: 10px; 
+                    border-left: 1px solid rgb(216, 221, 230);
+                }
+                .cloudingoButton{
+                    padding-left: 10px !important; 
+                    padding-right: 10px !important; 
+                    background: none !important;
+                }
+                .cloudingoButtonWhite{
+                    padding-left: 10px !important; 
+                    padding-right: 10px !important; 
+                    background-color: #ffffff !important;
+                    background-image: none !important;
+                }
+                .cloudingoGetStartedButton{
+                    position: absolute; 
+                    left: 80px; 
+                    background-color: #fffff; 
+                    bottom: 5px;
+                }
+                .cloudingoSubscribeButton{
+                    position: absolute; 
+                    left: 84px; 
+                    background-color: #fffff; 
+                    bottom: 5px;
+                }
+                .cloudingoContact{
+                    float:left;
+                    position:relative;
+                    margin:25px;
+                    border: 1px solid rgb(216, 221, 230);
+                    border-radius: .25em;
+                }   
+            </style>  
+        </head>
+        <body> 
+            <div class="slds-page-header" role="banner">
+              <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                  <p class="slds-text-heading--small"><apex:outputLabel value="{!CompanyName}"  /></p>
+                  <div class="slds-grid">
+                    <div class="slds-grid slds-type-focus slds-no-space">
+                      <p class="slds-page-header__title slds-truncate slds-align-middle slds-text-heading--large" title="Data Quality Assessment">Data Quality Assessment</p>                                            
+                    </div>                    
+                  </div>
+                  <p class="slds-text-body--small page-header__info" style="font-style: italic;"><apex:outputLabel value="{!CurrentTime}"  /></p>
+                </div>
+                <div class="slds-col slds-no-flex slds-grid slds-align-top">
+                    <p class="slds-text-body--small page-header__info" style="bottom: 7px; position:absolute; left: -65px;">powered by </p>                    
+                    
+                </div>
+              </div>              
+            </div>               
+            <div style="display:table;">
+                <div style="display: table-row;">
+                    <div style="display: table-cell; padding: 10px;">
+                        <div class="{!letterColor}"> 
+                            <div class="slds-text-body--regular dingoGrade">
+                                <apex:outputLabel value="{!letterGrade}"  />
+                            </div> 
+                        </div>
+                        <div style="float: left;">
+                            <div class="slds-text-heading--large" style="padding: 5px;">Your data quality received a <apex:outputLabel value="{!letterGrade}"  /> grade.</div>
+                            <div class="slds-grid slds-grid--pull-padded">
+                              <div class="slds-col--padded">
+                                <article class="slds-card slds-card--narrow">
+                                  <header class="slds-card__header slds-grid">
+                                    <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                                      <div class="slds-media__figure">
+                                       <div class="dingoCardImgContainer dingoBkLightBlue"> 
+                                            <div class="slds-text-body--regular dingoCardImg">
+                                                <img src="{!URLFOR($Resource.Styles, 'DataQualityFiltersCreated.png')}" alt="" id="DataQualityFiltersCreated"  title="" />
+                                            </div> 
+                                        </div> 
+                                      </div>
+                                      <div class="slds-media__body slds-truncate">        
+                                        <div>                              
+                                            <span class="slds-text-heading--small">Filters Created</span>   
+                                        </div>
+                                        <div>
+                                            <span class="slds-text-heading--large"><apex:outputLabel value="{!dcFilterCount}"  /></span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </header>
+                                  <div class="slds-card__body slds-text-align--center" style="position:relative;">                                  
+                                    <div class="dingoProgressHldr dingoBkGray"></div>
+                                    
+                                    <div class="dingoProgress dingoBkLightBlue" style="{!filterCreationProgress}"></div>
+                                  </div>                                  
+                                </article>
+                              </div>
+                              <div class="slds-col--padded">
+                                <article class="slds-card slds-card--narrow">
+                                  <header class="slds-card__header slds-grid">
+                                    <div class="slds-media slds-media--center slds-has-flexi-truncate"> 
+                                      <div class="slds-media__figure">
+                                       <div class="dingoCardImgContainer dingoBkOrange"> 
+                                            <div class="slds-text-body--regular dingoCardImg">
+                                                <img src="{!URLFOR($Resource.Styles, 'DataQualityRequiredFields.png')}" alt="" id="DataQualityRequiredFields"  title="" />
+                                            </div> 
+                                        </div> 
+                                      </div>
+                                      <div class="slds-media__body slds-truncate">        
+                                        <div>                              
+                                            <span class="slds-text-heading--small">Required Fields</span>   
+                                        </div>
+                                        <div>
+                               
+                                            <span class="slds-text-heading--large"><apex:outputLabel value="{!requiredFieldOutput}"  /></span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </header>
+                                  <div class="slds-card__body slds-text-align--center" style="position:relative;">                                  
+                                    <div class="dingoProgressHldr dingoBkGray"></div>
+                                    <div class="dingoProgress dingoBkOrange" style="{!requiredFieldsProgress}"></div>
+                                  </div>                                  
+                                </article>
+                              </div>
+                              <div class="slds-col--padded">
+                                <article class="slds-card slds-card--narrow">
+                                  <header class="slds-card__header slds-grid">
+                                    <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                                      <div class="slds-media__figure">
+                                       <div class="dingoCardImgContainer dingoBkGreen"> 
+                                            <div class="slds-text-body--regular dingoCardImg">
+                                                 <img src="{!URLFOR($Resource.Styles, 'DataQualityFilters.png')}" alt="" id="DataQualityFilters"  title="" />
+                                            </div> 
+                                        </div> 
+                                      </div>
+                                      <div class="slds-media__body slds-truncate">        
+                                        <div>                              
+                                            <span class="slds-text-heading--small">Filters Enabled</span>   
+                                        </div>
+                                        <div>
+                                            <span class="slds-text-heading--large"><apex:outputLabel value="{!dcActiveFilters}"  /></span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </header>
+                                  <div class="slds-card__body slds-text-align--center" style="position:relative;">                                  
+                                    <div class="dingoProgressHldr dingoBkGray"></div>
+                                    <div class="dingoProgress dingoBkGreen" style="{!filtersEnabled}"></div>
+                                  </div>                                  
+                                </article>
+                              </div>
+                              <div class="slds-col--padded">
+                                <article class="slds-card slds-card--narrow">
+                                  <header class="slds-card__header slds-grid">
+                                    <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                                      <div class="slds-media__figure">
+                                       <div class="dingoCardImgContainer dingoBkBlue"> 
+                                            <div class="slds-text-body--regular dingoCardImg">
+                                                <img src="{!URLFOR($Resource.Styles, 'DataQualityDingo.png')}" alt="" id="DataQualityDingo"  title="" />
+                                            </div> 
+                                        </div> 
+                                      </div>
+                                      <div class="slds-media__body slds-truncate">        
+                                        <div>                              
+                                            <span class="slds-text-heading--small">Cloudingo Running</span>   
+                                        </div>
+                                        <div>   
+                                         <span class="slds-text-heading--large"> <apex:outputText value="{!CloudingoRunning}"/></span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </header>
+                                  <div class="slds-card__body slds-text-align--center" style="position:relative;">                                  
+                                    <div class="dingoProgressHldr dingoBkGray"></div>
+                                    <div class="dingoProgress dingoBkBlue" style="{!cloudingoProgress}"></div>
+                                  </div>                                  
+                                </article>
+                              </div>
+                              
+                               <div class="slds-col--padded">
+                                <article class="slds-card slds-card--narrow">
+                                  <header class="slds-card__header slds-grid">
+                                    <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                                      <div class="slds-media__figure">
+                                       <div class="dingoCardImgContainer dingoBkPurple"> 
+                                            <div class="slds-text-body--regular dingoCardImg">
+                                                <img src="{!URLFOR($Resource.Styles, 'DataQualityDingo.png')}" alt="" id="DataQualityDingo"  title="" />
+                                            </div> 
+                                        </div> 
+                                      </div>
+                                      <div class="slds-media__body slds-truncate">        
+                                        <div>                              
+                                            <span class="slds-text-heading--small">Clean Data Score</span>   
+                                        </div>
+                                        <div>   
+                                         <span class="slds-text-heading--large"> <apex:outputText value="{!duplicateScore}"/></span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </header>
+                                  <div class="slds-card__body slds-text-align--center" style="position:relative;">                                  
+                                    <div class="dingoProgressHldr dingoBkGray"></div>
+                                    <div class="dingoProgress dingoBkPurple" style="{!duplicateScoreProgress}"></div>
+                                  </div>                                  
+                                </article>
+                              </div>
+                              
+                              
+                              
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+                <div style="display: table-row;">
+                    <div style="display: table-cell;">
+                        <div style="margin-left: 230px;">
+                        <div class="slds-text-heading--large" style="padding: 5px;">Suggestions</div>
+                        <div>
+                            <ul id="dingoSuggestions">
+                                <apex:variable var="foo" value="" rendered="{!isCloudingoInstalled == false}">
+                                  <li class="dingoLiBlue"><span class="slds-text-heading--small dingoSuggestionWarning">Install Cloudingo to remove existing duplicate records</span></li>
+                                </apex:variable>
+                                <apex:variable var="foo" value="" rendered="{!dcActiveFilters == '0%'}"> 
+                                <li class="dingoLiGreen"><span class="slds-text-heading--small">Enable DupeCatcher filters </span></li>
+                                </apex:variable>
+                                
+                                 <apex:variable var="foo" value="" rendered="{!requiredFieldsforContact != ''}">
+                                  <li class="dingoLiOrange"><span class="slds-text-heading--small"><apex:outputText value=" {!requiredFieldsforContact}"/></span></li>
+                                 </apex:variable>
+                                 <apex:variable var="foo" value="" rendered="{!requiredFieldsforAccount != ''}">
+                                  <li class="dingoLiOrange"><span class="slds-text-heading--small"><apex:outputText value=" {!requiredFieldsforAccount}"/></span></li>
+                                 </apex:variable>
+                                 <apex:variable var="foo" value="" rendered="{!requiredFieldsforLead != ''}">
+                                  <li class="dingoLiOrange"><span class="slds-text-heading--small"><apex:outputText value=" {!requiredFieldsforLead}"/></span></li>
+                                 </apex:variable>
+                                 
+                                 <apex:variable var="foo" value="" rendered="{!leadFilterCreated == false}">
+                                  <li class="dingoLiLightBlue"><span class="slds-text-heading--small">Create a DupeCatcher Lead Filter.</span></li>
+                                </apex:variable>
+                                <apex:variable var="foo" value="" rendered="{!accountFilterCreated == false}">
+                                  <li class="dingoLiLightBlue"><span class="slds-text-heading--small">Create a DupeCatcher Account Filter.</span></li>
+                                </apex:variable>
+                                <apex:variable var="foo" value="" rendered="{!contactFilterCreated == false}">
+                                  <li class="dingoLiLightBlue"><span class="slds-text-heading--small">Create a DupeCatcher Contact Filter.</span></li>
+                                </apex:variable>
+                               
+                            </ul>
+                        </div>
+                        </div>
+                    </div>                    
+                </div> 
+               
+                <div style="display: table-row;">                    
+                   <div style="display: table-cell; text-align:center;">
+                    
+                   
+                    <apex:outputPanel rendered="{!isCloudingoInstalled == false}" >
+                     <div class="dingoWarning">
+                        <div style="float:left; padding: 0;">
+                            <div class="dingoCardImgContainer"> 
+                                <div class="slds-text-body--regular dingoCardImg">
+                                    <img src="{!URLFOR($Resource.Styles, 'DataQualityWarning.png')}" alt="" id="DataQualityWarning"  title="" />
+                                </div> 
+                            </div>
+                        </div>
+                        <div style="float:left; margin-left: 15px; padding: 0;">
+                            <div class="slds-text-heading--large" style="padding: 5px;">You may have a large number of existing dupes.</div>     
+                                <span class="slds-text-body--regular" style="padding: 5px;">Improve your data quality by eliminating duplicate records you already have (or dedupe mass import files) with DupeCatcher's companion, Cloudingo.</span>
+                            </div>
+                        <div class="dingoTryContainer">                            
+                            <a href="http://cloudingo.com" target="_blank" style="text-decoration: none;">
+                                <span class="dingoTry slds-text-heading--large">
+                                    Try Cloudingo
+                                </span>
+                            </a>                            
+                        </div> 
+                       </div>  
+                    </apex:outputPanel>                         
+                    </div>
+                </div>
+                 
+                 
+                 
+                 <div style="width: 100%; text-align:center; display:inline-block;">
+                        <div style="text-align:left; display: inline-block;">            
+                            <apex:actionRegion id="savebuttonregion"/>
+                            <apex:commandButton styleClass="cloudingoButton slds-button slds-button--neutral" id="savebutton" value="Recalculate" action="{!recalculate}">
+                                 
+                            </apex:commandButton>              
+                        </div>
+                    </div> 
+                   
+                     
+            </div>
+        </body>
+    </html>
+    </apex:pageBlock>
+  <apex:actionPoller action="{!CheckReload}" interval="15" enabled="{!doRefresh}" reRender="PB"/>
+   </apex:form>
+</apex:page>

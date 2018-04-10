@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <webLinks>
+        <fullName>Send_to_Jigsaw</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <encodingKey>UTF-8</encodingKey>
+        <hasMenubar>false</hasMenubar>
+        <hasScrollbars>true</hasScrollbars>
+        <hasToolbar>false</hasToolbar>
+        <height>600</height>
+        <isResizable>true</isResizable>
+        <linkType>url</linkType>
+        <masterLabel>Submit to Jigsaw</masterLabel>
+        <openType>newWindow</openType>
+        <position>none</position>
+        <protected>false</protected>
+        <showsLocation>false</showsLocation>
+        <showsStatus>false</showsStatus>
+        <url>https://crm01.jigsaw.com/SendJigsawContactLogin.xhtml?crm=salesforce&amp;sfctid={!Contact.Id}&amp;cnEmail={!Contact.Email}&amp;cnTitle={!Contact.Title}&amp;cnFirstname={!Contact.FirstName}&amp;cnLastname={!Contact.LastName}&amp;cnPhone={!Contact.Phone}&amp;cnAddress={!Contact.MailingStreet}&amp;cnCity={!Contact.MailingCity}&amp;cnState={!Contact.MailingState}&amp;cnZip={!Contact.MailingPostalCode}&amp;cnCountry={!Contact.MailingCountry}&amp;session={!User.Session_ID}&amp;server={!API.Partner_Server_URL_60}&amp;crmUserId={!$User.Id}&amp;username={!$User.Username}</url>
+    </webLinks>
+    <webLinks>
+        <fullName>Update_from_Jigsaw</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <encodingKey>UTF-8</encodingKey>
+        <height>600</height>
+        <linkType>url</linkType>
+        <masterLabel>Update from Jigsaw</masterLabel>
+        <openType>sidebar</openType>
+        <protected>false</protected>
+        <url>https://crm01.jigsaw.com/UpdateCRMContactLogin.xhtml?crm=salesforce&amp;sfctid={!Contact.Id}&amp;cnEmail={!Contact.Email}&amp;cnTitle={!Contact.Title}&amp;cnFirstname={!Contact.FirstName}&amp;cnLastname={!Contact.LastName}&amp;cnPhone={!Contact.Phone}&amp;cnAddress={!Contact.MailingStreet}&amp;cnCity={!Contact.MailingCity}&amp;cnState={!Contact.MailingState}&amp;cnZip={!Contact.MailingPostalCode}&amp;cnCountry={!Contact.MailingCountry}&amp;session={!User.Session_ID}&amp;server={!API.Partner_Server_URL_60}&amp;crmUserId={!$User.Id}&amp;username={!$User.Username}</url>
+    </webLinks>
+</CustomObject>

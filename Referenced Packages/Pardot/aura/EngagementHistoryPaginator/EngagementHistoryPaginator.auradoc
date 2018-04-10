@@ -1,0 +1,6 @@
+<aura:documentation>
+	<aura:description><p>A <code>pi:EngagementHistoryPaginator</code> component to add pagination.</p></aura:description>
+	<aura:example name="EHPaginationExample" ref="pi:EHPaginationExample" label="Using the pi:EngagementHistoryPaginator Component">
+		<p>Use component <code>pi:EngagementHistoryPaginator</code>.</p>
+	</aura:example>
+</aura:documentation>

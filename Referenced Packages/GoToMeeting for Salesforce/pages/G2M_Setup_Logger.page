@@ -1,0 +1,24 @@
+<apex:page controller="G2M4Force.G2M_Ctrl_SetupLogger">
+    <apex:form >
+      <apex:sectionHeader title="Citrix GoToMeeting® Salesforce Integration"/>
+      <apex:pageBlock mode="edit" title="Logger Administration">
+        <apex:pageBlockButtons >
+            <apex:commandButton action="{!saveLoggerSettings}" value="Save"/>
+            <apex:commandButton action="{!returnToAdmin}" value="Cancel"/>
+        </apex:pageBlockButtons>
+      <apex:pageblockSection title="Notifications" columns="1" id="exceptions">
+         <apex:pageMessages />
+      </apex:pageblockSection>
+      
+      <apex:pageblockSection title="Settings" columns="2" id="loggerSettings" rendered="{!NOT(ISNULL(loggerInstance))}">
+         <apex:inputField value="{!loggerInstance.G2M4Force__enableLoggerEmails__c}"/>
+         <apex:selectList value="{!loggerInstance.G2M4Force__Error_Level__c}" title="Logging Level" size="1">
+            <apex:selectOptions value="{!validLogOptions}"/>
+         </apex:selectList>
+         <apex:inputField value="{!loggerInstance.G2M4Force__LogInDB__c}"/>
+         <apex:inputField value="{!loggerInstance.G2M4Force__UseSystemLog__c}"/>
+          
+      </apex:pageblockSection>
+    </apex:pageBlock>
+ </apex:form>
+ </apex:page>

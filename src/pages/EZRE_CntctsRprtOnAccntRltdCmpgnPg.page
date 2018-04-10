@@ -1,0 +1,49 @@
+<apex:page controller="EZRE_CntctsRprtOnAccntRltdCmpgnCntrllr" id="pg" sidebar="false" readOnly="true" cache="true">
+<apex:outputPanel id="msgoutpnl">
+     <apex:pageMessages id="pgmsg"/> 
+ </apex:outputPanel>
+ <apex:form id="fm">
+ <apex:pageBlock id="pb1" title="Contacts Report">
+ <apex:pageBlockSection >
+<apex:pageBlockSectionItem helpText="Select Rep Name">
+<apex:outputLabel style="font-weight: bold;">Rep Names</apex:outputLabel>
+     <apex:selectList value="{!selectedRep}" multiselect="false" size="1" id="pbsl1" style="margin-left:10PX;">
+     <apex:selectOptions value="{!repNames}">
+     </apex:selectOptions>
+     </apex:selectList>
+</apex:pageBlockSectionItem>
+ <apex:pageBlockSectionItem helpText="Select Campaign">  
+     <apex:outputLabel style="margin-left:55PX;font-weight: bold;">Campaign</apex:outputLabel>
+     <apex:selectList value="{!selectedCampaign}" multiselect="false" size="1" id="pbsl2" style="margin-left:10PX;">
+     <apex:selectOptions value="{!Campaigns}"></apex:selectOptions>
+     </apex:selectList>
+ </apex:pageBlockSectionItem> 
+ </apex:pageBlockSection>
+
+     <apex:pageBlockButtons location="bottom">
+     <apex:commandButton value="Show Report" action="{!mandatoryCheck}"  style="margin-left:150PX;" reRender="outpnl,msgoutpnl"/>
+    
+     </apex:pageBlockButtons>
+     </apex:pageBlock>
+     <apex:outputPanel id="outpnl">
+     <apex:pageBlock rendered="{!(contactsListToShow.size != 0)}" id="pbtbl">
+      <apex:pageBlockButtons location="top">                                   
+         <apex:commandButton value="Export Report" action="{!exportReport}" style="margin-left:150PX;" rendered="{!(contactsListToShow.size != 0)}"/>
+     </apex:pageBlockButtons>
+          <apex:pageblockTable value="{!contactsListToShow}" var="con">  
+          <apex:column headerValue="Account Name" value="{!con.Account.Name}"/>
+          <apex:column headerValue="Account Status" value="{!con.Account.Account_Status__c}"/>
+          <apex:column headerValue="First Name" value="{!con.FirstName}"/>
+          <apex:column headerValue="Last Name" value="{!con.LastName}"/>
+          <apex:column headerValue="Phone" value="{!con.phone}"/>
+          <apex:column headerValue="Mobile" value="{!con.MobilePhone}"/>
+          <apex:column headerValue="Email" value="{!con.Email}"/> 
+          <apex:column headerValue="ODS AWS Status" value="{!con.ODS_AWS_Status__c}" rendered="{!isODSAWS}"/>
+          <apex:column headerValue="Title Insurance Status" value="{!con.Title_Insurance_Status__c}" rendered="{!isTitleInsurance}"/>
+          <apex:column headerValue="Title" value="{!con.Title}"/>
+          <apex:column headerValue="TimeZone" value="{!con.Account.TimeZone__c}"/>
+         </apex:pageblockTable>
+     </apex:pageBlock>
+     </apex:outputPanel>
+ </apex:form>
+</apex:page>

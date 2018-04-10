@@ -1,0 +1,3 @@
+<aura:component description="This component surfaces a lead or contact's recent web activities like website visits, form submissions, and email opens and clicks." implements="flexipage:availableForRecordHome,force:hasRecordId,force:hasSObjectName" access="global" >
+    <pi:EngagementHistoryList componentMode="standard" recordId="{!v.recordId}" sObjectName="{!v.sObjectName}"/>
+</aura:component>

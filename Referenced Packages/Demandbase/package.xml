@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Demandbase</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <description>Demandbase for AppExchange is the first online service that lets you buy sales leads and marketing lists on a pay-as-you-go basis… right from Salesforce.com.</description>
+    <namespacePrefix>Demandbase</namespacePrefix>
+    <types>
+        <members>Lead.Industry__c</members>
+        <members>Lead.Lead_Id__c</members>
+        <members>Lead.Score__c</members>
+        <members>Lead.SubIndustry__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Demandbase</members>
+        <name>CustomTab</name>
+    </types>
+    <types>
+        <members>DemandbaseLogos</members>
+        <name>Document</name>
+    </types>
+    <version>36.0</version>
+</Package>

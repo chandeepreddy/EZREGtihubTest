@@ -1,0 +1,7 @@
+<aura:component controller="pi.PApiController" access="global">
+	<aura:method name="please" action="{!c.doCommand}" access="global">
+		<aura:attribute name="command" type="String"/>
+		<aura:attribute name="args" type="Object"/>
+		<aura:attribute name="callback" type="Object"/>
+	</aura:method>
+</aura:component>

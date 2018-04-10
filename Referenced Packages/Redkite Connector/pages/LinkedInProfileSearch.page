@@ -1,0 +1,227 @@
+<apex:page id="page" controller="RK_LinkedIn.LinkedInProfileSearchController" standardStylesheets="false" sidebar="false" showHeader="true"
+	title="LinkedIn Profile Search">
+	<meta http-equiv="p3p" content="CP='IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT'" />
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+	<script type="text/javascript" src="{!$Resource.jquery_loadmask_min_js}"></script>
+	<script type="text/javascript" src="{!$Resource.LinkedInConnectorCookieLib_js}"></script>
+	<style type="text/css">
+	h1{ font-family:Arial, Helvetica, sans-serif; }
+	p{ margin:0; }
+	</style>
+	<style type="text/css">
+	@import url('{!URLFOR($Resource.LinkedInConnectorResources, "css/jquery.loadmask.css")}');
+	@import url('{!URLFOR($Resource.LinkedInConnectorResources, "css/connectorBase.css")}');
+	@import url('{!URLFOR($Resource.LinkedInConnectorResources, "css/searchPage.css")}');
+	@import url('{!URLFOR($Resource.LinkedInConnectorResources, "css/profile.css")}');
+	</style>
+
+	<apex:form id="form">
+		<!--  Common OAuth Markup / javascript -->
+		<apex:actionFunction action="{!setControllerValues}" name="setControllerValues" reRender="ControllerValues, leftSidebar, searchResults"
+			onComplete="storeToken();">
+			<apex:Param name="cookie" assignTo="{!tokenCookie}" value="" />
+			<apex:Param name="sfdcPod" assignTo="{!sfdcPod}" value="" />
+		</apex:actionFunction>
+		<apex:actionFunction action="{!getSearchResultsPaged}" name="getSearchResultsPaged" reRender="searchResults"
+		    onComplete="jQuery('#searchResultsArea').unmask();">
+			<apex:Param name="startIndex" assignTo="{!startIndex}" value="" />
+		</apex:actionFunction>
+		<apex:panelGrid id="ControllerValues"  columns="10" width="100%">
+			<apex:inputHidden id="AuthUrl" value="{!linkedInAuthURL}"/>
+			<apex:inputHidden id="OAuthTokenCookie" value="{!tokenCookieReadOnly}"/>
+		</apex:panelGrid>
+		<script type="text/javascript">
+			var DEBUG = false;
+			
+			jQuery.noConflict();
+			jQuery(document).ready(function(){
+				setupController();
+			});
+			
+			function setupController(){
+				var rkLinkedInCookie = getCookie("RK_LinkedIn");
+				setControllerValues(rkLinkedInCookie, "https://"+document.location.hostname);
+			}
+			function storeToken(){
+				if (DEBUG) alert('store token-begin');
+				var cookieHidden = document.getElementById("{!$Component.OAuthTokenCookie}");
+				// Set cookie - Cookie Name, Value, Expiration in Days, and relative scope of the cookie
+				if (DEBUG) alert('store token:'+cookieHidden.value);
+				setCookie('RK_LinkedIn', cookieHidden.value, 1461, '/');
+				if (DEBUG) alert('store token-complete');
+			}
+			function openAuthWindow(){
+				if (DEBUG) alert('Open auth window');
+				var urlHidden =  document.getElementById("{!$Component.AuthUrl}");
+				//window.open(urlHidden.value,"","status=1,location=1,height=400,width=500" );
+				parent.top.location.href = urlHidden.value;
+			}
+		</script>
+		<!--  END - Common OAuth Markup / javascript -->
+
+		<div id="page-content">
+			<c:LinkedInPageHeader title="{!$Label.rk_linkedin__Search_Title}" />
+			<table><tr>
+			<td class="left-sidebar">
+			<apex:outputPanel id="leftSidebar">
+				<apex:outputPanel id="searchCriteria" styleClass="search-criteria" layout="block">
+					<div id="searchCriteriaHeader" class="box-list-header box-pad search-list-header">
+						<div class="search-list-header-text">{!$Label.Search_SearchCriteria_Title}</div>
+					</div>
+					<div class="search-criteria-content box-list-body box-list-body-pad">
+						<div class="search-criteria-input">
+							<label for="{!$Component.firstname}">{!$Label.Search_SearchCriteria_SearchFirstName}</label>
+							<apex:inputText id="firstname" value="{!firstName}"/>
+							<label for="{!$Component.lastname}">{!$Label.rk_linkedin__Search_SearchCriteria_SearchLastName}</label>
+							<apex:inputText id="lastname" value="{!lastName}"/>
+							<label for="{!$Component.company}">{!$Label.rk_linkedin__Search_SearchCriteria_SearchCompany}</label>
+							<apex:inputText id="company" value="{!company}"/>
+							<label for="{!$Component.title}">{!$Label.rk_linkedin__Search_SearchCriteria_SearchTitle}</label>
+							<apex:inputText id="title" value="{!title}"/>
+							<!-- 
+							<label for="{!$Component.country}">Country</label>
+							<apex:inputText id="country" value="{!country}"/>
+							<label for="{!$Component.postalcode}">Postal Code</label>
+							<apex:inputText id="postalcode" value="{!postalCode}"/>
+							 -->
+							<label for="{!$Component.keywords}">{!$Label.Search_SearchCriteria_SearchKeywords}</label>
+							<apex:inputText id="keywords" value="{!keywords}"/>
+						</div>
+						<div id="searchButtonArea" >
+							<apex:CommandLink styleClass="connector-button search-button" value="{!$Label.rk_linkedin__Search_SearchCriteria_ButtonLabel}" 
+								action="{!getSearchResults}" reRender="searchResults, ControllerValues, leftSidebar" 
+								onClick="jQuery('#searchResultsArea').mask('{!$Label.rk_linkedin__Search_SearchCriteria_ButtonLoadingMessage}');" 
+								onComplete="storeToken();jQuery('#searchResultsArea').unmask();" />
+						</div>
+					</div>
+				</apex:outputPanel>
+			</apex:outputPanel>
+			</td>
+<!--  LinkedIn Search Results -->
+			<td class="search-results">
+			<apex:outputPanel id="searchResults" layout="block"><div id="searchResultsArea">
+				<apex:messages />
+
+	<!--  LinkedIn Authorization Content -->
+				<apex:outputPanel rendered="{!showLogin}" layout="block" styleClass="actionable-area box-fill">
+				<div class="actionable-area-content">
+					<apex:outputPanel rendered="{!showTokenInvalid}" layout="block">
+						<apex:outputText escape="false" value="{!$Label.rk_linkedin__Auth_ExpiredToken}"/>
+					</apex:outputPanel>
+					<apex:outputText escape="false" value="{!$Label.rk_linkedin__Auth_LoginMessage}"/>
+					<div class="actionable-area-action">
+						<apex:CommandLink action="{!initiatieLinkedInLogin}" reRender="ControllerValues" 
+							onComplete="storeToken();openAuthWindow();">
+							<img alt="{!$Label.Auth_LoginButton}"
+								src="{!URLFOR($Resource.LinkedInConnectorResources,'image/log-in-linkedin-small.png')}"/>
+						</apex:CommandLink>
+					</div>
+				</div>
+				</apex:outputPanel>
+	<!-- End LinkedIn Authorization Content -->
+	
+	<!--  LinkedIn Search Error -->
+				<apex:outputPanel rendered="{!showErrorOccurred}">
+					<div class="actionable-area box-fill">
+					<div class="actionable-area-content">
+						<div><apex:outputText escape="false" value="{!$Label.rk_linkedin__Error_GenericMessage}" /></div>
+						<div class="error-show-detail-link-div actionable-area-action">
+							<apex:outputLink value="#" onClick="jQuery('#ErrorDetailDiv').slideToggle();return false;" >{!$Label.rk_linkedin__Error_ShowDetailLink}</apex:outputLink>
+						</div>
+					</div>
+					</div>
+					<div id="ErrorDetailDiv" style="display:none">
+						<div class="error-detail-div box-list-body box-pad"><pre>
+{!errorDetail}
+						</pre></div>
+					</div>
+				</apex:outputPanel>
+	<!--  End LinkedIn Search Error -->
+
+	<!--  LinkedIn Search Error -->
+				<apex:outputPanel rendered="{!showThrottleReached}" layout="block" styleClass="actionable-area box-fill">
+				<div class="actionable-area-content">
+					<div><apex:outputText escape="false" value="{!$Label.rk_linkedin__Search_APILimit}" /></div>
+				</div>
+				</apex:outputPanel>
+	<!--  End LinkedIn Search Error -->
+
+	<!--  Search Header -->
+				<apex:outputPanel rendered="{!showSearchHeader}"><div id="resultsHeader" class="box-fill box-pad search-list-header">
+					<div id="resultsHeaderButtons" class="action-buttons">
+						<apex:CommandLink id="useExistingProfile" styleClass="connector-button" target="_top" rendered="{!reLink}"
+							action="{!navigateToContact}" value="{!$Label.rk_linkedin__Search_SearchResultsHeader_KeepProfile}" />
+
+						<apex:CommandLink id="dontLinkButton" styleClass="connector-button" target="_top"
+							onClick="if ({!reLink}){ return confirm('{!$Label.rk_linkedin__Search_SearchResultsHeader_UnlinkConfirmMessage}'); } " 
+							action="{!reLinkAndNavigateToContact}" value="{!$Label.rk_linkedin__Search_SearchResultsHeader_Unlink}" />
+					</div>
+					<div id="resultsHeaderMessage" class="search-list-header-text">
+						<apex:outputText escape="false" value="{!$Label.rk_linkedin__Search_SearchResultsHeader_Title}" >
+							<apex:param value="{!contactId}" />
+							<apex:param value="{!initialFirstName}" />
+							<apex:param value="{!initialLastName}" />
+						</apex:outputText>
+					</div>
+				</div></apex:outputPanel>
+	<!--  End Search Header -->
+
+	<!--  Actual Search Results -->
+				<apex:outputPanel rendered="{!searchResults.size>0}" styleClass="search-results-body" layout="block">
+					<apex:repeat value="{!searchResults}" var="PersonProfile">
+						<div class="result box-pad">
+							<div  class="action-buttons">
+								<apex:commandLink value="{!$Label.rk_linkedin__Search_SearchResults_Link}" styleClass="connector-button" target="_top" 
+									rendered="{!reLink==false}"	action="{!PersonProfile.linkToContact}"/>
+								<apex:commandLink value="{!$Label.rk_linkedin__Search_SearchResults_Relink}" styleClass="connector-button" target="_top" 
+									onClick="return confirm('{!$Label.rk_linkedin__Search_SearchResults_RelinkConfirmMessage}');" 
+									rendered="{!reLink}" action="{!PersonProfile.relinkToContact}"/>
+							</div>
+							<c:LinkedInPersonProfileBasicInfo person="{!PersonProfile}" />
+						</div>
+					</apex:repeat>
+
+	<!--  LinkedIn Search Paging -->
+					<apex:outputPanel id="searchPaging" rendered="{!showSearchPaging}">
+						<div class="result-paging">
+							{!$Label.rk_linkedin__Search_SearchResults_PagingPage}
+							<apex:outputPanel rendered="{!startIndex!=0}">
+								<a href="#" onClick="jQuery('#searchResultsArea').mask('{!$Label.rk_linkedin__Search_SearchResults_PagingLoadMessage}');getSearchResultsPaged({!(startIndex-pagingSize)});return false;">
+									<strong>{!$Label.rk_linkedin__Search_SearchResults_PagingPrevious}</strong>
+								</a>
+							</apex:outputPanel>
+							<apex:repeat value="{!pageStartIndicies}" var="index">
+								<apex:outputPanel rendered="{!index==startIndex}">
+									<strong>{!((index/pagingSize)+1)}</strong> 
+								</apex:outputPanel>			
+								<apex:outputPanel rendered="{!index!=startIndex}">
+									<a href="#" onClick="jQuery('#searchResultsArea').mask('{!$Label.rk_linkedin__Search_SearchResults_PagingLoadMessage}');getSearchResultsPaged({!index});return false">
+										{!((index/pagingSize)+1)}
+									</a>
+								</apex:outputPanel>			
+							</apex:repeat>
+							<apex:outputPanel rendered="{!startIndex+pagingSize<resultSize}">
+								<a href="#" onClick="jQuery('#searchResultsArea').mask('{!$Label.rk_linkedin__Search_SearchResults_PagingLoadMessage}');getSearchResultsPaged({!(startIndex+pagingSize)});return false;">
+									<strong>{!$Label.rk_linkedin__Search_SearchResults_PagingNext}</strong>
+								</a>
+							</apex:outputPanel>
+						</div>
+					</apex:outputPanel>
+				</apex:outputPanel>
+	<!--  LinkedIn Search Paging -->
+
+	<!--  LinkedIn Search No Results -->
+				<apex:outputPanel styleClass="no-results" rendered="{!showNoResults}">
+					<apex:outputText escape="false" value="{!$Label.rk_linkedin__Search_SearchResults_NoResults}" />
+					<div class="last">&nbsp;</div>
+				</apex:outputPanel>
+	<!--  End LinkedIn Search No Results -->
+			</div></apex:outputPanel>
+			</td>
+			
+			</tr></table>
+<!--  End LinkedIn Search Results -->
+
+		</div>
+	</apex:form>
+</apex:page>

@@ -1,0 +1,25 @@
+.THIS .bBody {
+    padding: .5rem;
+    position: relative;
+}
+
+.THIS.uiMessage.warning {
+    border-color: #FFB75D;
+    background-color: #FFF3E4;
+}
+
+.THIS .slds-icon_container[class*="slds-icon-utility-"] {
+    padding-right: .75em;
+}
+
+.THIS .slds-icon-utility-warning .slds-icon {
+    margin-top: -1px;
+}
+
+.THIS.warning .slds-icon {
+    fill: #FFB75D;
+}
+
+.THIS.error .slds-icon {
+    fill: #f2a199;
+}

@@ -1,0 +1,277 @@
+<apex:component controller="ODS_DocumentUploadController">
+         <apex:attribute name="AccountServiceId" type="String" description="Account Serice Id"/>
+         <apex:attribute name="DocumentSuffix" type="String" description="Document Suffix"/>
+         <apex:attribute name="DragDropHeight" type="String" description="Height in Pixel for Drag and Drop Section"/>  
+         <apex:attribute name="FolderId" type="String" description="Folder Id"/>  
+         <apex:attribute name="AccountID" type="String" description="Account Id"/>  
+    <style>
+        #holder { 
+            
+            width: 98%; 
+            height:95%;  
+            
+            -webkit-border-radius: 8px 8px 8px 8px;
+            border-radius: 8px 8px 8px 8px;
+            text-align: center; 
+            }
+        #holder span, #uploadCompleted span { 
+            position: relative;
+            top: 11%;
+            transform: translateY(-50%);
+            text-shadow: 2px 2px 2px #525252;
+            font-size:2em;
+            color:#A3A3A3; 
+            }  
+        #holder.hover { border: 2px dashed #636363; }
+   
+        #uploadStatus span{  
+            text-shadow: 2px 2px 2px #525252;
+            font-size:1em;
+             }
+        
+        #holder p { margin: 10px; font-size: 14px; }
+        progress { width: 100%;  height:2em;  }  
+        .fail { background: #c00; padding: 2px; color: #fff; }
+        .hidden { display: none;}
+        .dragDropComponentSize{ height:{!DragDropHeight} ; }
+    </style>
+
+<article class="dragDropComponentSize" id="dndContainer">
+    <div id="holder" ><apex:image value="{!URLFOR($Resource.ODS_NewAssets,'images/upload.png')}" styleClass="icon-f"/>
+        <span id="holder_txt1"></span><br/> <p id="dragDropId" style="font-weight: bold;"><strong>Drag and Drop file here  </strong></p>
+         <span  id="holder_txt2" class="hidden"> </span>
+    </div> 
+    <p id="upload" class="hidden"><label>Drag &amp; drop not supported by your browser, but you can still upload via this input field:<br /><input type="file" /></label></p>
+    <br/><p id="filereader">This feature is available only in the following browsers (Google Chrome, Firefox, IE Edge). <br/>For other browser versions, please upload via Manual upload.</p>
+    <p id="formdata"></p>
+    <p id="progress"></p>
+    <p id="uploadStatus" class="hidden"><span>Upload progress:</span> <progress id="uploadprogress" min="0" max="100" value="0">0</progress></p> 
+</article>
+<script type="text/javascript" >
+
+    var holder = document.getElementById('holder');
+    var holder_txt1 = document.getElementById('holder_txt1');
+    var holder_txt2 = document.getElementById('holder_txt2');
+    var uploadStatus = document.getElementById('uploadStatus'); 
+
+    //var sfdcHostName =window.location.host.split('.')[1]; 
+    
+    
+    var sfdcHostName = '{!$Label.ODS_SfdcUrl}';
+
+    tests = {
+      filereader: typeof FileReader != 'undefined',
+      dnd: 'draggable' in document.createElement('span'),
+      formdata: !!window.FormData,
+      progress: "upload" in new XMLHttpRequest
+    }, 
+    support = {
+      filereader: document.getElementById('filereader'),
+      formdata: document.getElementById('formdata'),
+      progress: document.getElementById('progress')
+    }, 
+    progress = document.getElementById('uploadprogress'),
+    fileupload = document.getElementById('upload');
+
+"filereader formdata progress".split(' ').forEach(function (api) {
+  if (tests[api] === false) {
+  debugger;
+    support['filereader'].className = 'fail';
+    return;
+  } else { 
+    support[api].className = 'hidden';
+  }
+});
+ 
+
+function textBeforeDrag(flag){
+    if(flag)
+    {
+        holder_txt1.className = '';
+        holder_txt2.className = 'hidden';
+    }else{
+        holder_txt1.className = 'hidden';
+        holder_txt2.className = '';
+    }
+}
+
+function resetAll()
+{
+    holder.className = holder_txt1.className = '';  
+    holder_txt2.className = uploadStatus.className = 'hidden';
+}
+
+function readfiles(files) { 
+        var formData = tests.formdata ? new FormData() : null;
+      
+      //Not sure why multiple files dropping, so for time being disable multi file functionality
+      if(files.length > 1)
+      {
+          alert('Multi Upload is not supported, please try to upload single file');
+          return;
+      }
+
+    for (var i = 0; i < files.length; i++) {
+        
+        if(parseFloat(files[0].size / 1024).toFixed(2) > 5000){
+              alert("File size is greater than 5MB");
+              resetAll();
+              return false;
+         }
+         var fileEncodedNameTemp = files[i].name;
+         var fileTypeTemp = fileEncodedNameTemp .substring(fileEncodedNameTemp .lastIndexOf(".")+1);
+          
+         var isValidFileType = true;
+         var validFiles = '{!$Label.ODS_DocumentExtenstion}';
+             var splitFileExtensions = validFiles.split(',');
+             var fileExtension = fileTypeTemp;
+             for(var j = 0; j < splitFileExtensions .length; j++) {
+                           
+                 if(fileExtension == splitFileExtensions[j])
+                 {
+                     isValidFileType = true;
+                     break;
+                 }
+                 else
+                 {
+                      isValidFileType = false;
+                    
+                 }
+            }   
+            
+            if(isValidFileType == false)
+            {
+                alert("Invalid File Type");
+                resetAll();
+                return false;
+            }     
+            var accountServiceId = '{!DocumentSuffix}';
+            var attachmentName = accountServiceId+'_'+files[i].name;
+            //alert(attachmentName);
+            Visualforce.remoting.Manager.invokeAction(
+            
+            '{!$RemoteAction.ODS_DocumentUploadController.ValidateAttachmentName}',
+            
+            attachmentName,
+            
+            function(result, event){
+                            debugger;
+            
+                if (event.status) {
+                    
+                    if(result=="false"){
+                        uploadStatus.className = '';  
+        holder.className = 'hidden';
+        // now post a new XHR request
+        if (tests.formdata) {
+          var xhr = new XMLHttpRequest();
+          
+          var fileEncodedName = encodeURIComponent(files[0].name);
+          var fileType = fileEncodedName.substring(fileEncodedName.lastIndexOf(".")+1);
+          var fileName = fileEncodedName.replace(fileEncodedName.substring(fileEncodedName.lastIndexOf(".")), '');
+          var sfdcurl = 'https://'+sfdcHostName+'.salesforce.com/services/apexrest/ODS_DragAndDrop/v1?FileName='+fileEncodedName+'&DocName='+fileName+'&cType='+encodeURIComponent(files[0].type)+'&AccountService={!AccountServiceId}&AccountId={!AccountID}&ParentId={!FolderId}&ContentType='+fileType;
+          
+        
+          
+          xhr.open('POST','/services/proxy' );
+          
+          //xhr.setRequestHeader("Content-type",'multipart/form-data');
+          //xhr.setRequestHeader("Content-type",''); 
+          xhr.setRequestHeader("Authorization","Bearer {!$Api.Session_ID}");
+          xhr.setRequestHeader('SalesforceProxy-Endpoint', sfdcurl);
+          xhr.setRequestHeader('X-User-Agent', 'DragAndDropAPI v1.0');
+           
+          xhr.onload = function() { 
+          debugger;
+            progress.value = progress.innerHTML = 100; 
+            //resetAll();
+          };
+          
+          if (tests.progress) {
+              
+              xhr.upload.onprogress = function (event) {
+              if (event.lengthComputable) {
+                var complete = (event.loaded / event.total * 100 | 0);
+                progress.value = progress.innerHTML = complete;
+                debugger;
+                if(progress.value == '100')
+                {
+                    alert('File Uploaded Successfully');
+                    resetAll();
+                    RefreshTheDocuments();
+                }    
+              }
+            }
+          }
+          
+          xhr.onreadystatechange=function()
+            {
+                if (xhr.readyState==4 && xhr.status != 200)
+                {
+                    if(xhr.responseText)
+                        alert(xhr.responseText);
+                    else
+                        alert('Some error occurred while uploading file');
+                        
+                     console.log(xhr);
+                }
+            }
+    
+          xhr.send(files[0]);
+        } 
+                    }
+                    else{
+                        alert('Attachment name already exists');
+                         resetAll();
+                        return false;
+                        
+                    }
+                    
+                } else if (event.type === 'exception') {
+            
+                    alert('Exception Occured');
+            
+                } else {
+            
+                    alert('Exception Occured');
+            
+                }
+            
+            },
+            
+            {escape: true}
+            
+            );
+         
+         
+        
+    }
+}
+
+if (tests.dnd) { 
+  holder.ondragover = function () { 
+        this.className = 'hover'; 
+        textBeforeDrag(false); 
+        return false; 
+      };
+  holder.ondragend = function () { 
+        this.className = ''; 
+        textBeforeDrag(true); 
+        return false; 
+      };
+  holder.ondrop = function (e) {
+        textBeforeDrag(true);
+        this.className = '';
+        
+        e.preventDefault();
+        readfiles(e.dataTransfer.files);
+  }
+} else {
+        fileupload.className = 'hidden';
+        fileupload.querySelector('input').onchange = function () {
+        readfiles(this.files);
+  };
+}
+
+</script>
+</apex:component>

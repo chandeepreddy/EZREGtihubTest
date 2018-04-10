@@ -1,0 +1,7 @@
+<apex:page Controller="CandidatesWithResume"  contentType="text/csv#CandidatesDetails.csv" action="{!updatecanddiates}">
+"CandidateId","FirstName","LastName","Home Phone","Work Phone","Mobile Phone","Email Id","Resume Id","Resume Name","File Extension"
+
+ <apex:repeat value="{!lstWrapper}" var="con">
+  {!con.Cand.Id},{!con.cand.Name},{!con.cand.Last_Name__c},{!con.cand.Home_Phone_No__c},{!con.cand.Work_Phone_No__c},{!con.cand.Mobile_Phone_No__c},{!con.cand.Email__c},{!con.cont.Id},{!con.cont.Title},{!con.cont.FileExtension}
+ </apex:repeat>
+ </apex:page>

@@ -1,0 +1,5 @@
+<apex:page controller="ODS_DashboardRedirect" action="{!RedirectDashboardPage}" showHeader="false" sidebar="false">
+ <apex:form > 
+   <c:ODS_HeaderComponent />
+ </apex:form>      
+</apex:page>

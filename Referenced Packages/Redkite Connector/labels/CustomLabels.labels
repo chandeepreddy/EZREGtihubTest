@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Auth_ExpiredToken</fullName>
+        <categories>Authorization</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Expired OAuth Token message</shortDescription>
+        <value>Authorization has expired for the Redkite in|force Connector.</value>
+    </labels>
+    <labels>
+        <fullName>Auth_LoginButton</fullName>
+        <categories>Authorization</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The button label for the LinkedIn Log on message</shortDescription>
+        <value>in® | Log in with LinkedIn®</value>
+    </labels>
+    <labels>
+        <fullName>Auth_LoginMessage</fullName>
+        <categories>Authorization</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The message asking users to Log into LinkedIn</shortDescription>
+        <value>Please authorize the in|force Connector to access your LinkedIn® network.</value>
+    </labels>
+    <labels>
+        <fullName>Config_APIKeys_NonAdminUser</fullName>
+        <categories>Config, API Keys</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Message shown when a non admin user tries to Save the config w/o API Keys</shortDescription>
+        <value>Please ask your Salesforce Administrator to enter these values.</value>
+    </labels>
+    <labels>
+        <fullName>Config_APIKeys_NotShown</fullName>
+        <categories>Config, API Keys</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Generic message telling user that entered API Keys are not shown</shortDescription>
+        <value>For security reasons, previously entered Api and Secret keys are not displayed.</value>
+    </labels>
+    <labels>
+        <fullName>Config_APIKeys_Required</fullName>
+        <categories>Config, API Keys</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Generic message telling user that API Keys are required</shortDescription>
+        <value>LinkedIn® Api Key and LinkedIn® Secret Key must both be entered.</value>
+    </labels>
+    <labels>
+        <fullName>Config_Cache_Limits</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>n/a</shortDescription>
+        <value>n/a</value>
+    </labels>
+    <labels>
+        <fullName>Config_Link_DeploymentGuide_Label</fullName>
+        <categories>Config, Link</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link label for Deployment Guide</shortDescription>
+        <value>Deployment Guide</value>
+    </labels>
+    <labels>
+        <fullName>Config_Link_DeploymentGuide_Title</fullName>
+        <categories>Config, Link</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link title for Deployment Guide</shortDescription>
+        <value>in|force Connector Installation Instructions</value>
+    </labels>
+    <labels>
+        <fullName>Config_Link_FAQ_Label</fullName>
+        <categories>Config, Link</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link label for FAQ</shortDescription>
+        <value>Frequently Asked Questions</value>
+    </labels>
+    <labels>
+        <fullName>Config_Link_FAQ_Title</fullName>
+        <categories>Config, Link</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link title for FAQ</shortDescription>
+        <value>in|force Connector FAQ</value>
+    </labels>
+    <labels>
+        <fullName>Config_Link_Footer</fullName>
+        <categories>Config, Link</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Config page message at the footer of the Links section</shortDescription>
+        <value>&lt;p style=&quot;color:#999;&quot;&gt;* All links point to pages at &lt;a href=&quot;http://redkitetechnologies.com&quot; target=&quot;_blank&quot;&gt;redkitetechnologies.com&lt;/a&gt; and will open in a new tab or window.&lt;/p&gt;</value>
+    </labels>
+    <labels>
+        <fullName>Config_Link_Overview_Label</fullName>
+        <categories>Config, Link</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link label for Overview</shortDescription>
+        <value>Overview</value>
+    </labels>
+    <labels>
+        <fullName>Config_Link_Overview_Title</fullName>
+        <categories>Config, Link</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link title for Overview</shortDescription>
+        <value>in|force Connector Overview</value>
+    </labels>
+    <labels>
+        <fullName>Config_Nonadmin_ChangeConfig</fullName>
+        <categories>Config, Nonadmin</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Config page message shown to a non-admin user (after initial setup)</shortDescription>
+        <value>Please contact your organization&apos;s System Administrator to make any configuration changes to the in|force Connector.</value>
+    </labels>
+    <labels>
+        <fullName>Config_Nonadmin_InitialConfig</fullName>
+        <categories>Config, Nonadmin</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Config page message shown to a non-admin user (before initial setup)</shortDescription>
+        <value>Please contact your organization&apos;s System Administrator to complete deployment of the in|force Connector.</value>
+    </labels>
+    <labels>
+        <fullName>Config_PageTitle</fullName>
+        <categories>Config</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title for Config Page</shortDescription>
+        <value>in|force Connector: Configuration</value>
+    </labels>
+    <labels>
+        <fullName>Config_SectionHeader_Description</fullName>
+        <categories>Config</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Description for the Config Page Section Header</shortDescription>
+        <value>The in|force Connector combines the power of Salesforce.com&apos;s leading CRM functionality with the wealth of information available in LinkedIn®.</value>
+    </labels>
+    <labels>
+        <fullName>Config_SectionHeader_Subtitle</fullName>
+        <categories>Config</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Subtitle for the Config Page Section Header</shortDescription>
+        <value>Redkite in|force Connector</value>
+    </labels>
+    <labels>
+        <fullName>Config_SectionHeader_Title</fullName>
+        <categories>Config</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title for the Config Page Section Header</shortDescription>
+        <value>Configuration</value>
+    </labels>
+    <labels>
+        <fullName>Config_Settings_APIKeys_PubKey_Helptext</fullName>
+        <categories>Config, Settings</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Config settings Public API Key Helptext</shortDescription>
+        <value>Because LinkedIn® limits the number of times per day an application can make calls to its API — controlled by the API key — each organization must have its own API key. For more information on API keys, see the deployment guide.</value>
+    </labels>
+    <labels>
+        <fullName>Config_Settings_APIKeys_PubKey_Label</fullName>
+        <categories>Config, Settings</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Config settings Public API Key Field Label</shortDescription>
+        <value>LinkedIn® Api Key</value>
+    </labels>
+    <labels>
+        <fullName>Config_Settings_APIKeys_SecretKey_Helptext</fullName>
+        <categories>Config, Settings</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Config settings Secret API Key Helptext</shortDescription>
+        <value>LinkedIn® Secret Key to accompany the LinkedIn® API Key. See the deployment guide for more info.</value>
+    </labels>
+    <labels>
+        <fullName>Config_Settings_APIKeys_SecretKey_Label</fullName>
+        <categories>Config, Settings</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Config settings Secret API Key Field Label</shortDescription>
+        <value>LinkedIn® Secret Key</value>
+    </labels>
+    <labels>
+        <fullName>Config_Settings_APIKeys_Title</fullName>
+        <categories>Config, Settings</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Config settings API Keys subsection title</shortDescription>
+        <value>LinkedIn® Api Keys</value>
+    </labels>
+    <labels>
+        <fullName>Config_Settings_Button_Cancel</fullName>
+        <categories>Config, Settings</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label of Config Settings Cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Config_Settings_Button_ReEnterApiKeys</fullName>
+        <categories>Config, Settings</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label of Config Settings &quot;Re-enter API Keys&quot; button</shortDescription>
+        <value>Re-Enter LinkedIn® API Keys</value>
+    </labels>
+    <labels>
+        <fullName>Config_Settings_Button_Save</fullName>
+        <categories>Config, Settings</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label of Config Settings Save button</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Config_Settings_Title</fullName>
+        <categories>Config, Settings</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title of the Config Settings Section</shortDescription>
+        <value>Configuration Settings</value>
+    </labels>
+    <labels>
+        <fullName>Config_UpdateSuccessful</fullName>
+        <categories>Config</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Message shown when config have been updated</shortDescription>
+        <value>in|Force Connector Settings Updated</value>
+    </labels>
+    <labels>
+        <fullName>Error_GenericMessage</fullName>
+        <categories>Error</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Generic error message shown to user</shortDescription>
+        <value>An error has occurred connecting to LinkedIn®.  Please try again later or contact your System Administrator for further assistance.</value>
+    </labels>
+    <labels>
+        <fullName>Error_MissingConfig</fullName>
+        <categories>Error</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Exception message when the configuration record is missing</shortDescription>
+        <value>Configuration for the in|force Connector could not be found.  Please ask your Salesforce Administrator for assistance.</value>
+    </labels>
+    <labels>
+        <fullName>Error_ShowDetailLink</fullName>
+        <categories>Error</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for &quot;Show Error Detail&quot; link</shortDescription>
+        <value>Show Error Detail &gt;</value>
+    </labels>
+    <labels>
+        <fullName>Header_LinkedInLogo_Alt</fullName>
+        <categories>Header</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Alt value for LinkedIn Logo in Common Header</shortDescription>
+        <value>LinkedIn®</value>
+    </labels>
+    <labels>
+        <fullName>Header_RedKiteLogo_Alt</fullName>
+        <categories>Header</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Alt value for Redkite Logo in Common Header</shortDescription>
+        <value>Redkite</value>
+    </labels>
+    <labels>
+        <fullName>Info_LinkedIn_Data</fullName>
+        <categories>Info</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Notice to users letting them know tat the data is from LinkedIn</shortDescription>
+        <value>All LinkedIn® profile information is supplied by LinkedIn®.  The in|force Connector is provided by Redkite and is not affiliated in any way with LinkedIn®.</value>
+    </labels>
+    <labels>
+        <fullName>Profile_APILimit_NoProfile</fullName>
+        <categories>Profile, APILimit</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>API Limit message shown when contact has a link but no cached profile info</shortDescription>
+        <value>You have reached the LinkedIn® View Profile usage limit for today. Please retry this action tomorrow.&lt;br/&gt;
+&lt;br/&gt;
+LinkedIn® limits the number of new/refreshed Profiles you can view per day.</value>
+    </labels>
+    <labels>
+        <fullName>Profile_APILimit_RefreshPopup</fullName>
+        <categories>Profile, APILimit</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Message contained in a popup when user refreshes hits the profile API limit</shortDescription>
+        <value>Could not refresh the LinkedIn® Profile. The existing Profile data is displayed.\n\nYou have reached the LinkedIn® View Profile usage limit for today. Please retry this action tomorrow.\n\nLinkedIn® limits the number of new/refreshed Profiles you can view per day.</value>
+    </labels>
+    <labels>
+        <fullName>Profile_APILimit_ShowingSearchResults</fullName>
+        <categories>Profile, API Limit, Footer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Footer message displayed when a user receives an API Profile Limit after search</shortDescription>
+        <value>You have reached the LinkedIn® View Profile usage limit for today.&lt;br/&gt;
+LinkedIn® limits the number of new/refreshed Profiles you can view per day.&lt;br/&gt;
+&lt;br/&gt;
+This profile is currently displaying limited data and will be automatically refreshed when possible.</value>
+    </labels>
+    <labels>
+        <fullName>Profile_AddToYourNetwork</fullName>
+        <categories>Profile</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link label for the &quot;Add to your network&quot; link</shortDescription>
+        <value>Add {0} to your network</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Connections_LinkTitle</fullName>
+        <categories>Profile, Connections</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The hover text for a link to contact</shortDescription>
+        <value>View contact in Salesforce</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Connections_TargetsConections</fullName>
+        <categories>Profile, Connections</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for profile&apos;s connections shown when the Profile is a 3rd level contact</shortDescription>
+        <value>{0}&amp;#39;s connections</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Connections_Title</fullName>
+        <categories>Profile, Connections</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title for the connections section</shortDescription>
+        <value>How you&amp;#39;re connected to {0}</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Connections_ViewAllInLinkedIn</fullName>
+        <categories>Profile, Connections</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for link to view all connections in LinkedIn</shortDescription>
+        <value>see all {0} connections in LinkedIn®</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Connections_You</fullName>
+        <categories>Profile, Connections</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The &quot;You&quot; title at the top of the Connections info</shortDescription>
+        <value>You</value>
+    </labels>
+    <labels>
+        <fullName>Profile_FindProfileLink</fullName>
+        <categories>Profile, FindPrompt</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>link contact to a profile prompt&apos;s link label</shortDescription>
+        <value>Click to Find LinkedIn® Profile</value>
+    </labels>
+    <labels>
+        <fullName>Profile_FindProfileMessage</fullName>
+        <categories>Profile, FindPrompt</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Ask user to link contact to a profile</shortDescription>
+        <value>To view LinkedIn® information, please find a matching LinkedIn® Profile.</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Footer_ProfileAsOf</fullName>
+        <categories>Profile, Footer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>n/a</shortDescription>
+        <value>{0}</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Footer_Refresh</fullName>
+        <categories>Profile, Footer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link label for &quot;Refresh&quot; link</shortDescription>
+        <value>Refresh</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Footer_RefreshLoadMessage</fullName>
+        <categories>Profile, Footer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The &quot;Loading&quot; message while refresh is working</shortDescription>
+        <value>Refreshing...</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Footer_SearchLink</fullName>
+        <categories>Profile, Footer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link label for the &quot;Search Linked In&quot; link</shortDescription>
+        <value>Search LinkedIn®</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Footer_SearchMessage</fullName>
+        <categories>Profile, Footer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Message before the &quot;Search Linked In&quot; link</shortDescription>
+        <value>Not the right LinkedIn® Profile?</value>
+    </labels>
+    <labels>
+        <fullName>Profile_SeeAllLink</fullName>
+        <categories>Profile</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for the &quot;See All&quot; Links</shortDescription>
+        <value>Show All ({0})</value>
+    </labels>
+    <labels>
+        <fullName>Profile_SeeLessLink</fullName>
+        <categories>Profile</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for the &quot;See Less&quot; Links</shortDescription>
+        <value>Show Less</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Specialties_Title</fullName>
+        <categories>Profile, Specialties</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title for the specialties section of the profile</shortDescription>
+        <value>Specialties</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Summary_Title</fullName>
+        <categories>Profile, Summary</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title for the summary section of the profile</shortDescription>
+        <value>Summary</value>
+    </labels>
+    <labels>
+        <fullName>Profile_Title</fullName>
+        <categories>Profile</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title heading following the linked in logo</shortDescription>
+        <value>Profile</value>
+    </labels>
+    <labels>
+        <fullName>Profile_ViewProfileInLinkedIn</fullName>
+        <categories>Profile</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link label for the &quot;View Profile in LinkedIn&quot; link</shortDescription>
+        <value>View profile in LinkedIn®</value>
+    </labels>
+    <labels>
+        <fullName>Search_APILimit</fullName>
+        <categories>Search, APILimit</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Message shown when Search API limit has been reached</shortDescription>
+        <value>You have reached the LinkedIn® search usage limit for today. Please retry this action tomorrow.&lt;br/&gt;
+&lt;br/&gt;
+LinkedIn® limits the number of search pages you can view per day.</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchCriteria_ButtonLabel</fullName>
+        <categories>Search, Search Criteria</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label on Search Criteria Button</shortDescription>
+        <value>Search</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchCriteria_ButtonLoadingMessage</fullName>
+        <categories>Search, Search Results Header</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Load mask message shown when user clicks search button</shortDescription>
+        <value>Searching...</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchCriteria_NoCriteriaMessage</fullName>
+        <categories>Search, Search Criteria</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Message displayed when no search criteria are entered</shortDescription>
+        <value>Please enter search criteria.</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchCriteria_SearchCompany</fullName>
+        <categories>Search, Search Criteria</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for Search Criteria &quot;Company&quot; input text</shortDescription>
+        <value>Company</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchCriteria_SearchCompany_RemoveRegex</fullName>
+        <categories>Search Criteria</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Regular expression used to remove unwanted words (lowercase) from company names</shortDescription>
+        <value>(\s*(\W|\b(and|ag|associates|bank|bv|company|co|division|fcu|gmbh|group|holdings|inc|industries|limited|llc|lp|ltd|nv|partners|plc|public limited company|sons|son|sa|trust)\W?))*$</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchCriteria_SearchFirstName</fullName>
+        <categories>Search, Search Criteria</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for Search Criteria &quot;First Name&quot; input text</shortDescription>
+        <value>First Name</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchCriteria_SearchKeywords</fullName>
+        <categories>Search, Search Criteria</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for Search Criteria &quot;Search Phrase&quot; input text</shortDescription>
+        <value>Search Phrase</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchCriteria_SearchLastName</fullName>
+        <categories>Search, Search Criteria</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for Search Criteria &quot;Last Name&quot; input text</shortDescription>
+        <value>Last Name</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchCriteria_SearchTitle</fullName>
+        <categories>Search, Search Criteria</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for Search Criteria &quot;Title&quot; input text</shortDescription>
+        <value>Title</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchCriteria_Title</fullName>
+        <categories>Search, Search Criteria</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title for Search Criteria Box</shortDescription>
+        <value>Search</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchResultsHeader_KeepProfile</fullName>
+        <categories>Search, Search Results Header</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label on the &quot;Keep the Current Profile&quot; button</shortDescription>
+        <value>Keep the Current Profile</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchResultsHeader_Title</fullName>
+        <categories>Search, Search Results Header</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Message that appears in the Search Results Header</shortDescription>
+        <value>Can&amp;#39;t find the right &lt;a href=&quot;/{0}&quot; target=&quot;_blank&quot;&gt;{1} {2}&lt;/a&gt;?</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchResultsHeader_Unlink</fullName>
+        <categories>Search, Search Results Header</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label on the &quot;Don&apos;t Use Any Profile&quot; button</shortDescription>
+        <value>Don&apos;t Use Any Profile</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchResultsHeader_UnlinkConfirmMessage</fullName>
+        <categories>Search, Search Results Header</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Confirm popup message when unlinking a profile</shortDescription>
+        <value>By performing this action, you will remove the existing LinkedIn profile from Salesforce. Do you wish to continue?</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchResults_Link</fullName>
+        <categories>Search, Search Results</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label on the &quot;Use This Profile&quot; button when there was no previous profile</shortDescription>
+        <value>Use this Profile</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchResults_NoResults</fullName>
+        <categories>Search, Search Results</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Message displayed when there are no search results</shortDescription>
+        <value>&lt;div class=&quot;no-results-heading&quot;&gt;No results found&lt;/div&gt;
+&lt;div class=&quot;no-results-heading&quot;&gt;Suggestions:&lt;/div&gt;
+&lt;div class=&quot;bullet&quot;&gt;Double check the spelling of your search.&lt;/div&gt;
+&lt;div class=&quot;bullet&quot;&gt;Try modifying your search on the left side of this page.&lt;/div&gt;</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchResults_PagingLoadMessage</fullName>
+        <categories>Search, Search Results, Paging</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Message shown when user clicks on a Paging Link</shortDescription>
+        <value>Retrieving results...</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchResults_PagingNext</fullName>
+        <categories>Search, Search Results, Paging</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The Next Label for the search results paging control</shortDescription>
+        <value>next »</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchResults_PagingPage</fullName>
+        <categories>Search, Search Results, Paging</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The Page Label for the search results paging control</shortDescription>
+        <value>Page:</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchResults_PagingPrevious</fullName>
+        <categories>Search, Search Results, Paging</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The Previous Label for the search results paging control</shortDescription>
+        <value>« previous</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchResults_Relink</fullName>
+        <categories>Search, Search Results</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label on the &quot;Use This Profile&quot; button when there was a previous profile</shortDescription>
+        <value>Use this Profile</value>
+    </labels>
+    <labels>
+        <fullName>Search_SearchResults_RelinkConfirmMessage</fullName>
+        <categories>Search, Search Results</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Popup Message on the &quot;Use This Profile&quot; button when there was a previous profile</shortDescription>
+        <value>By performing this action, you will replace the existing LinkedIn profile in Salesforce. Do you wish to continue?</value>
+    </labels>
+    <labels>
+        <fullName>Search_Title</fullName>
+        <categories>Search</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title which follows the LinkedIn Logo on the search page</shortDescription>
+        <value>Profile Search</value>
+    </labels>
+</CustomLabels>

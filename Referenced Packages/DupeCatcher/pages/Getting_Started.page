@@ -1,0 +1,605 @@
+<apex:page >
+<head>
+ <apex:stylesheet value="{!URLFOR($Resource.SFSSDupeCatcher__Styles, 'assets/styles/salesforce-lightning-design-system.min.css')}" />
+<link class="user" href="/resource/1499977438000/sfssdupecatcher__Styles/dccss.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <style>
+        .dingoBkWhite{ background-color: #ffffff; }
+        .dingoGray{ color: #b8c3ce; }
+        .dingoLiGray:before{ color: #b8c3ce; }
+        .dingoBkGray{ background-color: #b8c3ce; }                
+        .dingoA{ background-color: #5a9cdd; }
+        .dingoBlue{ color: #5a9cdd; }                
+        .dingoLiBlue:before{ color: #5a9cdd; }
+        .dingoBkBlue{ background-color: #5a9cdd; }                
+        .dingoB{ background-color: #00c6b7; }
+        .dingoLightBlue{ color: #00c6b7; }                
+        .dingoLiLightBlue:before{ color: #00c6b7; }
+        .dingoBkLightBlue{ background-color: #00c6b7; }                
+        .dingoC{ background-color: #88c651; }
+        .dingoGreen{ color: #88c651; }                
+        .dingoLiGreen:before{ color: #88c651; }
+        .dingoBkGreen{ background-color: #88c651; }                
+        .dingoD{ background-color: #f39e58; }
+        .dingoOrange{ color: #f39e58; }                
+        .dingoLiOrange:before{ color: #f39e58; }
+        .dingoBkOrange{ background-color: #f39e58; }                
+        .dingoF{ background-color: #00c6b7; }
+        .dingoRed{ color: #ef6e64; }                
+        .dingoLiRed:before{ color: #ef6e64; }
+        .dingoBkRed{ background-color: #ef6e64; }
+        .dingoRedAlt{ color: rgb(194, 57, 52); }                
+        .dingoLiRedAlt:before{ color: rgb(194, 57, 52); }
+        .dingoBkRedAlt{ background-color: rgb(194, 57, 52); }
+        .dingoInactive{
+            background-color: rgb(194, 57, 52);
+        }                
+        .dingoActive{
+            background-color: rgb(75, 202, 129)
+        }
+        .dingoState {
+            border-radius: .25em;
+            color: #ffffff;
+            padding: 25px;
+            margin: 25px;
+            display: inline-block;
+            text-align: left;
+            width: 250px;
+            position: relative;
+            float:left;
+            height: 200px;
+        } 
+        .dingoStatusHldr{
+            border-radius: .25em;
+            padding: 25px;
+            margin: 25px;
+            display: inline-block;
+            text-align: left;
+            width: 250px;
+            position: relative;
+            float:left;                    
+        }
+        .dingoStatusLine{
+            float:left;
+            border-radius: .125rem;
+            height: 10px;
+            margin-right: 5px;
+            margin-left: 5px;
+            margin-bottom: 5px;
+            margin-top: 18px;
+            width: 50px;
+        }
+        .dingoCurrentState {                    
+            float:left;
+            border-radius: 50%;
+            padding: 15px;
+        } 
+        .dingoWorkList{
+        }
+        .dingoWorkList li{
+            height: 50px;
+            padding-top: 15px;
+        }
+        .cloudingoLink {
+            text-decoration: none !important;
+            font-weight: bold;
+        }
+        .cloudingoWork{
+            float:left; 
+            top: 25px; 
+            position: relative;
+            border: 1px solid rgb(216, 221, 230);
+            border-radius: .25em;
+        }
+        .cloudingoWork .slds-panel{
+            min-height: 200px;
+        }
+        .cloudingoWorkLiImg{
+            float:left;
+            margin-top:-10px;
+            padding-right:10px;
+        }
+        .cloudingoButton{
+            padding-left: 10px !important; 
+            padding-right: 10px !important; 
+            background: none !important;
+        }
+        .cloudingoButtonWhite{
+            padding-left: 10px !important; 
+            padding-right: 10px !important; 
+            background-color: #ffffff !important;
+            background-image: none !important;
+        }
+        .slds-table th, .slds-table td {
+            padding: .15rem;
+        }
+        .required {
+            float:left;
+            padding-right:2px;
+            color: rgb(194,57,52);
+            font-weight:700;
+        }
+        .slds-chk-div {
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            padding: .5rem 1rem 0 .75rem;
+        }
+    </style>
+
+<style type="text/css">
+    h1{
+    font-size: 25px;
+    }
+    
+    h2{
+    font-size: 18px;
+    }
+    
+    
+    .uiTabset--default .tabs__nav {
+        border-bottom: 1px solid rgb(216, 221, 230);
+        background-color: transparent;
+    }
+    .flexipageTabset {
+        position: relative;
+        width: 100%;
+        padding: 0;
+    }
+    .flexipageComponent:not(:first-child) {
+        margin-top: 1rem;
+    }
+    .uiTabset--default .tabs__item {
+        text-transform: uppercase;
+        letter-spacing: .0625em;
+    }
+    @media (min-width: 64em)
+    .uiTabset--base .tabs__item {
+        font-size: .875rem;
+    }
+    .uiTabItem {
+        list-style: none;
+        white-space: nowrap;
+        display: inline-block;
+    }
+    .flexipageTabset>.uiTabBar .uiTabItem .tabHeader, .flexipageTabset>.uiTabBar .uiTabOverflowMenuItem .uiPopupTrigger a {
+        max-width: 240px;
+        padding-top: 0;
+    }
+    .uiTabset--default .tabs__item.active>a {
+        border-color: rgb(0, 112, 210);
+        color: rgb(22, 50, 92);
+    }
+    .uiTabset--default .tabs__item>a:hover {
+        border-color: rgb(0, 112, 210);
+        color: rgb(22, 50, 92);
+    }
+    .uiTabset--default .tabs__item>a {
+        border-bottom: 2px solid transparent;
+        padding: 1.5rem 1rem .5rem;
+        color: rgb(84, 105, 141);
+        outline:0;
+    }
+    .uiTabset--base .tabs__item>a {
+        display: block;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+
+<script>    
+    function switchTabs(tabIndex){
+        var tabs = document.getElementsByClassName("dcTab");
+        var tabCount = tabs.length;
+        for(var i=0; i<tabCount; i++)
+        {
+            var currentTab = tabs[i];
+            currentTab.style.display="none";
+        }
+        var tabHeaders = document.getElementsByClassName("dcTabH");
+        var tabHeadersCount = tabHeaders.length;
+        for(var i=0; i<tabHeadersCount; i++)
+        {
+            var currentTabHeader = tabHeaders[i];
+            currentTabHeader.className = 'dcTabH tabs__item uiTabItem';
+        }
+        var newTab = document.getElementById("div"+tabIndex);
+        newTab.style.display="";    
+        var newTabHeader = document.getElementById("tab"+tabIndex);
+        newTabHeader.className = 'dcTabH tabs__item active uiTabItem';
+    };
+    
+    function showHideDomainList(){
+        var domainList = document.getElementById('list');
+        var domainListButton = document.getElementById('listButton');
+        
+        if(domainList)
+        {
+            var display = domainList.getAttribute('style');
+                                    
+            if(!display)
+                domainList.setAttribute('style','');
+            
+            if(domainList.style.display == 'block')
+            {
+                domainListButton.innerHTML = domainListButton.innerHTML.replace('hide','view')
+                domainList.style.display ='none';
+            }
+            else
+            {
+                domainListButton.innerHTML = domainListButton.innerHTML.replace('view','hide')
+                domainList.style.display ='block';
+            }
+        }
+    }
+    
+</script>
+    
+</head>
+<body>
+    <div class="slds-page-header" role="banner">
+        <div class="slds-grid">
+            <div class="slds-col slds-has-flexi-truncate">
+                <div class="slds-grid">
+                    <div class="slds-grid slds-no-space">
+                        <p class="slds-page-header__title slds-truncate slds-align-middle slds-text-heading--large" title="Getting Started">Getting Started</p>                                            
+                    </div>                    
+                </div>
+            </div>                    
+        </div>              
+    </div>
+    <div class="tabset uiTabset--base uiTabset--default uiTabset flexipageTabset">
+        <div role="application tablist" class="uiTabBar" style="margin-top: 15px;">
+            <ul class="tabs__nav" role="presentation">
+                <li id="tab4" class="dcTabH tabs__item active uiTabItem" role="presentation">
+                    <a class="tabHeader" role="tab" title="Activity" href="javascript:switchTabs(4);">
+                        <span class="title">About</span>                    
+                    </a>
+                </li>
+                <li id="tab1" class="dcTabH tabs__item uiTabItem" role="presentation">
+                    <a class="tabHeader" role="tab" title="Activity" href="javascript:switchTabs(1);">
+                        <span class="title">Creating a Filter</span>                    
+                    </a>
+                </li>
+                <li id="tab2" class="dcTabH tabs__item uiTabItem" role="presentation">
+                    <a class="tabHeader" role="tab" title="Activity" href="javascript:switchTabs(2);">
+                        <span class="title">Creating a Rule</span>                    
+                    </a>
+                </li>
+                <li id="tab3" class="dcTabH tabs__item uiTabItem" role="presentation">
+                    <a class="tabHeader" role="tab" title="Activity" href="javascript:switchTabs(3);">
+                        <span class="title">Application Settings</span>                    
+                    </a>
+                </li>
+                <li id="tab5" class="dcTabH tabs__item uiTabItem" role="presentation">
+                    <a class="tabHeader" role="tab" title="Activity" href="javascript:switchTabs(5);">
+                        <span class="title">Watch Tutorial</span>                    
+                    </a>
+                </li>
+            </ul>
+        </div>                      
+    </div>
+     <div id="div1" class="dcTab" style="display:none;">
+         <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap">
+            <div class="slds-form--stacked slds-grow slds-scrollable--y">
+                <div class="slds-panel__section slds-has-divider--bottom" style="background: rgb(247, 249, 251); color: rgb(22, 50, 92);">
+                    <div class="slds-media slds-tile">             
+                        <p class="tile__title slds-truncate slds-text-heading--medium">
+                            How to Create a Filter
+                        </p>
+                    </div>                
+                </div>
+                <div class="slds-panel__section">
+                    <p>The first step in identifying and blocking duplicates is to set Filters and Rules.  Click on the DupeCatcher Filters tab from the DupeCatcher home page, then click “New” in the Recent DupeCatcher Filters area.</p>
+                    <img  class="dcImage" width="500px" height="216px" rel="#img3" src="{!URLFOR($Resource.DupeCatcherImages, 'images/newFilter.png')}" />
+                    <div class="simple_overlay" id="img3"><img width="675px" src="{!URLFOR($Resource.DupeCatcherImages, 'images/newFilter.png')}"/></div>
+                    <p>The Filters setup screen is very easy to use.  Set the following parameters by either entering information, or by making selections from the drop down menus:</p>
+                    <img class="dcImage" width="500px" height="273px" rel="#img4" src="{!URLFOR($Resource.DupeCatcherImages, 'images/newFilterPage.png')}" />
+                    <div class="simple_overlay" id="img4"><img  width="675px" src="{!URLFOR($Resource.DupeCatcherImages, 'images/newFilterPage.png')}"/></div>
+                    <br />
+                    <br />
+                    <div id="accordion">
+                        <div class="changeDiv"><div class="spacer"></div><h2>Filter Name:</h2><br />
+                            Create your own unique name for the filter. We recommend using something descriptive.</div>
+                        <div id="filterType" class="changeDiv"><h2>Filter Type:</h2><br />
+                            Select the type of record for which you want to block duplicates.</div>
+                            <div id="filterTypeImg"><apex:image url="{!URLFOR($Resource.SFSSDupeCatcher__DupeCatcherImages, 'images/filterType.png')}" /></div>
+                        <div id="matchInsert" class="changeDiv"><h2>Match on Insert Action:</h2><br />
+                            Select the action you want DupeCatcher to take when it identifies a duplicate that is being inserted into the Salesforce org.</div>
+                            <div id="matchOnInsertImg"><apex:image url="{!URLFOR($Resource.SFSSDupeCatcher__DupeCatcherImages, 'images/matchOnInsert.png')}"/></div>
+                        <div id="matchUpdate" class="changeDiv"><h2>Match on Update Action:</h2><br />
+                            Select the action you want DupeCatcher to take when it identifies a duplicate record that is being updated in the Salesforce org.</div>
+                            <div id="matchOnUpdateImg"><apex:image url="{!URLFOR($Resource.SFSSDupeCatcher__DupeCatcherImages, 'images/matchOnUpdate.png')}"/></div>
+                        <div id="matchingActions" class="changeDiv">(Matching Actions)<br />
+                            <div class="indent"><h4>Do Not Insert/Update:</h4>&nbsp; blocks the record, presents a warning message to the user, stays on the edit page,  lists matches as hyperlinks, allows Override if enabled (Enterprise Edition and higher only)</div>
+                            <div class="indent"><h4>Display Matching Records:</h4>&nbsp; blocks the record, presents a warning message to the user,  lists matches as hyperlinks in a table</div>
+                            <div class="indent"><h4>Report Duplicate:</h4>&nbsp; Allows the record into the database, triggers an alert (and a task if set) to be handled later by the admin (or possibly the user), allows Merge/Convert</div>     
+                        </div>
+                        <div class="changeDiv"><h2>Error Message:</h2><br />
+                            Create an optional customized error message to display when DupeCatcher identifies a duplicate based on the filter.</div>
+                        <div class="changeDiv"><h2>Search All Records:</h2><br />
+                            Checking this box directs DupeCatcher to check for matches against ALL records within the Salesforce org. Leaving this box unchecked directs DupeCatcher to check for matches ONLY against the records visible to the individual user entering new data.  We recommend checking this box.</div>
+                        <div class="changeDiv"><h2>Active:</h2><br />
+                            This box must be checked in order for the filter to function.  Note:  You can toggle this box to turn filters on and off as needed without deleting them.</div>
+                        <div id="taskAlert" class="changeDiv"><h2>Create Tasks for Alerts:</h2><br />
+                            Tasks are set ONLY when the Match on Insert/Update Action is set to “Report Duplicate.”  If you are using this action, you can optionally have a task created when a duplicate alert is triggered. Alerts can be set for the user or for the owner/admin of the Filter. You also have the option of setting pop-up reminders for all tasks that get created. You choose to create these reminders on the Application Settings tab.</div>
+                            <div id="taskAlertImg"><apex:image url="{!URLFOR($Resource.SFSSDupeCatcher__DupeCatcherImages, 'images/taskForAlerts.png')}"/></div>
+                    </div>
+                    <p>Once all of your options have been set, click Save to create the Filter.  You will be redirected to the Filter Details page, which shows the settings you made, metrics on duplicates, Rules that apply to this Filter, and any alerts that have been triggered when a duplicate is identified.</p>
+                    <p class="important">IMPORTANT: In order for a filter to work, you must set a rule for that filter.</p>
+                </div>
+            </div>
+        </div>    
+    </div>           
+    <div id="div2" class="dcTab" style="display:none;">
+        <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap">
+            <div class="slds-form--stacked slds-grow slds-scrollable--y">
+                <div class="slds-panel__section slds-has-divider--bottom" style="background: rgb(247, 249, 251); color: rgb(22, 50, 92);">
+                    <div class="slds-media slds-tile">             
+                        <p class="tile__title slds-truncate slds-text-heading--medium">
+                            How to Create a Rule
+                        </p>
+                    </div>                
+                </div>
+                <div class="slds-panel__section">
+                    <p>From the Filter Details page, click New DupeCatcher Filter Rule in the DupeCatcher Filter Rules section.</p>
+                    <img class="dcImage" width="500px" height="230px" rel="#img5" src="{!URLFOR($Resource.DupeCatcherImages, 'images/creatingRules.png')}" /> 
+                    <div class="simple_overlay" id="img5"><img  width="675px" src="{!URLFOR($Resource.DupeCatcherImages, 'images/creatingRules.png')}" /></div>
+                    <p>From the Filter Rule Edit page, you can select the fields (both standard and custom) you want DupeCatcher to use to identify duplicates, and you can select the matching methods for those filters. Your options will vary slightly depending on the type of Filter you’ve created in Step 1, and the fields you choose.</p>
+                    <div id="accordion">
+                        <div class="changeDiv"><h2>Field:</h2><br />
+                            The field drop down lists both standard and custom fields on the record object.  Select the field you want to use to identify duplicates.  To choose multiple fields, you will need to create multiple DupeCatcher Rules.</div>
+                        <div class="changeDiv"><h2>Matching Approach:</h2><br />
+                            Allows you to select the kind and degree of match of your selected field. Matching Approach options include Exact, First N Letters/Numbers, Domain, etc., and will vary based on the field you’ve selected.</div>
+                        <div id="matchBlanks" class="changeDiv"><h2>Match Blanks:</h2><br />
+                            If selected, when a record is inserted with no data in a field the DupeCatcher is checking based on your Rules, and there are other records in the database with no data in that field, DupeCatcher will block the insert. For example, if the Rule checks the email field, and the email field is left blank, DupeCatcher will return a list of records whose email field is blank.</div>
+                            <div id="matchBlanksImg"><apex:image url="{!URLFOR($Resource.SFSSDupeCatcher__DupeCatcherImages, 'images/editRule.png')}"/></div>
+                    </div>            
+                    <p>Once you save a Rule, you will be redirected to the Filter Summary page.  All Rules for an individual Filter will be listed on this page.  From this page, you can Edit and Delete Rules, or view a Rule summary page using hyperlinks.</p>
+                    <img  class="dcImage" width="500px" height="171px" rel="#img6" src="{!URLFOR($Resource.DupeCatcherImages, 'images/viewRules.png')}" />
+                    <div class="simple_overlay" id="img6"><img  width="675px"/></div><!--src="{!URLFOR($Resource.DupeCatcherImages, 'images/viewRules.png')}"-->
+                    <p>You can have multiple Filters and multiple Rules within individual Filters running at the same time, but please note that Filters operate on an OR logic, and Rules operate on an AND logic. That is, only one Filter out of multiple Filters needs to identify a duplicate for that duplicate to be blocked, but all Rules within an individual Filter must match for that Filter to block the duplicate.</p>
+                    <p>Once you have your Filters and Rules set, DupeCatcher is ready to work.  As long as you have selected Active in at least one of your Filters, DupeCatcher will function as records are added to Salesforce.</p>
+                </div>
+            </div>                                   
+        </div>   
+    </div>             
+    <div id="div3" class="dcTab" style="display:none;">
+        <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap">
+            <div class="slds-form--stacked slds-grow slds-scrollable--y">
+                <div class="slds-panel__section slds-has-divider--bottom" style="background: rgb(247, 249, 251); color: rgb(22, 50, 92);">
+                    <div class="slds-media slds-tile">             
+                        <p class="tile__title slds-truncate slds-text-heading--medium">
+                            Web Lead Sources</p>
+                    </div>                
+                </div>
+                <div class="slds-panel__section">
+                    <p>DupeCatcher is designed with flexibility to enable you to manage leads in the way that best suits your organization, while still maintaining a high level of data quality.  Merely blocking duplicate records from entering a database is not the only solution to data management and data quality. Sometimes there are reasons for allowing duplicates to be created at the point of entry and managed later.  One example is leads that get automatically entered into Salesforce from a web site registration form.  Because there is no human sitting between the web form and the Salesforce database, there is no way to check if new data is being entered beyond the matching fields set in DupeCatcher.</p>
+                    <p>To accommodate this need, DupeCatcher provides an Application Settings tab where users can enter web lead sources (standard or custom).  By default, DupeCatcher has the following lead sources set on the Application Settings tab: Web, Web Lead, Web to Lead (these lead sources can be removed).</p>
+                    <p>If you use web-to-lead in your Salesforce org, add the lead sources of your web lead records to this text box so that DupeCatcher will NOT block them.  Instead, DupeCatcher will handle web leads as if your filters had a matching action of “Report Duplicate.”  That is, DupeCatcher will allow duplicate web leads into the database, but will attach an alert to those duplicates.</p>
+                    <p>When a web lead source is NOT listed on the Application Settings Tab, DupeCatcher may block the lead based on the Filters and Rules you have set.  But, as a user, you are not alerted that the lead has been blocked.</p>
+                    <p>Be sure to add the lead source EXACTLY as it appears on the records that come from web sources.</p>
+                    <p>Be sure to click the “Save” button after making any changes on the Application Settings tab.</p>
+                    <img class="dcImage" width="500px" height="277px" rel="#img7" src="{!URLFOR($Resource.DupeCatcherImages, 'images/webLeadSource.png')}" />
+                    <div class="simple_overlay" id="img7"><img  width="675px" src="{!URLFOR($Resource.DupeCatcherImages, 'images/webLeadSource.png')}" /></div>
+                    <br />
+                    <br />
+                    <h2>Bypass Filters for Listed Users</h2>
+                    <p>In certain cases, some organizations have a need to periodically bypass DupeCatcher Filters—in other words, create new records or update records in the database that are not subject to DupeCatcher filtering.  To accommodate this need, DupeCatcher’s Application Settings tab has an area where a Salesforce login ID can be entered.  Any access to the Salesforce org using a login ID that is listed here will NOT be subject to DupeCatcher filtering.</p>
+                    <p>Be sure to click the “Save” button after making any changes on the Application Settings tab.</p>
+                    <img  class="dcImage" width="500px" height="267px" rel="#img8" src="{!URLFOR($Resource.DupeCatcherImages, 'images/bypassFilter.png')}"/>
+                    <div class="simple_overlay" id="img8"><img  width="675px" src="{!URLFOR($Resource.DupeCatcherImages, 'images/bypassFilter.png')}"/></div>
+                    <br />
+                    <br />
+                    <h2>Set Immediate Reminder for Tasks</h2>
+                    <p>The Application Settings tab also provides the ability to set pop-up reminders for all tasks that get created (if selected) when the Match on Insert/Update Action is set to “Report Duplicate” (see the Creating Filters section above).  Set these pop-up reminders by checking the box labeled “Set Immediate Reminder for Tasks” on the Application Settings tab.</p>
+                    <p>Be sure to click the “Save” button after making any changes on the Application Settings tab.</p>
+                    <img  class="dcImage" width="500px" height="267px" rel="#img9" src="{!URLFOR($Resource.DupeCatcherImages, 'images/reminder.png')}" />
+                    <div class="simple_overlay" id="img9"><img  width="675px" src="{!URLFOR($Resource.DupeCatcherImages, 'images/reminder.png')}" /></div>
+                    <br />
+                    <br />
+                    <h2>Allow Override</h2>
+                    <p>DupeCatcher allows admins to control whether or not users can override a DupeCatcher block of an insert. Selecting the “Allow Override” checkbox enables the feature and displays an Override button as part of the blocked duplicate warning message when the Match on Insert/Update Action is set to “Do Not Insert/Update.” NOTE: Due to API limitations, the Override function is only available in Enterprise Edition and higher. In addition, certain permissions may need to be set for Override to be enabled for all users.</p>
+                    <p>Be sure to click the “Save” button after making any changes on the Application Settings tab.</p>
+                    <img  class="dcImage" width="500px" height="281px" rel="#img10" src="{!URLFOR($Resource.DupeCatcherImages, 'images/override.png')}" />
+                    <div class="simple_overlay" id="img10"><img width="675px" src="{!URLFOR($Resource.DupeCatcherImages, 'images/override.png')}" /></div>
+                    <br />
+                    <br />
+                    <h2>Email Domains to Ignore</h2>
+                    <p>For DupeCatcher Filter Rules that match on email domain, you can limit results by entering domains of common, web-based email systems (Gmail, Hotmail, Yahoo, etc.) in the “Email Domains to Ignore” area.  DupeCatcher will then ignore these domains when performing its scan.  For example, enter “gmail.com” to prevent returning all records with email addresses with the gmail.com domain as duplicates.</p>
+                    <p>Be sure to click the “Save” button after making any changes on the Application Settings tab.</p>
+                    <img class="dcImage" width="500px" height="218px" rel="#img11" src="{!URLFOR($Resource.DupeCatcherImages, 'images/ignoreDomains.png')}" />
+                    <div class="simple_overlay" id="img11"><img  width="675px" src="{!URLFOR($Resource.DupeCatcherImages, 'images/ignoreDomains.png')}" /></div>
+                    <br />
+                   <button id="listButton" onclick="showHideDomainList();" rel="#list" type="button">Click here to view Ignored Domain list</button>
+                    <div class="table_overlay" id="list" style="margin: 15px; padding: 15px; -webkit-box-shadow: none; -moz-box-shadow: none;">          
+                        <table align="center" border="0px" cellpadding="0px" cellspacing="0px" class="theTable" style="border-collapse:collapse;table-layout:fixed; margin: 0; " width="499px">
+
+                             <col width="164px">
+                             <col width="115px">
+                             <col width="117px">
+                             <col width="103px">
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle" width="164px">abv.bg</td>
+                              <td class="tableStyle" width="115px">hotmail.fr</td>
+                              <td class="tableStyle" width="117px">primehome.com</td>
+                              <td class="tableStyle" width="103px">yahoo.com.ph</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">aol.com</td>
+                              <td class="tableStyle">ig.com.br</td>
+                              <td class="tableStyle">rediffmail.com</td>
+                              <td class="tableStyle">yahoo.de</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">arcor.de</td>
+                              <td class="tableStyle">inbox.com</td>
+                              <td class="tableStyle">rocketmail.com</td>
+                              <td class="tableStyle">yahoo.fr</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">bezeqint.net</td>
+                              <td class="tableStyle">indiatimes.com</td>
+                              <td class="tableStyle">rtrtr.com</td>
+                              <td class="tableStyle">yahoo.in</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">email.com</td>
+                              <td class="tableStyle">live.com</td>
+                              <td class="tableStyle">spam.la</td>
+                              <td class="tableStyle">yahoomail.com</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">fastmail.fm</td>
+                              <td class="tableStyle">live.fr</td>
+                              <td class="tableStyle">spidernet.com.cy</td>
+                              <td class="tableStyle">ymail.com</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">freenet.de</td>
+                              <td class="tableStyle">lycos.com</td>
+                              <td class="tableStyle">t-online.de</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">gmail.ca</td>
+                              <td class="tableStyle">lycos.de</td>
+                              <td class="tableStyle">web.de</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">gmail.co.jp</td>
+                              <td class="tableStyle">mail.com</td>
+                              <td class="tableStyle">windowslive.com</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">gmail.co.uk</td>
+                              <td class="tableStyle">mail.ru</td>
+                              <td class="tableStyle">wp.pl</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">gmail.com</td>
+                              <td class="tableStyle">mailinator.com</td>
+                              <td class="tableStyle">ya.ru</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">gmail.de</td>
+                              <td class="tableStyle">me.com</td>
+                              <td class="tableStyle">yahoo.ca</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">gmx.de</td>
+                              <td class="tableStyle">msn.com</td>
+                              <td class="tableStyle">yahoo.co.id</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">gmx.deorange.fr</td>
+                              <td class="tableStyle">naver.com</td>
+                              <td class="tableStyle">yahoo.co.in</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">gmx.net</td>
+                              <td class="tableStyle">netcabo.pt</td>
+                              <td class="tableStyle">yahoo.co.jp</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">google.com</td>
+                              <td class="tableStyle">online.de</td>
+                              <td class="tableStyle">yahoo.co.th</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">guerrillamailblock.com</td>
+                              <td class="tableStyle">optusnet.com.au</td>
+                              <td class="tableStyle">yahoo.co.uk</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">hcl.in</td>
+                              <td class="tableStyle">orange.frme.com</td>
+                              <td class="tableStyle">yahoo.com</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">hotmail.co.za</td>
+                              <td class="tableStyle">plasa.com</td>
+                              <td class="tableStyle">yahoo.com.au</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             <tr height="20px">
+                              <td height="20px" class="tableStyle">hotmail.com</td>
+                              <td class="tableStyle">posta.ge</td>
+                              <td class="tableStyle">yahoo.com.br</td>
+                              <td class="tableStyle">&nbsp;</td>
+                             </tr>
+                             </col>
+                             </col>
+                             </col>
+                             </col>
+                        </table>
+                    </div>            
+                </div>
+            </div>                                   
+        </div>   
+    </div>              
+    <div id="div4" class="dcTab">
+        <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap">
+            <div class="slds-form--stacked slds-grow slds-scrollable--y">
+                <div class="slds-panel__section slds-has-divider--bottom" style="background: rgb(247, 249, 251); color: rgb(22, 50, 92);">
+                    <div class="slds-media slds-tile">             
+                        <p class="tile__title slds-truncate slds-text-heading--medium">
+                            About DupeCatcher</p>
+                    </div>                
+                </div>
+                <div class="slds-panel__section">
+                    <p>DupeCatcher functions based on Filters and Rules set by a Salesforce administrator.  Once installed, admins will see a DupeCatcher option in the Salesforce dropdown menu on the top right.</p>
+                    <img  class="dcImage" width="500px" height="303px" rel="#img1" src="{!URLFOR($Resource.DupeCatcherImages, 'images/menu.png')}" />
+                    <div class="simple_overlay" id="img1"><img  width="675px" src="{!URLFOR($Resource.DupeCatcherImages, 'images/menu.png')}"/></div>
+                    <p>Selecting the DupeCatcher option will display DupeCatcher tabs in the main Salesforce window. Your options will be as follows:</p>
+                    <div id="accordion">
+                        <div class="changeDiv"><h2>DupeCatcher Filters:</h2><br />
+                            Select to set and activate Filters and Rules.  Once Filters are set, you can view them from this tab by clicking the “Go” button next to the “View” drop down menu.</div>
+                        <div class="changeDiv"><h2>DupeCatcher Duplicate Alerts:</h2><br />
+                            Filters set with a matching action of “Report Duplicate” will create alerts when a duplicate is identified, and those alerts will be viewable from this tab. Once Alerts are created, you can view them from this tab by clicking the “Go” button next to the “View” drop down menu. (Note: Alerts are also viewable from within the individual Filter details view.)</div>
+                        <div class="changeDiv"><h2>DupeCatcher Application Settings:</h2><br />
+                            The DupeCatcher Applications Settings tab is used to enable certain functions within DupeCatcher such as: override of filters (Enterprise Edition and higher only), support for dedupe of web-to-lead inserts, exempting specified user IDs from DupeCatcher filtering, setting notifications for DupeCatcher tasks (based on filter settings), and listing public web domains to ignore on domain matches.</div>
+                            <div id="matchBlanksImg"><apex:image url="{!URLFOR($Resource.SFSSDupeCatcher__DupeCatcherImages, 'images/editRule.png')}"/></div>
+                    </div>
+                    <img  class="dcImage" width="500px" height="282px" rel="#img2" src="{!URLFOR($Resource.DupeCatcherImages, 'images/tabs.png')}"/>
+                    <div class="simple_overlay" id="img2"><img  width="675px" src="{!URLFOR($Resource.DupeCatcherImages, 'images/tabs.png')}"/></div>                    
+                </div>            
+            </div>
+        </div>                                   
+    </div>         
+    <div id="div5" class="dcTab" style="display:none;">
+        <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap">
+            <div class="slds-form--stacked slds-grow slds-scrollable--y">
+                <div class="slds-panel__section slds-has-divider--bottom" style="background: rgb(247, 249, 251); color: rgb(22, 50, 92);">
+                    <div class="slds-media slds-tile">             
+                        <p class="tile__title slds-truncate slds-text-heading--medium">
+                            Tutorial</p>
+                    </div>                
+                </div>
+                <div class="slds-panel__section">
+                    <br />
+                    <br />
+                    <div class="dcImage" style="width:660px;height:410px"><apex:iframe height="390" width="640" src="https://www.youtube.com/embed/FZnGciZ1yMI" frameborder="false" ></apex:iframe></div>
+                    <br />
+                    <a href="https://www.youtube.com/watch?feature=player_embedded&v=FZnGciZ1yMI" target="_blank">Click here if you can't see the video (YouTube)</a>
+                </div>            
+            </div>
+        </div>                                   
+    </div>      
+</body>
+</apex:page>

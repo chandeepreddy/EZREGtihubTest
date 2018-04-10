@@ -1,0 +1,60 @@
+<apex:page controller="G2M4Force.G2M_Admin_Controller" action="{!loadInitialValues}" tabStyle="G2M_Admin__tab">
+    <apex:form >
+      <apex:sectionHeader title="GoToMeeting® User Settings"/>
+      <apex:pageBlock mode="edit" title="GoToMeeting Integration Settings">
+      
+      <apex:pageblockSection title="Notifications" columns="1" id="exceptions">
+         <apex:pageMessages />
+      </apex:pageblockSection>
+          <!-- Init App -->
+        <apex:pageblockSection title="Setup GoToMeeting for Salesforce" columns="1" id="initApp" rendered="{!notInitialized}">
+            <apex:commandButton value="Setup Integration" action="{!initialize}"/>
+        </apex:pageblockSection>      
+        
+           <apex:pageblockSection title="Connect to GoToMeeting" columns="1" id="userMaintenance">  
+             <apex:commandButton value="Connect an Account" action="{!refreshG2MAuthorizationKey}" disabled="{!notInitialized}" rendered="{!NOT(userAuthorized)}"/>
+             <apex:commandButton value="Disconnect" action="{!disconnect}" rendered="{!userAuthorized}"/> 
+        </apex:pageBlockSection>    
+         
+        
+        <apex:pageblockSection title="Meeting Synchronization - Occurs Nightly" columns="1" id="synchronizeMeetings" rendered="{!isAuthKeyValid}">         
+             <apex:commandButton value="Synchronize My Meetings" action="{!synchronizeMeetings}" disabled="{!notInitialized}"/> 
+        </apex:pageBlockSection>             
+        
+        <!-- Logger Setup -->
+        <apex:pageblockSection title="Log Settings" columns="1" id="loggerSettings" rendered="{!NOT(ISNULL(loggerInstance)) && NOT(notInitialized)}">
+            <apex:pageBlockSectionItem labelStyle="width:5%">
+               <apex:outputLabel value="Email Logs" style="float:left"/>
+               <apex:outputPanel >
+                 <apex:inputField label="Email Logs" value="{!loggerInstance.G2M4Force__enableLoggerEmails__c}" onClick="SaveLogSettings()" id="EmailLogs"/>
+                 <apex:actionFunction name="SaveLogSettings" action="{!saveLoggerSettings}" rerender="EmailLogs"/>
+               </apex:outputPanel>
+             </apex:pageBlockSectionItem>                     
+        </apex:pageblockSection>
+        
+        <!-- Manage Scheduler  -->
+        <apex:pageblockSection title="Manage Batch Schedules" columns="2" id="manageBatchSchedules" rendered="false">  
+            <apex:commandButton value="Schedule Batch Processes" action="{!manageBatchSchedules}" disabled="{!notInitialized}"/>
+            <apex:commandButton value="Kick off Meeting updates" action="{!kickOffMeetingUpdater}" disabled="{!notInitialized}"/>
+        </apex:pageblockSection>
+        
+        <!-- Lead Contact Conflicts -->
+        <!-- Ramesh [16-12]- Moved this checkbox to GoToMeeting Admin Settings
+        <apex:pageblockSection title="Duplicate Lead/Contact Settings" columns="2" id="leadContactConflicts" rendered="{!$Profile.Name == 'System Administrator' && NOT(notInitialized)}">  
+            <apex:outputText value="Allow the integration to update the activity history of each lead/contact when there are duplicate records."/>
+            <apex:inputCheckBox value="{!updateAllLeadsContacts}"  onClick="SaveContactSettings()" id="updateAllLeads"/>
+            <apex:outputText value="Create New Lead" rendered="false"/>
+            <apex:inputCheckBox value="{!createNewLeads}" rendered="false" disabled="{!notInitialized}"/>
+            <apex:actionFunction name="SaveContactSettings" action="{!saveLeadContactSettings}" rerender="updateAllLeads"/>
+        </apex:pageblockSection>
+        -->
+        
+        <!-- Attendance Statistics Interval -->
+        <apex:pageblockSection title="Citrix Contact Interval" columns="2" id="citrixContactInterval" rendered="false">  
+           <apex:outputText value="Time Interval (in minutes) to trigger attendance data fetch"/>
+           <apex:inputText value="{!citrixContactInterval}"/>
+           <apex:commandButton value="Save Time Interval " action="{!saveTimeInterval}" disabled="{!notInitialized}"/>
+        </apex:pageblockSection>        
+      </apex:pageBlock>
+    </apex:form>
+</apex:page>

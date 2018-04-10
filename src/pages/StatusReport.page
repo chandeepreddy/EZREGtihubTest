@@ -1,0 +1,530 @@
+<apex:page controller="ODS_StatusReportController" showHeader="false" sidebar="false" standardStyleSheets="false" id="PageId">
+    
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+        
+        <title>ON DEMAND SERVICES </title>
+        <apex:includeScript value="https://code.jquery.com/jquery-latest.min.js"/>
+        <!-------- Bootstrap ----->
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/bootstrap.css')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'js/bootstrap.js')}"/>
+        <apex:stylesheet value="https://fonts.googleapis.com/css?family=Open+Sans:400,700"/>
+        <apex:includeScript value="https://www.google.com/recaptcha/api.js"/>
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/style.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/jquery-ui.css')}"/>
+        <!-------- Fonts Awesome ----->
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'font-awesome/css/font-awesome.css')}"/>
+        
+        
+        <script type="text/javascript">
+        var pager;
+        $(document).ready(function(){
+            debugger;
+            
+            $("#statusreport").addClass("active");
+            var IsCustomer = {!isCustomer};            
+            if(IsCustomer){
+                $("#mnuMyAccount").css("display","block");                   
+            }else{            
+                $("#mnuCustomer").css("display","block");
+            }
+            
+            $("button.collapsed").click(function(){
+                $(".header").toggleClass("header-fixed");
+                $(".navbar-toggle").toggleClass("nav-btn-fixed");
+                $(".mid-bg").toggleClass("mid-bg-fixed");
+            });
+            
+            //Search popup
+            $('.tsearch').click(function(){
+                $('.advnc_search').slideToggle('fast');
+            });
+            
+            var AccountID = $(".ddlstAccount").val();
+            
+            var ServiceID = $(".ddlstService").val();            
+            ApplySearchAction(AccountID,ServiceID); 
+        });
+        
+        function showAlert()
+        {
+            var msg = document.getElementById("formId.pgMsg").value;
+            alert(msg);
+            
+        }
+        function ApplySearch(){
+            var AccountID = $(".ddlstAccount").val();
+            var ServiceID = $(".ddlstService").val();
+            
+            ApplySearchAction(AccountID,ServiceID)
+        }
+        
+        function fnSearchStatusreport(){
+            var FromDate = $('.tfrom_date').val();
+            var ToDate = $('.tto_date').val();
+            GetSearchResultsFromAjax(FromDate,ToDate);
+            
+        }
+        //function to restrict numbers in datepicker
+        function isNumber(evt) {
+            evt = (evt) ? evt : window.event;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if (!(charCode > 31 && (charCode < 48 || charCode > 57) && charCode ==91 )) {
+                return false;
+            }
+            return true;
+        }
+        
+        
+        function sortTable(n) {
+            debugger;
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("myTable2");
+            switching = true;
+            //Set the sorting direction to ascending:
+            dir = "asc"; 
+            /*Make a loop that will continue until
+                no switching has been done:*/
+                while (switching) {
+                    //start by saying: no switching is done:
+                    switching = false;
+                    rows = table.getElementsByTagName("TR");
+                    /*Loop through all table rows (except the
+                    first, which contains table headers):*/
+                    for (i = 1; i < (rows.length - 1); i++) {
+                        //start by saying there should be no switching:
+                        shouldSwitch = false;
+                        /*Get the two elements you want to compare,
+                      one from current row and one from the next:*/
+                        x = rows[i].getElementsByTagName("TD")[n];
+                        y = rows[i + 1].getElementsByTagName("TD")[n];
+                        /*check if the two rows should switch place,
+                      based on the direction, asc or desc:*/
+                        if (dir == "asc") {
+                            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                                //if so, mark as a switch and break the loop:
+                                shouldSwitch = true;
+                                break;
+                            }
+                        } else if (dir == "desc") {
+                            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                                //if so, mark as a switch and break the loop:
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (shouldSwitch) {
+                        /*If a switch has been marked, make the switch
+                      and mark that a switch has been done:*/
+                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                        switching = true;
+                        //Each time a switch is done, increase this count by 1:
+                        switchcount ++; 
+                    } else {
+                        /*If no switching has been done AND the direction is "asc",
+                      set the direction to "desc" and run the while loop again.*/
+                        if (switchcount == 0 && dir == "asc") {
+                            dir = "desc";
+                            switching = true;
+                        }
+                    }
+                }
+            }
+    </script>
+    
+    <style>
+        .popupBackground {
+        /* Background color */
+        background-color:black;
+        opacity: 0.20;
+        filter: alpha(opacity = 20);
+        
+        /* Dimensions */
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 998;
+        position: absolute;
+        font-family: sans-serif;
+        /* Mouse */
+        cursor:wait;
+        }
+        
+        /* This is for the message DIV */
+        .PopupPanel {
+        /* Background color */
+        border: solid 2px skyblue;
+        background-color: white;
+        font-family: sans-serif;
+        /* Dimensions */
+        left: 50%;
+        width: 100px;
+        margin-left: -100px;
+        top: 50%;
+        height: 100px;
+        margin-top: -25px;
+        z-index: 999;
+        position: fixed;
+        
+        /* Mouse */
+        cursor:pointer;
+        }
+        
+        .GridviewScrollHeader TH, .GridviewScrollHeader TD 
+        { 
+        padding: 5px; 
+        font-weight: bold; 
+        white-space: nowrap; 
+        border-right: 1px solid #AAAAAA; 
+        border-bottom: 1px solid #AAAAAA; 
+        background-color: #EFEFEF; 
+        text-align: left; 
+        vertical-align: bottom; 
+        } 
+        .GridviewScrollItem TD 
+        { 
+        padding: 5px; 
+        white-space: nowrap; 
+        border-right: 1px solid #AAAAAA; 
+        border-bottom: 1px solid #AAAAAA; 
+        background-color: #FFFFFF; 
+        } 
+        .GridviewScrollPager  
+        { 
+        border-top: 1px solid #AAAAAA; 
+        background-color: #FFFFFF; 
+        
+        } 
+        .GridviewScrollPager TD 
+        { 
+        padding-top: 3px; 
+        font-size: 14px; 
+        padding-left: 5px; 
+        padding-right: 5px; 
+        } 
+        .GridviewScrollPager A 
+        { 
+        color: #666666; 
+        }
+        .GridviewScrollPager SPAN
+        
+        {
+        
+        font-size: 16px;
+        
+        font-weight: bold;
+        
+        }
+        
+        .inner_table {
+        width: 50%; 
+        border-collapse: collapse;
+        overflow: auto;
+        height: 300px;
+        display: inherit;
+        
+        }
+        
+        #pagination a {
+        display:inline-block;
+        margin-right:5px;
+        
+        }
+        
+        .pg-normal {
+        color: black;
+        font-weight: normal;
+        text-decoration: none;
+        cursor: pointer;
+        }
+        
+        .pg-selected {
+        color: black;
+        font-weight: bold;
+        text-decoration: underline;
+        cursor: pointer;
+        }
+    </style>
+    
+    </head>
+    
+    <body>
+        <apex:form id="formId">
+            <apex:pageMessages id="pgMsg" />
+            <div class="shadow-show"></div>
+            <c:ODS_HeaderComponent />
+            <apex:actionStatus id="statusSaveTrip" stopText="">
+                <apex:facet name="start">
+                    <div>
+                        <div class="popupBackground" />
+                        <div class="PopupPanel">
+                            <table border="0" width="100%" height="100%">
+                                <tr>
+                                    <td align="center"><b>Please Wait</b></td>
+                                </tr>
+                                <tr>
+                                    <td align="center"><img src="{!$Resource.ODS_Statussign}"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </apex:facet>
+            </apex:actionStatus>
+            
+            <apex:actionFunction name="GetSearchResultsFromAjax" action="{!GetSearchResults}" reRender="CustomerPanel,listPanel,PanelId,SearchResultsPanel" status="statusSaveTrip" oncomplete="loadPagination();">
+                <apex:param name="FromDt" value="" assignTo="{!FromDate}"/>
+                <apex:param name="ToDt" value="" assignTo="{!ToDate}"/>
+            </apex:actionFunction>
+            <!--<apex:actionFunction name="passFromDateToController" action="{!InvokeFromDateMethod}" rerender="CustomerPanel" status="statusSaveTrip">
+<apex:param name="FromDt" value="" assignTo="{!FromDate}"/>
+</apex:actionFunction>
+<apex:actionFunction name="passToDateToController" action="{!InvokeToDateMethod}" rerender="CustomerPanel" status="statusSaveTrip">
+<apex:param name="ToDt" value="" assignTo="{!ToDate}"/>
+</apex:actionFunction> -->
+            
+            <apex:actionFunction name="ApplySearchAction" action="{!GetStatusReportByAccountServiceID}" status="statusSaveTrip" reRender="listPanel,SearchResultsPanel,PanelId,CustomerPanel,addSRBttnPanel,AddSRDisclaimer" immediate="True" oncomplete="loadPagination();" >
+                <apex:param name="SelectedAccountId" value="" assignTo="{!AccountId}"/>
+                <apex:param name="SelectedServiceID" value="" assignTo="{!ServiceID}"/>
+            </apex:actionFunction> 
+            
+            <div class="clr"></div>
+            <div class="mnu navbar-default"> 
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#prelude_mnu"><i class="fa fa-bars" aria-hidden="true"></i></button>
+            </div>
+            <div class="clr"></div>
+            
+            <div class="mid-bg">
+                <div class="sub-warp">                
+                    <div class="top_srch">
+                        <h1><!-- Status Report --></h1>
+                        <div class="tsearch">Search<i class="fa fa-search" aria-hidden="true"></i></div>
+                        <div class="advnc_search">
+                            <div>
+                                <input type="text" name="txt_from" class="tfrom_date" placeholder="From Date" id="date_service" onkeypress="return isNumber(event)" autocomplete = "off"/>  
+                                
+                                <input type="text" name="txt_to" class="tto_date" placeholder="To Date" id="date_service1" onkeypress="return isNumber(event)" autocomplete = "off" />                                
+                                
+                                <apex:selectList value="{!srStatus}" size="1" rendered="{!IF(objUser.PortalUserRole__c == 'Customer',False, True)}">
+                                    <apex:selectOptions value="{!StatusPicklistValues}"/>                                    
+                                </apex:selectList>                            
+                                
+                                <input type="button" onclick="fnSearchStatusreport();"  value="Search" style="background: #4ECAF4;float: left;padding: 5px 20px;color: #fff;font-weight: bold;border-radius: 5px;border: navajowhite;margin-top: 10px;margin-left: 15px;"/>
+                            </div>
+                        </div>
+                    </div>                
+                    <div class="mid-white">
+                        <div class="mid-user-sec">
+                            <!-- <apex:outputPanel id="CustomerPanel">
+<div class="mid-usertxt"><strong>Customer:</strong>{!AccountName} - <strong>  Service:</strong><a>{!ServiceName}</a></div>                            
+</apex:outputPanel>-->
+                        </div>
+                        <div class="timeline-scroll" id ="divID">
+                            
+                            <apex:outputPanel id="listPanel">                                
+                                <apex:pageBlock id="SearchResultsPanel">
+                                  <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/jquery.dataTables.css')}"/>
+                                    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"/>
+                                    <apex:includeScript value="https://cdn.datatables.net/1.10.0/js/jquery.dataTables.js"/>
+                                    
+                                    <style type="text/css" media="screen">
+                                        table.dataTable.display tbody tr.odd > .sorting_1, table.dataTable.order-column.stripe tbody tr.odd > .sorting_1 {
+                                        background-color: #F1F1F1;
+                                        }
+                                        
+                                    </style>
+                                    <script type="text/javascript" charset="utf8">
+                                    var oTable;
+                                    var currentNumberDisplayed = 5;
+                                    
+                                    $(document).ready(function() {
+                                        $('#load').click( function () {
+                                            var oSettings = oTable.fnSettings();
+                                            currentNumberDisplayed += 5;
+                                            oSettings._iDisplayLength = currentNumberDisplayed;
+                                            oTable.fnDraw();
+                                        });
+                                        
+                                        oTable = $('[id$=pgTbleId]').dataTable({
+                                            "iDisplayLength": 25,
+                                            "bSort": false,
+                                            "bFilter": false,
+                                            "dom": '<"top"flp<"clear">>rt<"bottom"ifp<"clear">>',
+                                            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                                            stateSave: true
+                                        });
+                                    });
+                                    
+                                    </script>
+                                    <apex:outputPanel id="noSearchRes" rendered="{!(stRprtList.size==0 && stRprtList!=null ) }">
+                                        <strong><center>No Records Found.</center></strong>
+                                    </apex:outputPanel>
+                                    <apex:variable var="counter" value="{!1}"/>
+                                    <apex:variable var="NextPopupCounter" value="{!2}"/>
+                                    <apex:variable var="PrevPopupCounter" value="{!0}"/>
+                                    <apex:outputPanel id="PanelId">
+                                        <!--<apex:outputPanel styleClass="statuspage-nav page-nav-bg"  rendered="{!(stRprtList.size!=0 && stRprtList!='' && stRprtList!=null ) }"> 
+<apex:commandButton value="First" action="{!showFirst}" disabled="{!!ShowPrevious}" rerender="SearchResultsPanel" styleClass="save-submit page-nav-btn first-nav-btn"/>
+<apex:commandButton value="Previous" action="{!showPrevious}" disabled="{!!ShowPrevious}" rerender="SearchResultsPanel" styleClass="save-submit page-nav-btn previous-nav-btn"/>
+<apex:outputText value="{!CurrentPageInfo}" />
+<apex:commandButton value="Next" action="{!showNext}" disabled="{!!ShowNext}" rerender="SearchResultsPanel" styleClass="save-submit page-nav-btn next-nav-btn"/>
+<apex:commandButton value="Last" action="{!showLast}" disabled="{!!ShowNext}" rerender="SearchResultsPanel" styleClass="save-submit page-nav-btn last-nav-btn"/>                      
+</apex:outputPanel>  -->
+                                        <apex:outputPanel id="addSRBttnPanel">
+                                            <div id="pageNavPositionTop"></div>
+                                            <div class="time-submit" >                       
+                                                <apex:commandButton value="Add Status Report" action="{!AddStatusReport}"   styleClass="save-submit" rendered="{!ShowAddSR}"  />  
+                                            </div>
+                                        </apex:outputPanel>  
+                                        <apex:pageBlockTable StyleClass="timeline" Style="cellpadding:0; cellspacing:0; width:100%;"  value="{!stRprtList}" var="sr" id="pgTbleId" first="{!CurrentPage }" rows="{!PageSize}" rendered="{!(stRprtList.size!=0 && stRprtList!='' && stRprtList!=null ) }">  
+                                            
+                                            
+                                            <apex:column >
+                                                <apex:facet name="header">DATE</apex:facet>   
+                                                <apex:outputField label="DATE" value="{!sr.Status_Date__c}" style="text-align:left;"/>
+                                            </apex:column>
+                                            <apex:column style="width: 200px; text-align:left;" >
+                                                <apex:facet name="header">Account</apex:facet>   
+                                                <apex:outputText label="Account" value="{!sr.Account_Services__r.Account__r.Name} - {!sr.Account_Services__r.ODS_Services__r.Name__c}" style="text-align:left;"/>
+                                            </apex:column>
+                                            
+                                            <apex:column >
+                                                <apex:facet name="header">WORK PERFORMED TODAY</apex:facet>   
+                                                <apex:outputText label="WORK PERFORMED TODAY" value="{!sr.Work_For_The_Day__c}" style="text-align:left;" escape="false"/>
+                                            </apex:column>
+                                            <apex:column >
+                                                <apex:facet name="header">WORK TO BE PERFORMED NEXT WORKING DAY </apex:facet>   
+                                                <apex:outputText label="WORK TO BE PERFORMED NEXT WORKING DAY" value="{!sr.Work_For_The_Next_Day__c}" style="text-align:left;" escape="false"/>
+                                            </apex:column>                                
+                                            <apex:column style="width: 194px;" >
+                                                <apex:facet name="header">ISSUES / CONCERNS / ROAD BLOCKS /  QUESTIONS </apex:facet>   
+                                                <apex:outputText label="ISSUES / CONCERNS / ROAD BLOCKS /  QUESTIONS" value="{!sr.Issues_and_Concerns__c}" style="text-align:left;" escape="false"/>
+                                            </apex:column>
+                                            <apex:column rendered="{!IF((isCustomer), False, True)}"  style="text-align:left;" >
+                                                <apex:facet name="header">Status</apex:facet>   
+                                                <apex:outputText label="Status" value="{!sr.Status__c}" style="text-align:left; margin-left: 0;"/>                                    
+                                            </apex:column>     
+                                            
+                                            <apex:column style="text-align:left;">
+                                                <apex:facet name="header">Action</apex:facet> 
+                                                
+                                                <apex:commandLink styleClass="time_view" title="View" html-data-toggle="modal" html-data-target="#myModal-{!counter}" onClick="return false;" >
+                                                    <strong><i class="fa fa-eye" aria-hidden="true"></i></strong>
+                                                </apex:commandLink> 
+                                                <apex:commandLink action="{!editStatusReport}" value="" styleclass="status_edit" style="" rendered="{!IF((isCustomer) || sr.Status__c == 'Submitted',False, True)}"> 
+                                                    <i class="fa fa-pencil" aria-hidden="true"></i>                                     
+                                                    <apex:param name="editSRId" value="{!sr.id}" />  
+                                                </apex:commandLink>   
+                                                <apex:commandLink action="{!deleteStatusReport}" onclick="return confirm('Are you sure you want to delete?');" value="" styleclass="status_delete" rendered="{!IF((isCustomer) || sr.Status__c == 'Submitted',False, True)}">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                    <apex:param name="deleteSRId" value="{!sr.id}"/>
+                                                </apex:commandLink> 
+                                                
+                                                
+                                                <div id="myModal-{!counter}" class="modal fade in" role="dialog" >
+                                                    <div class="modal-dialog">                            
+                                                        <div class="modal-content status-report">
+                                                            <a href="#"><i class="fa fa-caret-left" aria-hidden="true" data-dismiss="modal"  data-toggle="modal" data-target="#myModal-{!PrevPopupCounter}"></i></a>
+                                                            <center>
+                                                                <h4> <apex:outputText value="{0,date,MM'/'dd'/'yyyy}" >
+                                                                    <apex:param value="{!sr.Status_Date__c}"/>
+                                                                    </apex:outputText> </h4>
+                                                            </center>
+                                                            <a href="#" style="float:right; text-align:right;" data-dismiss="modal"  data-toggle="modal" data-target="#myModal-{!NextPopupCounter}"><i class="fa fa-caret-right" aria-hidden="true"></i></a>
+                                                            <div class="clr"></div>
+                                                            <div class="popup-scroll">
+                                                                <div class="popuptext-width">
+                                                                    <strong>WORK PERFORMED TODAY</strong><br />
+                                                                    <apex:outputText label="WORK PERFORMED TODAY" value="{!sr.Work_For_The_Day__c}" escape="false"/>
+                                                                </div>
+                                                                
+                                                                <div class="popuptext-width status-bg">
+                                                                    <strong>WORK TO BE PERFORMED NEXT WORKING DAY</strong><br />
+                                                                    <apex:outputText label="WORK TO BE PERFORMED NEXT WORKING DAY" value="{!sr.Work_For_The_Next_Day__c}" styleClass="status-bg" escape="false"  />
+                                                                </div>
+                                                                <div class="popuptext-width">
+                                                                    <strong>ISSUES/QUESTIONS/CONCERNS/ROAD BLOCKS</strong><br />
+                                                                    <apex:outputText label="ISSUES/QUESTIONS/CONCERNS/ROAD BLOCKS" value="{!sr.Issues_and_Concerns__c}" escape="false"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="popup-btn status-btn">
+                                                                <button type="button" class="btn btn-default" data-dismiss="modal">CLOSE</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="clr"></div>
+                                                    
+                                                </div> 
+                                                
+                                                <apex:variable var="counter" value="{!counter+ 1}"/>   
+                                                
+                                                <apex:variable var="NextPopupCounter" value="{!counter+1}"/>  
+                                                <apex:variable var="PrevPopupCounter" value="{!counter-1}"/>  
+                                                
+                                            </apex:column> 
+                                            
+                                            
+                                            
+                                            <apex:column rendered="false">
+                                                
+                                            </apex:column>
+                                        </apex:pageBlockTable>
+                                        
+                                    </apex:outputPanel>
+                                    
+                                    <!--<apex:outputPanel styleClass="statuspage-nav page-nav-bg"  rendered="{!(stRprtList.size!=0 && stRprtList!='' && stRprtList!=null ) }"> 
+<apex:commandButton value="First" action="{!showFirst}" disabled="{!!ShowPrevious}" rerender="SearchResultsPanel" styleClass="save-submit page-nav-btn first-nav-btn"/>
+<apex:commandButton value="Previous" action="{!showPrevious}" disabled="{!!ShowPrevious}" rerender="SearchResultsPanel" styleClass="save-submit page-nav-btn previous-nav-btn"/>
+<apex:outputText value="{!CurrentPageInfo}" />
+<apex:commandButton value="Next" action="{!showNext}" disabled="{!!ShowNext}" rerender="SearchResultsPanel" styleClass="save-submit page-nav-btn next-nav-btn"/>
+<apex:commandButton value="Last" action="{!showLast}" disabled="{!!ShowNext}" rerender="SearchResultsPanel" styleClass="save-submit page-nav-btn last-nav-btn"/>                      
+</apex:outputPanel>  -->
+                                </apex:pageBlock>
+                            </apex:outputPanel>
+                            <apex:outputPanel id="AddSRDisclaimer" styleClass="note-text">
+                                <apex:outputLabel rendered="{!ShowDisclaimer}">
+                                    Note: Please select Customer and Service  to add Status Report.
+                                </apex:outputLabel>
+                            </apex:outputPanel>
+                            <apex:outputPanel id="addSRBttnPanel">
+                                <div class="time-submit" >                       
+                                    <apex:commandButton value="Add Status Report" action="{!AddStatusReport}"   styleClass="save-submit" rendered="{!ShowAddSR}"  />  
+                                </div>
+                            </apex:outputPanel>                          
+                        </div> 
+                        
+                    </div>
+                </div>
+            </div>
+            <c:ODS_FooterComponent />
+            
+        </apex:form>
+    </body>
+    
+    <apex:stylesheet value="https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"  />
+    <apex:includeScript value="https://code.jquery.com/jquery-1.9.1.js" />
+    <apex:includeScript value="https://code.jquery.com/ui/1.10.3/jquery-ui.js" />
+    <script type="text/javascript">
+    
+    j$ = jQuery.noConflict();
+    
+    j$(document).ready(function() 
+                       {
+                           j$( "#date_service, #date_service1").datepicker(
+                               {
+                                   dateFormat : 'mm/dd/yy',
+                                   changeMonth : true,
+                                   changeYear : true,
+                                   yearRange: '-100y:c+nn',
+                                   maxDate: '0d'
+                               });
+                           $("#date_service, #date_service1").bind('paste',function(e){
+                               e.preventDefault();  //disable paste in datePicker
+                           });
+                       });
+    </script>
+    
+</apex:page>

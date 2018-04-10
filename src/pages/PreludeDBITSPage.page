@@ -1,0 +1,19 @@
+<apex:page controller="PreludeDBITSController">
+    <apex:pageMessages id="msg"></apex:pageMessages>
+    <apex:form >
+        <br/> &nbsp;&nbsp;&nbsp;   <img src="{!$Resource.EZRE_Prelude_Logo}" />
+        <apex:outputlabel style="font-size:25px; font-weight:bold; color:#0489B1" value="DBITS Vendor Introduction">
+        </apex:outputlabel> 
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="4">
+                <apex:outputLabel value="Select an Account"></apex:outputLabel>
+                <apex:selectList value="{!strSelectedAccount}" size="1" >
+                    <apex:selectOptions value="{!AccountPicklist}"></apex:selectOptions>
+                </apex:selectList>&nbsp; &nbsp;              
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons location="Bottom">            
+                <apex:commandButton value="Send Email" action="{!SendEmailToDBITS}" reRender="msg"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

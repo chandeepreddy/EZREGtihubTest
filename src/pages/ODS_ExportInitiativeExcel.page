@@ -1,0 +1,69 @@
+<apex:page showHeader="false"  sidebar="false" controller="ODS_ExportInitiativeController"  contentType="application/vnd.ms-excel#{!Account}-{!InitiativeAccountService}-{!FromDate} to {!ToDate} Initiative.xls"   language="en-US" cache="true"  >
+     
+            <html>
+                  <head>
+                        <style>
+                              @page
+                              {   
+                                 size:landscape;
+                              }                            
+                        </style>
+                  </head>
+           
+            
+            <body style="font-family: 'Open Sans', sans-serif; font-size:14px;">
+                   <style>
+                        .btnStyle {
+                              color: #FFFFFF !important;
+                              font: bold 14px 'Open Sans Condensed' !important;
+                              background: #42A9DD !important;
+                              padding: 5px 5px !important;
+                              margin: 0 !important;
+                              border: none !important;
+                              border-radius: 5px !important;
+                              cursor: pointer !important;
+                              -webkit-box-shadow: -1px -1px -1px #222222 !important;
+                              box-shadow: -1px -1px -1px #222222 !important;
+                              text-decoration: none !important;
+                         }
+                   </style>
+                   
+                                   
+                   
+                  
+             <div>
+                  <div >      
+                        <div>                                        
+                             <div>
+                                    <h1 style=" font-size:18px; width:70%; color: #3399cc;"> Initiative -  {!InitiativeName} - {!InitiativeAccountService}</h1>       
+                                    <div style="float:left;"  >
+                                           <strong>Status:</strong>
+                                           <label style="" id="lblStatus" >{!Status}</label>
+                                    </div>
+                                    <br/>
+                                    <apex:outputPanel rendered="{!If(CheckBriefDescription_Assumption  =true,true,false)}">
+                                         <div style="width;100%; display:inline-block;">
+                                                <div style=" margin-top:5px; float:left; display:inline-block;"><strong  style="text-align: Left; width:100px; float: Right; ">Description:</strong><label style="font-weight:normal;" id="Comments" >{!BriefDescription}</label>  </div>            
+                                         </div>
+                                    </apex:outputPanel> 
+                             </div>                               
+                             <br />
+
+                             <div style="clear:both"></div>                       
+                             <div>
+                                  <h1 style=" font-size:14px; width:70%; color: #3399cc;margin:0px;padding:0px;">ESTIMATES:</h1>                       
+                                  <apex:outputText value="{!InitiativeEntries}" escape="false"></apex:outputText>
+                             </div>                         
+                        </div>
+                  </div>
+            </div>
+            
+            <apex:outputPanel rendered="{!If(CheckComments =true,true,false)}">
+                    <div style="width;100%; display:inline-block;">
+                                 <div style=" margin-top:5px; float:left; display:inline-block;"><strong  style="text-align: Left; width:100px; float: Right; ">Comments:</strong><label style="font-weight:normal;" id="Comments" >{!Comments}</label>  </div>            
+                    </div>
+           </apex:outputPanel>
+
+            </body>           
+      </html>
+</apex:page>

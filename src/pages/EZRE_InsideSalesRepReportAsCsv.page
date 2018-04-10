@@ -1,0 +1,10 @@
+<apex:page controller="EZRE_InsideSalesRepReportAsCsv" language="en-US" cache="true" contentType="application/vnd.ms-excel#Inside SalesRep Daily Summary Report.xls" showHeader="false" sidebar="false">
+  <apex:pageblock id="Pb"> 
+  <apex:pageblockTable value="{!SummaryRep}" var="rec"> 
+   <apex:column headerValue="Inside Sales Rep Name" value="{!rec.salesRepName}"/>
+   <apex:column headerValue="Number Of Accounts" value="{!rec.noOfAccts}"/>
+   <apex:column headerValue="Number Of Contacts" value="{!rec.noOfContacts}"/>
+   <apex:column headerValue="Appointments Fixed" value="{!rec.noOfAppointments}"/>
+  </apex:pageblockTable>
+  </apex:pageblock>
+</apex:page>

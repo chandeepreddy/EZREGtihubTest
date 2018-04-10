@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION" description="An event to notify start and end indices" access="public">
+    <aura:attribute name="start" type="Integer" access="public"/>
+    <aura:attribute name="end" type="Integer" access="public"/>
+    <aura:attribute name="isLastPage" type="Boolean" access="public"/>
+    <aura:attribute name="isFirstPage" type="Boolean" access="public"/>
+</aura:event>

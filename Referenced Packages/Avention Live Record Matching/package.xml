@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Avention Live Record Matching</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <description>Avention Live Record Matching matches newly created CRM records to the Avention database and appends with Avention information. Avention for Salesforce transforms sales by understanding the ideal targets for each sales professional and then continuously delivering the most timely and relevant opportunities personalized by their profile. With Avention for Salesforce, sales professionals can focus their efforts where there is the greatest opportunity, resulting in greater revenue and improved sales productivity.</description>
+    <namespacePrefix>iSellLiveMatch</namespacePrefix>
+    <types>
+        <members>Account.iSell_LiveRecordMatching_Account_OM</members>
+        <members>Lead.iSell_LiveRecordMatching_Lead_OM</members>
+        <name>WorkflowOutboundMessage</name>
+    </types>
+    <version>36.0</version>
+</Package>

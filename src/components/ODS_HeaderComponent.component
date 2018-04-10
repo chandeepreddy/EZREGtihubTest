@@ -1,0 +1,253 @@
+<apex:component controller="ODS_HeaderController" id="TestPgn"  >
+  <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=10;IE=9; IE=8; IE=7; IE=EDGE" />
+
+        <title>ON DEMAND SERVICES </title>
+        <apex:includeScript value="https://code.jquery.com/jquery-latest.min.js"/>
+      
+        
+        <!-------- Bootstrap ----->
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/bootstrap.css')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'js/bootstrap.js')}"/>
+        <apex:stylesheet value="https://fonts.googleapis.com/css?family=Open+Sans:400,700"/>
+        <apex:includeScript value="https://www.google.com/recaptcha/api.js"/>
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/style.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/style_dev.css')}"/>
+        <link href="{!URLFOR($Resource.ODS_Assets,'css/style_dev.css')}" rel="stylesheet" type="text/css"/>
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/jquery-ui.css')}"/> 
+      
+        <script>
+            $(document).ready(function(){
+                debugger;
+                var IsCustomer = {!isCustomer};  
+                  if(IsCustomer)
+                  {
+                      $("#mnuMyAccount").css("display","block");  
+                      $(".ddlstAccount").attr('disabled', true);
+                  }
+                  else
+                  {
+                      $("#mnuCustomer").css("display","block");
+                      $("#mnuClientQuery").css("display","block");
+                  } 
+                ////Profile Dropdown
+                $( ".user-name span, .shadow-show" ).click(function(event) {
+                  event.preventDefault();
+                  $( ".account_links, .shadow-show" ).slideToggle( "fast" );
+                });
+                
+                debugger;
+                var Accountid = $(".ddlstAccount").val();
+                var Serviceid = $(".ddlstService").val(); 
+                ODS_HeaderController.RedirectDashboardPage(Accountid,Serviceid, 
+                function (result,event)
+                {
+                    if(result == 'ODS')
+                    {
+                        $("#mnuTimeshet").css("display", "block");
+                         
+                    }
+                    else if (result == 'Other')
+                    {
+                        $("#mnuTimeshet").css("display", "none");
+                         
+                    }
+                    else{
+                        $("#mnuTimeshet").css("display", "block");
+                         
+                    }
+                },
+                
+              
+             {escape:true});   
+            });    
+                        
+            function logout(){
+                window.location.replace("{!$Site.Prefix}/secur/logout.jsp");
+            } 
+            
+            function fnLoadServiceDropdown(){
+                var Accountid = $(".ddlstAccount").val();
+                var Serviceid = $(".ddlstService").val(); 
+                ODS_HeaderController.RedirectDashboardPage(Accountid,Serviceid, 
+                function (result,event)
+                {
+                    if(result == 'ODS')
+                    {
+                        $("#mnuTimeshet").css("display", "block");
+                         
+                    }
+                    else if (result == 'Other')
+                    {
+                         $("#mnuTimeshet").css("display", "none");
+                         
+                    }
+                },
+                {escape:true});
+                LoadServiceDropdown();
+            }
+            
+            function ApplyEngagementTypeChanges(){
+                var Accountid = $(".ddlstAccount").val();
+                var Serviceid = $(".ddlstService").val(); 
+                ODS_HeaderController.RedirectDashboardPage(Accountid,Serviceid, 
+                function (result,event)
+                {
+                    var jsonResult = result.split('$$##');
+                    
+                    var EngType = jsonResult[0];
+                    
+                    var AgileType = jsonResult[1];  
+                    
+                    if(EngType == 'ODS')
+                    {
+                        $("#mnuTimeshet").css("display", "block");
+                         
+                    }
+                    else if (EngType == 'Other')
+                    {
+                        $("#mnuTimeshet").css("display", "none");
+                         
+                    }
+                },
+                {escape:true});
+                ApplySearch();
+            }
+            
+        </script>
+        <style>
+            .popupBackground {
+                /* Background color */
+                background-color:black;
+                opacity: 0.20;
+                filter: alpha(opacity = 20);
+            
+                /* Dimensions */
+                width: 100%;
+                height: 500%;
+                top: 0;
+                left: 0;
+                z-index: 998;
+                position: absolute;
+                font-family: sans-serif;
+                /* Mouse */
+                cursor:wait;
+            }
+         
+            /* This is for the message DIV */
+            .PopupPanel {
+                /* Background color */
+                border: solid 2px skyblue;
+                background-color: white;
+                font-family: sans-serif;
+                /* Dimensions */
+                left: 50%;
+                width: 100px;
+                margin-left: -100px;
+                top: 50%;
+                height: 100px;
+                margin-top: -25px;
+                z-index: 999;
+                position: fixed;
+                
+                /* Mouse */
+                cursor:pointer;
+            }
+        </style>
+        <!-------- Fonts Awesome ----->
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'font-awesome/css/font-awesome.css')}"/>        
+        
+    </head>
+    <body>  
+        <apex:actionFunction name="LoadServiceDropdown" action="{!SetRelatedService}"   status="statusSaveTrip" reRender="ServiceSelectList" immediate="false" oncomplete="ApplySearch();" >
+        </apex:actionFunction>
+        <apex:actionStatus id="statusSaveTrip" stopText="">
+                <apex:facet name="start">
+                    <div>
+                        <div class="popupBackground" />
+                        <div class="PopupPanel">
+                            <table border="0" width="100%" height="100%">
+                                <tr>
+                                    <td align="center"><b>Please Wait</b></td>
+                                </tr>
+                                <tr>
+                                    <td align="center"><img src="{!$Resource.ODS_Statussign}"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </apex:facet>
+            </apex:actionStatus>           
+            <div class="shadow-show"></div>
+            <div class="header" id = "testpg">
+                <div class="sub-warp">
+                    <div class="logo">
+                        <a href="Dashboard" class="demandblueLogo"><img src="{!URLFOR($Resource.ODS_Assets,'images/logo.png')}" alt="logo"  /></a> 
+                        <a href="Dashboard" class="on-demad-logo"><img src="{!URLFOR($Resource.ODS_Assets,'/images/on-demand-logo.png')}" alt="logo" /></a>
+                    </div>
+                    <div class="head-right">
+                        <div class="username-head user-name">
+                            <!--<img src="{!URLFOR($Resource.ODS_Assets,'images/head-user-icon.png')}" alt="user-icon"/>  -->
+                            <apex:outputPanel > 
+                                     <apex:image value="{!URLFOR($Resource.ODS_Assets,'images/tech_pic.jpg')}" rendered="{!UserPhoto=='' && UserPhoto==null}" style="width:21px;" />
+                                     <apex:image url="/servlet/servlet.FileDownload?file={!UserPhoto}" rendered="{!UserPhoto!='' && UserPhoto!=null}" style="width:21px;" />
+                                  </apex:outputPanel>
+                                 
+                                 
+                             <span style="cursor:pointer;">{!currentUserName}<i class="fa fa-sort-desc" aria-hidden="true"></i></span>
+                            <div class="account_links">
+                                <img src="{!URLFOR($Resource.ODS_Assets,'images/white-arrow.png')}" alt="user-icon" style="width:auto;"/>
+                                 <ul>  
+                                     <li><a href="#" id="logout" onclick="logout();"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
+                                 </ul>
+                            </div>  
+                        </div>
+                        <apex:selectList id="ddlstAccountId" onchange="fnLoadServiceDropdown()" value="{!AccountId}" size="1" styleClass="droptext ddlstAccount" >
+                            <apex:selectOptions value="{!AccountPicklistValues}"/>                                    
+                        </apex:selectList>
+                        <apex:selectList value="{!ServiceId}" id="ServiceSelectList" size="1"  onchange="ApplyEngagementTypeChanges();" styleClass="bluedrop ddlstService">
+                            <apex:selectOptions value="{!ServiceDropdownValues}" />  
+                        </apex:selectList>    
+                    </div> 
+                </div>
+            </div>
+            <div class="clr"></div>
+            <div class="mnu navbar-default">
+
+                <div class="collapse navbar-collapse" id="prelude_mnu">
+                    <div class="sub-warp">
+                        <ul class="nav nav-pills wow pulse nav-scroll">
+                            <li id="rdnDashboard"> <a href="Dashboard" id="dashboard">Dashboard</a> </li>
+                            <li id="mnuInitiative" ><a href="ViewInitiative"  id="initiative">Initiative</a></li>
+                            <li id="mnuTimeshet" ><a href="viewTimesheet"  id="timesheet">Timesheet</a></li>
+                            <li><a href="StatusReport"  id="statusreport">Status Report</a></li>
+                            <li><a href="Documents" id="documents"> Documents</a></li> 
+                            <li><a href="Invoice" id="Invoice"> Invoice </a></li>
+                            <li id="mnuCustomer" style="display:none;"><a href="Customer"  id="customer" >Customers  </a></li>
+                            <li id="mnuMyAccount" style="display:none;"><a href="Customer"  id="MyAccount" >My Account</a></li>
+                            <li id="mnuClientQuery" style="display:none;"><a href="ClientQuery"  id="ClientQuery" >Client Queries</a></li>
+                             
+ 
+                            <!--  <li><a href="people.html">People</a></li>
+                            
+                            <li><a href="documents.html"> Documents </a></li>
+                            <li><a href="#" class="user-name">  MY Profile <i class="fa fa-sort-desc" aria-hidden="true"></i></a>
+                                <ul class="account_links">  
+                                    <li><img src="images/head-user-icon.png" alt="user-cion"> <a href="#" class="user-text">James Smith</a></li>
+                                    <li><a href="#">Edit Profile</a></li>
+                                    <li><a href="login.html">Logout</a></li>
+                                </ul>
+                            </li>-->
+
+                        </ul>
+                    </div> 
+                </div>
+                 <input type="hidden" id="currentvfpage" value="{!$CurrentPage.Name}"/> 
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#prelude_mnu"><i class="fa fa-bars" aria-hidden="true"></i></button>
+            </div>
+            <div class="clr"></div>
+            
+            </body>
+</apex:component>

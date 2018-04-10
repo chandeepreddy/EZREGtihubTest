@@ -1,0 +1,25 @@
+.THIS .slds-listbox__item:hover {
+	background-color: rgb(244, 246, 249);
+}
+
+.THIS .slds-icon {
+	fill: rgb(21, 137, 238);
+}
+
+.THIS .slds-listbox {
+	max-height: 12em;
+}
+
+.THIS.ie11 .slds-has-inline-listbox {
+	border: none;
+}
+
+.THIS .eh-avatar {
+	background-color: rgba(129, 153, 175, 1);
+}
+
+.THIS .eh-avatar svg.slds-icon {
+	width: 1.8em;
+	margin-left: .24em;
+	fill: white;
+}

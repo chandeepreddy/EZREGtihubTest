@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>CUST_NAME</field>
+    </columns>
+    <columns>
+        <field>G2M_Meeting__c.Start_Time__c</field>
+    </columns>
+    <columns>
+        <field>G2M_Meeting__c.End_Time__c</field>
+    </columns>
+    <columns>
+        <field>G2M_Meeting__c.Attendee_Count__c</field>
+    </columns>
+    <columns>
+        <field>G2M_Meeting__c.Formatted_Meeting_ID__c</field>
+    </columns>
+    <format>Tabular</format>
+    <name>GTM Session</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$G2M_Meeting__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <timeFrameFilter>
+        <dateColumn>G2M_Meeting__c.End_Time__c</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

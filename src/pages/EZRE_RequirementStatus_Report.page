@@ -1,0 +1,168 @@
+<apex:page controller="EZRE_RequirementTracking_Report" id="pg" readOnly="true" sidebar="false">
+<!-- Jquery -->
+<apex:includeScript value="//code.jquery.com/jquery-1.11.3.min.js"/>
+<apex:stylesheet value="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"/>
+ 
+<!-- DataTable -->
+<apex:includeScript value="//cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"/>
+<apex:stylesheet value="//cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css"/>
+ 
+<!-- Search Highlight -->
+<apex:includeScript value="//bartaz.github.io/sandbox.js/jquery.highlight.js"/>
+<apex:includeScript value="//cdn.datatables.net/plug-ins/1.10.9/features/searchHighlight/dataTables.searchHighlight.min.js"/>
+<apex:stylesheet value="//cdn.datatables.net/plug-ins/1.10.9/features/searchHighlight/dataTables.searchHighlight.css"/>
+ 
+<!-- DataTable buttons -->
+<apex:includeScript value="https://cdn.datatables.net/buttons/1.0.3/js/dataTables.buttons.min.js"/>
+<apex:includeScript value="//cdn.datatables.net/buttons/1.0.3/js/buttons.flash.min.js"/>
+<apex:includeScript value="//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"/>
+<apex:includeScript value="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"/>
+<apex:includeScript value="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"/>
+<apex:includeScript value="//cdn.datatables.net/buttons/1.0.3/js/buttons.html5.min.js"/>
+<apex:includeScript value="//cdn.datatables.net/buttons/1.0.3/js/buttons.print.min.js"/>
+<apex:stylesheet value="https://cdn.datatables.net/buttons/1.0.3/css/buttons.dataTables.min.css"/>
+
+<style>
+.filterMatches{
+  background-color: #BFFF00;
+}
+.tertiaryPalette{
+  color: #000 !important;
+}
+.dt-buttons{
+  margin-left: 10px;
+}
+</style>
+
+<script>
+
+function DynamicDatePicker(d_id)
+{  
+    DatePicker.pickDate(false,d_id.id,false);
+}
+function DateValidation()
+{
+    var frmdate = document.getElementById("{!$Component.frm.Pb.Pbs.PbsItem.frmdate}").value;
+    var todate = document.getElementById("{!$Component.frm.Pb.Pbs.PbsToItem.ToDate}").value;
+
+    if(Date.parse(frmdate) > Date.parse(todate))
+    {
+        alert("To Date cannot be less than From Date");
+        //document.getElementById("{!$Component.frm.Pb.Pbs.PbsItem.frmdate}").value = '';
+        //document.getElementById("{!$Component.frm.Pb.Pbs.PbsToItem.ToDate}").value = '';
+        //document.getElementById("{!$Component.frm.pbtable}").visiblity = 'hidden';
+        //return false;
+        HideMethod();
+    }
+    else
+    {
+       Method(); 
+        //return true;
+    }
+}
+</script>
+<script type="text/javascript">
+$(document).ready(function(){
+  
+ var accountsTable = $('[cid$="accountsTable"]').parent('table').eq(0).DataTable({
+   //enables results highlight
+   searchHighlight: true,
+   //sets record lengths to show in picklist
+   aLengthMenu: [
+     [10, 25, 50, 100, 200, -1],
+     [10, 25, 50, 100, 200, "All"]
+   ],
+   "iDisplayLength": 10,
+   //adds copy, print buttons...
+   dom: 'lBfrtip', //l=length, B=buttons, f=filter(search), r=processing, t=the table, I=table summary, p=page controls
+   buttons: [
+     'excel',
+     {
+       extend: 'print',
+       customize: function(win) {
+         $(win.document.body)
+         .css( 'font-size', '10pt' )
+         .prepend('<img src="http://datatables.net/media/images/logo-fade.png" style="position:absolute; top:0; left:0;" />');
+ 
+         $(win.document.body).find( 'table' )
+         .addClass( 'compact' )
+         .css( 'font-size', 'inherit' );
+       }
+     }
+   ],
+ });
+ 
+});
+</script>
+  <apex:form id="frm">
+  <apex:actionFunction Name="Method" action="{!runReport}"/>
+  <apex:actionFunction Name="HideMethod" action="{!hidetable}"/>
+  <apex:pageMessages ></apex:pageMessages>
+  <apex:pageblock title="Requirement Status Report" id="Pb">
+  <apex:pageBlockSection columns="6" id="Pbs">
+  
+  <apex:pageBlockSectionItem id="PbsItem">
+  From Date
+   <apex:outputPanel id="panel">
+    <div class = "requiredInput" id="div">
+        <div class = "requiredBlock"></div>
+   <apex:inputText id="frmdate" label="From Date" value="{!dtFromDate}" size="10" onclick="DynamicDatePicker(this);"  disabled="false" style="width:150px;" required="true"/>
+  </div>
+  </apex:outputPanel>
+  </apex:pageBlockSectionItem>
+   <apex:pageBlockSectionItem id="PbsToItem">
+  
+  To Date
+   <apex:outputPanel >
+    <div class = "requiredInput">
+        <div class = "requiredBlock"></div>
+  <apex:inputtext id="ToDate" label="To Date" value="{!dtToDate}" size="10" onclick="DynamicDatePicker(this);"  disabled="false" style="width:150px;" required="true" /> 
+  </div>
+  </apex:outputPanel>
+  </apex:pageBlockSectionItem>
+ <apex:pageBlockSectionItem >Order By
+   
+  <apex:selectList id="Filter" value="{!strFilterValue}" size="1">
+  <apex:selectOptions value="{!FilterValues}">
+  </apex:selectOptions>
+  </apex:selectList>
+  </apex:pageBlockSectionItem>
+  </apex:pageBlockSection>
+  <apex:pageBlockButtons location="bottom">
+  <apex:commandButton Value="Run Report" onclick="if(!DateValidation()) return false;" reRender="frm" style="margin-left:160PX;"/> 
+  </apex:pageBlockButtons>
+  </apex:pageblock>
+  </apex:form>
+  <apex:form >
+  <apex:pageblock title="Requirement Status Report"  rendered="{!isShowTable}" id="pbtable">
+  <apex:pageBlockButtons location="Top">
+  <!--<apex:commandlink action="{!ExportAsCSV}" target="_blank">
+  <apex:commandButton Value="ExportAs Excel"  style="margin-left:150PX;"/>
+  </apex:commandlink>-->
+  </apex:pageBlockButtons>
+  <apex:pageblockTable value="{!SummaryReq}" var="rec" html-cid="accountsTable">
+    <apex:column headerValue="Owner Name" value="{!rec.req.owner.name}"/> 
+    <apex:column headerValue="Created Date" value="{!rec.req.CreatedDate}"/>
+    <apex:column headerValue="Requirement Code" value="{!rec.req.Opportunity_Code__c}"/>
+    <apex:column headerValue="Status" value="{!rec.req.Status__c}"/>
+    <apex:column headerValue="Client Name" value="{!rec.req.C_Name__r.Name}"/>
+    <apex:column headerValue="End Client Name" value="{!rec.req.End_Client_Name__c}"/>
+    <apex:column headerValue="Job Title">
+    <apex:outputLink value="/{!rec.req.Id}">{!rec.req.name}</apex:outputLink>
+    </apex:column>
+    <apex:column headerValue="Requirement Type" value="{!rec.req.Requirement_Type__c}"/>
+   <apex:column headerValue="Resumes Requested" value="{!rec.req.No_Of_Resumes__c}"/>
+   <apex:column headerValue="Resumes Submitted" value="{!rec.req.ResumesSubmitted__c}"/>
+   <apex:column headerValue="Assigned LR's" value="{!rec.LRNames}"/> 
+   <apex:column headerValue="Assigned R's" value="{!rec.RNames}"/> 
+   <apex:column headerValue="Resumes Sub for this Period" value="{!rec.NoofResumes}"/>
+   <apex:column headerValue="Req Closed Date" value="{!rec.req.Req_Closed_Date__c}"/>  
+   <apex:column headerValue="No.of Client Interviews" value="{!rec.intrwdCndCunt}"/>
+   <apex:column headerValue="No.of Client Offered Candidates" value="{!rec.offrdCndCunt}"/>
+   <apex:column headerValue="No.of Candidates Started" value="{!rec.strtdCndCunt}"/>
+   <apex:column headerValue="MR Approved Total Count" value="{!rec.mrApprvedCandTotalCount}"/>
+   <apex:column headerValue="MR Approved for this Period" value="{!rec.mrApprvdCandsForGivenPeriod}"/> 
+  </apex:pageblockTable>
+  </apex:pageblock>
+  </apex:form>
+</apex:page>

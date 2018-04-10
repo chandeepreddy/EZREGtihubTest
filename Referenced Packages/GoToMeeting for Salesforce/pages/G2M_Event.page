@@ -1,0 +1,57 @@
+<apex:page standardController="Event" extensions="G2M4Force.G2M_Event_Controller" action="{!validateAuthKey}" tabStyle="G2M_Event__tab"> 
+    <apex:form >
+      <apex:actionFunction action="{!cancel}" name="goBack"/>      
+      <apex:sectionHeader title="GoToMeeting® for Salesforce"/>
+      <apex:pageBlock mode="edit" title="{!IF(isImmediate, 'Meet Now','Schedule Meeting')} {!IF(attendeeName != null, ' with ' + attendeeName,'')}"> 
+        <apex:pageBlockButtons >
+          <apex:commandlink style="font-size:11px;text-decoration:none;" styleClass="btn" action="{!save}" rendered="{!isImmediate}">Start</apex:commandLink>
+          <apex:commandlink style="font-size:11px;text-decoration:none;" styleClass="btn" action="{!save}" rendered="{!NOT(isImmediate)}">Schedule</apex:commandLink>
+          <apex:commandLink style="font-size:11px;text-decoration:none;" styleClass="btn" action="{!cancel}" value="Cancel"/>                
+        </apex:pageBlockButtons>
+        <apex:pageMessages />       
+        <apex:pageblockSection title="Meeting Detail" columns="1" id="meetingDetail">
+           <apex:inputField id="meetingSubject" value="{!Event.Subject}" required="true"/>
+           <apex:pageblockSectionItem rendered="{!NOT(isImmediate)}">
+             <apex:outputLabel value="Start Date"/>
+             <apex:outputPanel >
+               <apex:inputText label="Meeting Start Date" id="meetingStartDate" value="{!startDate}"  required="true" onfocus="DatePicker.pickDate(false, '{!$Component.meetingStartDate}', false);"/>
+               <apex:selectList multiselect="false" size="1" id="meetingStartTime" value="{!startTimeOffset}" required="true">
+                 <apex:selectOptions value="{!startTimeOptions}"/>
+               </apex:selectList>
+             </apex:outputPanel>
+           </apex:pageblockSectionItem>
+           <apex:pageblockSectionItem rendered="{!NOT(isImmediate)}" >
+             <apex:outputLabel value="Meeting Duration" for="meetingDuration"/>
+             <apex:selectList multiselect="false" size="1" id="meetingDuration" value="{!duration}"  required="true">
+               <apex:selectOptions value="{!durationOptions}"/>
+             </apex:selectList>
+           </apex:pageblockSectionItem>   
+           <apex:inputField id="sendInviteEmail" value="{!Event.G2M4Force__G2M_Send_Invite_Email__c}" onclick="toggleEmailComment(this)"/>                    
+           <apex:pageblockSectionItem id="emailMessage"> 
+             <apex:outputLabel value="Custom Message" id="emailMessageLabel" style="display:none"/>                      
+             <apex:inputTextArea value="{!emailComment}" rows="6" cols="80" id="emailMessageInput" style="display:none" title="Meeting invitation text will be included below your custom message"/>
+           </apex:pageblockSectionItem> 
+           <apex:pageblockSectionItem id="emailMessageDescription" dataStyleClass="labelCol"> 
+             <apex:outputLabel value="" id="emailMessageEmptyLabel" style="display:none"/>                       
+             <apex:outputLabel value="Meeting invitation text will be included below your custom message" id="emailMessageDescription" style="display:none"/>
+           </apex:pageblockSectionItem>                                                      
+<script language="javascript">
+  function toggleEmailComment(sendEmail) {
+     var emailCommentLabel = document.getElementById('{!$Component.emailMessage.emailMessageLabel}');
+     var emailCommentInput = document.getElementById('{!$Component.emailMessage.emailMessageInput}');  
+     var emailCommentEmptyLabel = document.getElementById('{!$Component.emailMessageDescription.emailMessageEmptyLabel}');
+     var emailCommentDescription = document.getElementById('{!$Component.emailMessageDescription.emailMessageDescription}');       
+     
+     if (sendEmail.checked) {
+         emailCommentLabel.style.display = emailCommentInput.style.display = emailCommentEmptyLabel.style.display = emailCommentDescription.style.display = "block";
+     } else {
+         emailCommentLabel.style.display = emailCommentInput.style.display = emailCommentEmptyLabel.style.display = emailCommentDescription.style.display = "none";
+     }
+  }
+  
+ 
+</script> 
+        </apex:pageBlockSection> 
+      </apex:pageBlock>  
+    </apex:form>
+</apex:page>

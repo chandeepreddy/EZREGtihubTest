@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>S10Q_oauth</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <modules>
+        <module>
+            <label>S10Q_oauth</label>
+            <moduleType>connected</moduleType>
+            <name>S10Q_oauth</name>
+            <types>
+                <members>S10Q_oauth_devConfig</members>
+                <name>ConnectivityDevConfigMetadata</name>
+            </types>
+            <types>
+                <members>relateiq__S10Q_oauth</members>
+                <name>Module</name>
+            </types>
+            <version>8.0</version>
+        </module>
+    </modules>
+    <namespacePrefix>relateiq</namespacePrefix>
+    <version>36.0</version>
+</Package>

@@ -1,0 +1,3 @@
+<apex:page standardController="Lead" tabStyle="lead">
+<apex:iframe src="https://apps.firstrain.com/salesforce/001/dynamic/sf.do?sessionId={!$Api.Session_ID}&serverURL={!$Api.Partner_Server_URL_180}&accountId={!lead.id}&accountName={!URLENCODE(lead.company)}&userId={!$User.Id}&type=lead&sfticker=&uln={!URLENCODE($User.LastName)}&ufn={!URLENCODE($User.FirstName)}&org={!URLENCODE($Organization.Name)}" height="250px" id="firstrainIframe"/>
+</apex:page>

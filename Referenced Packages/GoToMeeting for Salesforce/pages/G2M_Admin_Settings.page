@@ -1,0 +1,32 @@
+<apex:page controller="G2M4Force.G2M_Admin_Settings_Controller" action="{!loadInitialValues}" tabstyle="GoToMeeting_Admin_Settings__tab">
+
+    <apex:form >
+         <apex:sectionHeader title="GoToMeeting® Admin Settings"/>
+         
+         <apex:pageBlock mode="edit" title="GoToMeeting Integration Settings">
+      
+              <apex:pageblockSection title="Notifications" columns="1" id="exceptions">
+                 <apex:pageMessages escape="false" />
+              </apex:pageblockSection>
+            <apex:pageblockSection title="Automatic Sync Meetings" columns="1" id="syncMeetings" rendered="{!noScheduledJobs && userAuthorized}">
+                <apex:commandButton value="Automatically Sync Meetings ( Nightly )" action="{!kickOffMeetingUpdater}" disabled="{!notInitialized}"/>
+            </apex:pageblockSection>      
+          
+            <apex:pageblockSection title="Automatic Sync Meetings" columns="1" id="turnOffMeetings" rendered="{!NOT(noScheduledJobs) && userAuthorized}">
+                <apex:commandButton value="Turn off Automatic Sync" action="{!turnOffBatchJobs}" disabled="{!notInitialized}"/>
+            </apex:pageblockSection> 
+            
+            <!-- Lead Contact Conflicts -->
+            <apex:pageblockSection title="Duplicate Lead/Contact Settings" columns="2" id="leadContactConflicts" rendered="{!NOT(notInitialized) && userAuthorized}">  
+                <apex:outputText value="Allow the integration to update the activity history of each lead/contact when there are duplicate records."/>
+                <apex:inputCheckBox value="{!updateAllLeadsContacts}"  onClick="SaveContactSettings()" id="updateAllLeads"/>
+                <apex:outputText value="Create New Lead" rendered="false"/>
+                <apex:inputCheckBox value="{!createNewLeads}" rendered="false" disabled="{!notInitialized}"/>
+                <apex:actionFunction name="SaveContactSettings" action="{!saveLeadContactSettings}" rerender="updateAllLeads"/>
+            </apex:pageblockSection>
+        
+         </apex:pageBlock>
+         
+    </apex:form>
+
+</apex:page>

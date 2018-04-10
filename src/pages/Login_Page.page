@@ -1,0 +1,37 @@
+<apex:page docType="html-5.0" controller="ODSLoginController" sidebar="false" showHeader="false" standardStyleSheets="false">
+<apex:form >
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+        
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets, 'css/style.css')}"/>        
+        <apex:stylesheet value="https://fonts.googleapis.com/css?family=Open+Sans:400,700"/>
+        <apex:includeScript value="http://code.jquery.com/jquery-latest.min.js"/>
+        <apex:includeScript value="https://www.google.com/recaptcha/api.js"/>        
+        <title>ON DEMAND SERVICES </title>
+    </head>
+
+    <body class="login-bg">  
+        <div class="wrap">
+            <div class="login-logo"><a href="#">
+            <apex:image url="{!URLFOR($Resource.ODS_Assets, 'images/DB_Login.png')}" alt="logo"/>
+            </a></div>
+            <div class="login">
+                <h2>Log In</h2>
+                
+                 <apex:outputPanel id="pnlMessages" >
+                <apex:pagemessages id="pgMsg"></apex:pagemessages>
+            </apex:outputPanel>
+               
+                <apex:inputText label="email" id="name" styleClass="email" value="{!username}"  required="true" html-placeholder="Username"/>
+                <apex:inputSecret label="password" id="password" styleClass="password"   value="{!password}" html-placeholder="Password"/>
+                <div class="g-recaptcha" data-sitekey="6LfDvyYTAAAAAG6oEBe4WIJmZl0iYkc9lx412Je5"></div>
+                <apex:commandButton value="login" action="{!login}" styleClass="submit"/>
+                <apex:commandButton value="Forgot Password" action="{!ForgotPassword}" styleClass="forgot-pass"/>
+            </div>            
+        </div> 
+        <div class="copyright">COPYRIGHT © 2018 DEMANDBLUE. ALL RIGHTS RESERVED</div>     
+    </body>
+    </apex:form>
+</apex:page>

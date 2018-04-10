@@ -1,0 +1,114 @@
+<apex:page controller="CustomAccountLookupController"
+  title="Search" 
+  showHeader="false" 
+  sideBar="false" 
+  tabStyle="Account" 
+  id="pg" >
+ 
+  <apex:form >
+  <apex:outputPanel id="page" layout="block" style="margin:5px;padding:10px;padding-top:2px;">
+    <apex:tabPanel switchType="client" selectedTab="name1" id="tabbedPanel">
+ 
+      <!-- SEARCH TAB -->
+     <apex:tab label="Search" name="tab1" id="tabOne"> 
+ 
+        <apex:actionRegion >  
+          <apex:outputPanel id="top" layout="block" style="margin:5px;padding:10px;padding-top:2px;">
+            <apex:outputLabel value="Search" style="font-weight:Bold;padding-right:10px;" for="txtSearch"/>
+            <apex:inputText id="txtSearch" value="{!searchCandidateString}" />
+              <span style="padding-left:5px">
+                  <apex:commandButton id="btnGo" value="Go" action="{!Search}" rerender="searchResults"></apex:commandButton> 
+                  <apex:commandButton id="btnNew" action="{!saveAccount}" value="New" rerender="searchResults"></apex:commandButton> 
+              </span>
+               <!-- <apex:commandButton id="btnSearch" action="{!searchCandidate}" value="Search" rerender="searchResults"></apex:commandButton> -->
+          </apex:outputPanel>
+ 
+          <apex:outputPanel id="pnlSearchResults" style="margin:10px;height:350px;overflow-Y:auto;" layout="block">
+            <apex:pageBlock id="searchResults"> 
+              <apex:pageBlockTable value="{!resultsCandidate}" var="a" id="tblResults">
+                <apex:column >
+                
+                  <apex:facet name="header">
+                    <apex:outputPanel >First Name</apex:outputPanel>
+                  </apex:facet>
+                  <apex:outputLink value="javascript:top.window.opener.lookupPick2('{!FormTag}','{!TextBox}_lkid','{!TextBox}','{!a.Id}','{!a.Name}',false)" rendered="{!NOT(ISNULL(a.Id))}">{!a.Name}</apex:outputLink>     
+                 
+                <!-- <apex:outputPanel layout="block">
+                      <apex:outputText value="{!a.Name}"/><br/>  
+                      <apex:outputText value="{!a.Last_Name__c}" /><br/> 
+                      <apex:outputLink value="javascript:top.window.opener.lookupPick2('{!FormTag}','{!TextBox}_lkid','{!TextBox}','{!a.Id}','{!a.Name}', false)" rendered="{!NOT(ISNULL(a.Id))}">{!a.Name}</apex:outputLink>     
+                 </apex:outputPanel> -->                
+                </apex:column>
+                <apex:column >
+                <apex:facet name="header">
+                  <apex:outputPanel >Last Name</apex:outputPanel>
+                </apex:facet>
+                <apex:outputField value="{!a.Last_Name__c}"/>
+                </apex:column>
+                <apex:column >  
+                <apex:facet name="header">
+                  <apex:outputPanel >Added User</apex:outputPanel>
+                </apex:facet>
+                <apex:outputField value="{!a.OwnerId}"/>
+                </apex:column>
+                 <apex:column >
+                <apex:facet name="header">
+                  <apex:outputPanel >Skills</apex:outputPanel>
+                </apex:facet>
+                <apex:outputField value="{!a.Skills__c}"/>
+                </apex:column>
+                <apex:column >
+                <apex:facet name="header">
+                  <apex:outputPanel >Location</apex:outputPanel>
+                </apex:facet>
+                <apex:outputField value="{!a.Location__c}"/>
+                </apex:column>
+                <apex:column >
+                <apex:facet name="header">
+                  <apex:outputPanel >Mobile</apex:outputPanel>
+                </apex:facet>
+                <apex:outputField value="{!a.Mobile_Phone_No__c}"/>
+                </apex:column>
+                <apex:column >
+                <apex:facet name="header">
+                  <apex:outputPanel >Email</apex:outputPanel>
+                </apex:facet>
+                <apex:outputField value="{!a.Email__c}"/>
+                </apex:column>
+                <apex:column >
+                <apex:facet name="header">
+                  <apex:outputPanel >Visa Type</apex:outputPanel>
+                </apex:facet>
+                <apex:outputField value="{!a.Visa_Type__c}"/>
+                </apex:column>        
+                <apex:column >
+                <apex:facet name="header">
+                  <apex:outputPanel >Cost</apex:outputPanel>
+                </apex:facet>
+                <apex:outputField value="{!a.Cost__c}"/>
+                </apex:column>                             
+              </apex:pageBlockTable>
+            </apex:pageBlock>
+          </apex:outputPanel>
+        </apex:actionRegion>
+ 
+      </apex:tab> 
+ 
+      <!-- NEW ACCOUNT TAB -->
+     <!-- <apex:tab label="New Candidate" name="tab2" id="tabTwo"> 
+        <apex:pageBlock id="newAccount" title="New Candidate"> 
+          <apex:pageBlockButtons >
+            <apex:commandButton action="{!saveAccount}" value="Save"/>
+          </apex:pageBlockButtons>
+          <apex:pageMessages />
+ 
+          <apex:pageBlockSection columns="2">
+              <apex:inputField id="CandidateName"  value="{!candidate.Name}"/>
+          </apex:pageBlockSection> 
+        </apex:pageBlock>
+ 
+      </apex:tab> -->
+    </apex:tabPanel>
+  </apex:outputPanel>
+  </apex:form>
+</apex:page>

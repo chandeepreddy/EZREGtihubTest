@@ -1,0 +1,9 @@
+<apex:page id="PardotAccountSocialData"
+    standardcontroller="Account"
+    extensions="pi.PersonAccountController,pi.AccessPardotController">
+    <style>
+        Body { Background: transparent; }
+    </style>
+    <apex:iframe rendered="{!IsPersonAccount}" src="{!pardotBaseUrl}/socialData/socialData/email/{!URLENCODE(AccountEmail)}{!authenticatedQueryString}&serverurl={!$Api.Partner_Server_URL_90}&source=salesforce&tab=lead&style={!$User.UIThemeDisplayed}&fid={!AccountId}" height="390" scrolling="True" id="prospect_insight"/>
+    <apex:pageMessage severity="warning" rendered="{!(!IsPersonAccount)}" summary="This action is not supported on this page. This action is only supported on Lead, Contact, and Person Account pages." />
+</apex:page>

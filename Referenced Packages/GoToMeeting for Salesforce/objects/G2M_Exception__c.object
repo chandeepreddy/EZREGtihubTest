@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
+    <description>This custom object stores the technical exceptions created by the GoToMeeting Salesforce integration.</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <fields>
+        <fullName>Category__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Defines the exception category. &quot;Business&quot; and &quot;Technical&quot; are the current defined categories.</description>
+        <externalId>false</externalId>
+        <label>Category</label>
+        <length>64</length>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>DMLFieldNames__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>DMLFieldNames</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Exception_Originator__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>The user who created the exception</description>
+        <externalId>false</externalId>
+        <label>Exception Originator</label>
+        <referenceTo>User</referenceTo>
+        <relationshipName>G2M_Exceptions</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Function_Point__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Describes the function point in the code that caused the exception</description>
+        <externalId>false</externalId>
+        <label>Function Point</label>
+        <length>64</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Generated_ApexMessage__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>A flag to signify, if the exception framework read the user friendly message.</description>
+        <externalId>false</externalId>
+        <label>Generated ApexMessage</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Line_Number__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Stores the line number where the exception occurred</description>
+        <externalId>false</externalId>
+        <label>Line Number</label>
+        <precision>5</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Message__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Stores the complete stack trace of the exception.</description>
+        <externalId>false</externalId>
+        <label>Message</label>
+        <length>32768</length>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>NotifyEmail__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>A flag to indicate whether the exception needs to be notified by email with details</description>
+        <externalId>false</externalId>
+        <label>NotifyEmail</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>OrgId__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Store the orgId of the org generating the error</description>
+        <externalId>false</externalId>
+        <label>OrgId</label>
+        <length>20</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Page_Severity__c</fullName>
+        <deprecated>false</deprecated>
+        <description>List the page severity of the apex message to be displayed to the end user.</description>
+        <externalId>false</externalId>
+        <label>Page Severity</label>
+        <length>25</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Profile_Name__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Stores the profile name associated with the exception originator</description>
+        <externalId>false</externalId>
+        <label>Profile Name</label>
+        <length>80</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Show_EndUser__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>A flag that say whether the message is shown to the end user in the user interface</description>
+        <externalId>false</externalId>
+        <label>Show EndUser</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Type__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Stores the exception type. DMLException, GovernorLimit exception are examples</description>
+        <externalId>false</externalId>
+        <label>Type</label>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>TextArea</type>
+    </fields>
+    <fields>
+        <fullName>User_Friendly_Message__c</fullName>
+        <deprecated>false</deprecated>
+        <description>If the exception needs to be propagated to the UI, what is the message to be displayed to the end user.</description>
+        <externalId>false</externalId>
+        <label>User Friendly Message</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>TextArea</type>
+    </fields>
+    <label>GoToMeeting Exception</label>
+    <nameField>
+        <label>G2M Exception Name</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>GoToMeeting Exceptions</pluralLabel>
+    <searchLayouts/>
+    <sharingModel>ReadWrite</sharingModel>
+    <validationRules>
+        <fullName>Exception_Message_Required</fullName>
+        <active>true</active>
+        <description>The exception message with details is required</description>
+        <errorConditionFormula>OR( 
+ISBLANK( Message__c ) 
+, ISNULL(Message__c ) 
+)</errorConditionFormula>
+        <errorDisplayField>Message__c</errorDisplayField>
+        <errorMessage>Exception Message is required.</errorMessage>
+    </validationRules>
+    <validationRules>
+        <fullName>PageSeverityReq_UserMessage</fullName>
+        <active>true</active>
+        <description>Page severity needs to be defined for every user message</description>
+        <errorConditionFormula>AND ( 
+Show_EndUser__c 
+, OR 
+( ISBLANK(Page_Severity__c) 
+, ISNULL(Page_Severity__c) 
+) 
+)</errorConditionFormula>
+        <errorDisplayField>Page_Severity__c</errorDisplayField>
+        <errorMessage>Page Severity is required when show end user flag is set</errorMessage>
+    </validationRules>
+    <validationRules>
+        <fullName>UserFriendlyMessageReq_UI_Errors</fullName>
+        <active>true</active>
+        <description>A user friendly message is required, when the message needs to be displayed in the UI</description>
+        <errorConditionFormula>AND ( Show_EndUser__c , 
+OR ( 
+ISBLANK( User_Friendly_Message__c ) 
+, ISNULL( User_Friendly_Message__c ) 
+) 
+)</errorConditionFormula>
+        <errorDisplayField>User_Friendly_Message__c</errorDisplayField>
+        <errorMessage>User friendly message is required, if show end user flag is set to true</errorMessage>
+    </validationRules>
+</CustomObject>

@@ -1,0 +1,65 @@
+<apex:page controller="iSell.AppTabController" id="thePage" sidebar="false">
+    <apex:includeScript value="{!URLFOR($Resource.iSell__jquery)}"/>
+
+    <link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:300" rel="stylesheet" type="text/css"/>
+    <style>
+        .sf1Splash {
+            font-family: 'Source Sans Pro', sans-serif;
+            font-weight: 300;
+            font-size: 36px;
+            line-height: 38px;
+            color: #333333;
+            text-align: center;
+            margin: 50px 20px;
+        }
+        
+        a.openButton {
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 18px;
+            font-weight:300;
+            line-height:20px;
+            text-shadow: none;
+            text-decoration: none;
+            
+            color: #fff;
+            background-color: rgb(36, 111, 182);
+            background-image: none;
+            border: 1px solid rgb(36, 111, 182);
+            border-radius: 3px;
+            box-shadow: none;
+            padding: 9px 12px;
+            vertical-align: middle;
+            width: 176px;
+            
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        }
+        a.openButton:hover{
+            text-decoration: none;
+            color: #fff;
+            background: #175EA1;
+            border-color: #175EA1;
+        }
+    </style>
+    
+    <apex:iframe src="{!url + $Api.Partner_Server_URL_190}" 
+        id="theIframe" scrolling="true" rendered="{!!IsSF1}">
+    </apex:iframe>
+    
+    <div id="sfOneFallback" style="display:none;">
+        <div class="sf1Splash">Welcome to the <br/>D&amp;B Hoovers <br/>application</div>
+        <apex:outputLink styleClass="openButton" 
+            value="{!url + $Api.Partner_Server_URL_190}">Open D&amp;B Hoovers Now</apex:outputLink>
+    </div>
+    
+    <apex:outputText id="isLightning" style="display:none;" rendered="{!isLightning}" value=""/> 
+
+
+<script type="text/javascript">
+    
+$(document).ready(window.onAppTabDocumentReady);
+    
+</script>
+
+</apex:page>

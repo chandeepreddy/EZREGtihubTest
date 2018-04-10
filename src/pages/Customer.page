@@ -1,0 +1,282 @@
+<!--
+ * @author           Kalaiselvi R
+ * @version          1.0 
+ * @date             05-Oct-2016
+ * @Status           Developed
+ * @description      This is the class for the customer List Page.
+ -->
+<apex:page controller="ODS_CustomerController" sidebar="false" showHeader="false" standardStylesheets="false">
+    <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+    
+    <script src="https://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+    
+    <!-------- Bootstrap ----->
+    <link href="{!URLFOR($Resource.ODS_Assets,'css/bootstrap.css')}" rel="stylesheet" type="text/css" />
+    <script src="{!URLFOR($Resource.ODS_Assets,'js/bootstrap.j')}s" type="text/javascript"></script>
+    
+    
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet"/>
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+    
+    <link href="{!URLFOR($Resource.ODS_Assets,'css/style.css')}" rel="stylesheet" type="text/css"  />
+    <link href="{!URLFOR($Resource.ODS_Assets,'css/style_dev.css')}" rel="stylesheet" type="text/css"  />
+    
+    <script type="text/javascript">
+        $(document).ready(function(){
+            debugger;
+            var IsCustomer = {!isCustomer};        
+            if(IsCustomer){
+                $("#MyAccount").addClass("active");  
+                $("#mnuMyAccount").css("display","block");   
+                $(".ddlstAccount").css("display","none"); 
+                $(".ddlstService").css("display","none"); 
+                $(".ApplyBtn").css("display","none"); 
+             }else{
+                $("#customer").addClass("active");        
+                $("#mnuCustomer").css("display","block");
+                $('#custLifecycle').hide();
+            }
+            
+            $("button.collapsed").click(function(){
+                $(".header").toggleClass("header-fixed");
+                $(".navbar-toggle").toggleClass("nav-btn-fixed");
+                $(".mid-bg").toggleClass("mid-bg-fixed");
+            });                
+            ApplySearch();
+        });
+        
+        function ApplySearch(){
+            var AccountID = $(".ddlstAccount").val();
+            var ServiceID = $(".ddlstService").val();        
+
+            ApplySearchAction(AccountID,ServiceID)
+            var isCustomerGrid = {!isCustomerGrid};       
+            if(isCustomerGrid){
+                $(".ddlstAccount").css("display","none"); 
+                $(".ddlstService").css("display","none");
+                $(".ApplyBtn").css("display","none");
+            }
+        } 
+        function changeService()
+        {
+            var customerServiceId = $(".ddlstCustomerService").val();
+            ApplyChangeService(customerServiceId);
+        }         
+    </script>
+    
+    <style>
+            .popupBackground {
+                /* Background color */
+                background-color:black;
+                opacity: 0.20;
+                filter: alpha(opacity = 20);
+            
+                /* Dimensions */
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                z-index: 998;
+                position: absolute;
+                font-family: sans-serif;
+                /* Mouse */
+                cursor:wait;
+            }
+         
+            /* This is for the message DIV */
+            .PopupPanel {
+                /* Background color */
+                border: solid 2px skyblue;
+                background-color: white;
+                font-family: sans-serif;
+                /* Dimensions */
+                left: 50%;
+                width: 100px;
+                margin-left: -100px;
+                top: 50%;
+                height: 100px;
+                margin-top: -25px;
+                z-index: 999;
+                position: fixed;
+                
+                /* Mouse */
+                cursor:pointer;
+            }
+        </style>
+    
+    <!-------- Fonts Awesome ----->
+    <link href="{!URLFOR($Resource.ODS_Assets,'font-awesome/css/font-awesome.css')}" rel="stylesheet" type="text/css"  />
+    
+    <title>ON DEMAND SERVICES </title>
+    </head>
+
+    <body>
+        <apex:form id="formId">
+        <div class="shadow-show"></div>   
+            <c:ODS_HeaderComponent />
+            <apex:actionStatus id="statusSearch" stopText="">
+                <apex:facet name="start">
+                    <div>
+                        <div class="popupBackground" />
+                        <div class="PopupPanel">
+                            <table border="0" width="100%" height="100%">
+                                <tr>
+                                    <td align="center"><b>Please Wait</b></td>
+                                </tr>
+                                <tr>
+                                    <td align="center"><img src="{!$Resource.ODS_Statussign}"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </apex:facet>
+            </apex:actionStatus>
+    <apex:actionFunction name="ApplySearchAction" action="{!GetCustomerByAccountServiceID}" status="statusSearch" reRender="outPnlCustGrid, outPnlCustDetails, searchPanelId">
+                <apex:param name="AccountId" value="" assignTo="{!AccountId}"/>
+                <apex:param name="ServiceID" value="" assignTo="{!ServiceID}"/>      
+    </apex:actionFunction>
+<apex:outputPanel id="outPnlCustGrid" rendered="{!NOT(isCustomerGrid)}">
+<div class="clr"></div>
+<div class="mid-bg">
+    <div class="sub-warp">
+        <h1 style="float:left;"><!-- Customers List--></h1>
+             
+        <div class="mid-white">
+           <div class="timeline-scroll">     
+             <apex:outputPanel id="noSearchRec" rendered="{!(accServceLst.size==0 && accServceLst!=null ) }">
+                <strong><center>No Records Found.</center></strong>
+           </apex:outputPanel> 
+            <apex:outputPanel id="searchPanelId">     
+                      
+               <apex:pageBlock id="pgblckCustGrid" rendered="{!NOT(ISNULL(accServceLst))}">
+                   <apex:pageBlockTable StyleClass="timeline customer-width" Style="cellpadding:0; cellspacing:0; width:100%;"  value="{!accServceLst}" var="rec"
+                           first="{!CurrentPage }" rows="{!PageSize}" rendered="{!(accServceLst.size !=0 && accServceLst !='' && accServceLst !=null ) }" >                                               
+                        <apex:column headerValue="CUSTOMER NAME" value="{!rec.Account__r.Name}" style="text-align:left;"/>
+                        <apex:column headerValue="SERVICE OPTED" value="{!rec.ODS_Services__r.Name__c}" style="text-align:left;"/>
+                        <apex:column headerValue="TECHNICAL ACCOUNT MANAGER" value="{!rec.Technical_Account_manager__r.Name}" style="text-align:left;"/>
+                        <apex:column headerValue="CONTRACT EXPIRY DATE" value="{!rec.Contract_End_Date__c}" style="text-align:left;"/>  
+                        <apex:column headerValue="Action" style="text-align:left;">
+                            <apex:CommandLink styleClass="time_view" title="View" action="{!passParamToContrler}" style="float:none;"  > 
+                                <apex:param name="custId" value="{!rec.Account__c}"/>
+                                <apex:param name="custSrvce" value="{!rec.ODS_Services__c}"/>
+                                <strong><i class="fa fa-eye" aria-hidden="true"></i></strong>
+                            </apex:CommandLink> 
+                        </apex:column>                                     
+                   </apex:pageBlockTable>
+                   <apex:outputPanel styleClass="page-nav-bg" rendered="{!(accServceLst.size!=0 && accServceLst !='' && accServceLst !=null)}" > 
+                        <apex:commandButton value="First" action="{!showFirst}" disabled="{!!ShowPrevious}" rerender="searchPanelId" styleClass="save-submit page-nav-btn first-nav-btn"/>
+                        <apex:commandButton value="Previous" action="{!showPrevious}" disabled="{!!ShowPrevious}" rerender="searchPanelId" styleClass="save-submit page-nav-btn previous-nav-btn"/>
+                        <apex:outputText value="{!CurrentPageInfo}" />
+                        <apex:commandButton value="Next" action="{!showNext}" disabled="{!!ShowNext}" rerender="searchPanelId" styleClass="save-submit page-nav-btn next-nav-btn"/>
+                        <apex:commandButton value="Last" action="{!showLast}" disabled="{!!ShowNext}" rerender="searchPanelId" styleClass="save-submit page-nav-btn last-nav-btn"/>       
+                   </apex:outputPanel> 
+               </apex:pageBlock>
+              </apex:outputPanel> 
+           </div>
+        </div>
+    </div>
+</div>      
+</apex:outputPanel> 
+  
+<apex:actionFunction name="ApplyChangeService" action="{!fetchServiceById}" status="statusSearch" reRender="outPnlCustDetails">
+    <apex:param name="ServiceID" value="" assignTo="{!ServiceID }"/>
+</apex:actionFunction>
+<apex:outputPanel id="outPnlCustDetails" rendered="{!isCustomerGrid}" > 
+<div class="clr"></div>
+<div class="mid-bg">
+    <div class="sub-warp">
+      <!--  <h1 style="float:left;">Customer - <apex:outputText > {!objAcc.Name}</apex:outputText></h1> -->
+        <div class="head-right customer-search"> 
+           <apex:selectList value="{!slctdCustService}" size="1" styleClass="bluedrop ddlstCustomerService" style="width:125px" onchange="return changeService();">
+               <apex:selectOptions value="{!CustomerServices}"></apex:selectOptions>
+           </apex:selectList>
+        </div>
+        <div class="clr"></div>
+        <div class="cust-left">
+            <div class="cust-box">
+                <h4>Company Information</h4>
+                <ul class="list-type">
+                    <li><label>Company Name</label><span><apex:outputField value="{!objAcc.Name}" /></span></li>
+                    <li><label>Address</label><span> <apex:outputText value="{!billingAddress}" /></span></li>
+                    <li><label>Website Address</label><span><apex:outputField value="{!objAcc.Website}" /> </span></li>
+                </ul>
+            </div>
+            <div class="cust-box" style="min-height: 297px;">
+                <h4>People Information</h4>
+     
+               <ul class="cust-list">                  
+                  <apex:repeat value="{!objCon }" var="Con" id="theRepeat"> 
+                      <li>    
+                         <div style="float:left;     width: 50%;">                   
+                              <div class="people-user">
+                                <apex:image value="{!URLFOR($Resource.ODS_Assets,'images/tech_pic.jpg')}" rendered="{!Con.Attachments.size==0}" styleClass="cust-img" />
+                                <apex:image url="/servlet/servlet.FileDownload?file={!Con.Attachments[0].id}" rendered="{!Con.Attachments.size>0}" styleClass="cust-img" />                              
+                              </div>
+                              <p><apex:outputText value="{!Con.Name}"/></p>
+                          </div>
+                          <span>
+                          <div  style="float:left;  width: 100%; ">
+                          <apex:image value="{!URLFOR($Resource.ODS_Assets,'images/email-icon.png')}" styleClass="email-icon"/> 
+                          <strong><apex:outputText value="{!Con.Email}" rendered="{!Con.Email != '' && Con.Email != null}" />
+                          <apex:outputText value="Not available" rendered="{!Con.Email == '' && Con.Email == null}" /></strong> 
+                          </div>
+                          <div  style="float:left; width: 100%; ">
+                          <apex:image value="{!URLFOR($Resource.ODS_Assets,'images/phone-icon.png')}" styleClass="phone-icon"/>
+                          <strong><apex:outputText value="{!Con.MobilePhone}" rendered="{!Con.MobilePhone != '' && Con.MobilePhone != null}" />
+                          <apex:outputText value="Not available" rendered="{!Con.MobilePhone == '' && Con.MobilePhone == null}" /></strong>
+                          </div>
+                          </span>
+                      </li>
+                  </apex:repeat>
+               </ul>
+            </div>                      
+        </div>
+        <div class="cust-right">
+        <div class="cust-box">
+            <div style="float:left; width:50%;">
+                <h4>Technical  Account Manager</h4>
+                <ul class="list-type"> 
+                    <li><span class = "Manager"><apex:outputText >{!tamName}</apex:outputText> </span></li>
+                    <li><apex:image value="{!URLFOR($Resource.ODS_Assets,'images/email-icon.png')}" styleClass="email-icon"/><span><apex:outputText >{!tamEmail}</apex:outputText></span></li>
+                    <li><apex:image value="{!URLFOR($Resource.ODS_Assets,'images/phone-icon.png')}" styleClass="phone-icon"/><span><apex:outputText >{!tamPhone}</apex:outputText></span></li>
+                </ul>
+           </div>
+           <div class="cus-line">
+            <h4>Account Manager </h4>
+            <ul class="list-type">
+                <li><span class = "Manager"><apex:outputText >{!AcntMngrName}</apex:outputText></span></li>
+                <li><apex:image value="{!URLFOR($Resource.ODS_Assets,'images/email-icon.png')}" styleClass="email-icon"/>
+                <span><apex:outputText value="{!AcntMngrEmail}" rendered="{!AcntMngrEmail!= '' && AcntMngrEmail!= null}" />
+                <apex:outputText value="Not available" rendered="{!AcntMngrEmail == '' && AcntMngrEmail == null}" /></span></li>
+                <li><apex:image value="{!URLFOR($Resource.ODS_Assets,'images/phone-icon.png')}" styleClass="phone-icon"/>
+                <span><apex:outputText value="{!AcntMngrPhone}" rendered="{!AcntMngrPhone!= '' && AcntMngrPhone!= null}" />
+                <apex:outputText value="Not available" rendered="{!AcntMngrPhone == '' && AcntMngrPhone == null}" /></span></li>
+            </ul>
+           </div>
+           </div>
+           <div class="cust-box">
+                <h4>ODS Services details </h4>
+                <ul class="cust-form">
+                    <li><label>Contract Start Date</label><apex:outputField value="{!objAccSrvc.Contract_Start_Date__c}" /> </li>
+                    <li><label>Contract End Date</label><apex:outputField value="{!objAccSrvc.Contract_End_Date__c}" /> </li>
+                    <li><label>Subscription Fee</label> <apex:outputField value="{!objAccSrvc.Retainer_Fee_Amount__c}" /> </li>
+                    <li><label>ODS Hourly Rate</label><apex:outputField value="{!objAccSrvc.ODS_Hourly_Rate_Amount__c}" /> </li>
+                    <li><label>Subscription Fee Frequency</label><apex:outputField value="{!objAccSrvc.Retainer_Fee_Frequency_Type__c}" /> </li>
+                    <li><apex:outputLabel rendered="{!NOT(isCustomer)}">Customer Portal Demo</apex:outputLabel><apex:outputField value="{!objAccSrvc.Account__r.Customer_Portal_Demo__c}" rendered="{!NOT(isCustomer)}"/> </li>
+                    <li><apex:outputLabel rendered="{!NOT(isCustomer)}">Customer Portal Access</apex:outputLabel><apex:outputField value="{!objAccSrvc.Account__r.Customer_Portal_Access__c}" rendered="{!NOT(isCustomer)}" /> </li>
+                    <li><apex:outputLabel rendered="{!NOT(isCustomer)}">Setup Weekly and Monthly Meeting</apex:outputLabel><apex:outputField value="{!objAccSrvc.Account__r.Setup_Weekly_Monthly_Meeting__c}" rendered="{!NOT(isCustomer)}" /> </li>
+                    <li><apex:outputLabel rendered="{!NOT(isCustomer)}">Onboarding Document</apex:outputLabel><apex:outputField value="{!objAccSrvc.Account__r.Onboarding_Document__c}" rendered="{!NOT(isCustomer)}" /> </li>
+                    <li><apex:outputLabel rendered="{!NOT(isCustomer)}">Lightning Readiness Check</apex:outputLabel><apex:outputField value="{!objAccSrvc.Account__r.Lightning_Readiness_Check__c}" rendered="{!NOT(isCustomer)}" /> </li>                    
+                </ul>
+           </div>                     
+        </div>        
+    </div>
+</div>
+</apex:outputPanel> 
+<c:ODS_FooterComponent /> 
+</apex:form>
+</body>
+</apex:page>

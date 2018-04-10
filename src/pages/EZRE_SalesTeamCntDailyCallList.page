@@ -1,0 +1,135 @@
+<apex:page controller="EZRE_InsideSalesDailyCntWorkAllocation" sidebar="false" id="pg">
+<!-- Jquery -->
+<apex:includeScript value="//code.jquery.com/jquery-1.11.3.min.js"/>
+<apex:stylesheet value="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"/>
+ 
+<!-- DataTable -->
+<apex:includeScript value="//cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"/>
+<apex:stylesheet value="//cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css"/>
+ 
+<!-- Search Highlight -->
+<apex:includeScript value="//bartaz.github.io/sandbox.js/jquery.highlight.js"/>
+<apex:includeScript value="//cdn.datatables.net/plug-ins/1.10.9/features/searchHighlight/dataTables.searchHighlight.min.js"/>
+<apex:stylesheet value="//cdn.datatables.net/plug-ins/1.10.9/features/searchHighlight/dataTables.searchHighlight.css"/>
+ 
+<!-- DataTable buttons -->
+<apex:includeScript value="https://cdn.datatables.net/buttons/1.0.3/js/dataTables.buttons.min.js"/>
+<apex:includeScript value="//cdn.datatables.net/buttons/1.0.3/js/buttons.flash.min.js"/>
+<apex:includeScript value="//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"/>
+<apex:includeScript value="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"/>
+<apex:includeScript value="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"/>
+<apex:includeScript value="//cdn.datatables.net/buttons/1.0.3/js/buttons.html5.min.js"/>
+<apex:includeScript value="//cdn.datatables.net/buttons/1.0.3/js/buttons.print.min.js"/>
+<apex:stylesheet value="https://cdn.datatables.net/buttons/1.0.3/css/buttons.dataTables.min.css"/>
+
+<style type="text/css">
+    .col1 { text-align:right; font-weight: bold;}
+    .col2 {text-align:left; padding-right:50px;}
+           
+</style>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  
+ var accountsTable = $('[cid$="accountsTable"]').parent('table').eq(0).DataTable({
+   //enables results highlight
+   searchHighlight: true,
+   //sets record lengths to show in picklist
+   aLengthMenu: [
+     [10, 25, 50, 100, 200, -1],
+     [10, 25, 50, 100, 200, "All"]
+   ],
+   "iDisplayLength": 10,
+   //adds copy, print buttons...
+   dom: 'lBfrtip', //l=length, B=buttons, f=filter(search), r=processing, t=the table, I=table summary, p=page controls
+   buttons: [
+     
+   ],
+ });
+ 
+});</script>
+
+<script>
+function updateReason(pklst,recdId)
+{
+    var reasnVal = document.getElementById(pklst);
+    var formattedRsn = reasnVal.value;
+    
+    var id = document.getElementById(recdId).value;
+
+    actnupdateReason(id,formattedRsn);
+      
+}
+</script>
+
+<apex:form >
+
+<apex:actionFunction name="actnupdateReason" action="{!updateNotCallReason}" reRender="Daily Call List" immediate="false">
+     <apex:param name="id" value="" assignTo="{!id}"/> 
+     <apex:param name="reason" value="" assignTo="{!reasonForNotCall}"/> 
+</apex:actionFunction>
+
+<apex:pageblock title="Daily Call List" >
+ <apex:panelGrid columns="7" columnClasses="col1, col2,col1, col2, col1,col2">
+
+ <apex:outputtext styleclass="font-weight:bold" value="Rep Name"/>
+ <apex:selectList value="{!SelectedRepName}" multiselect="false" size="1" >
+                <apex:selectOptions value="{!RepNames}"/>
+                
+ </apex:selectList>
+ 
+ <apex:outputLabel >Time Zone </apex:outputLabel>
+ <apex:selectList value="{!SelectedTimeZone}" multiselect="false" size="1" label="Time Zone"  >
+                <apex:selectOption itemLabel="All" itemValue="null" />
+                <apex:selectOption itemLabel="CST" itemValue="CST" />
+                <apex:selectOption itemLabel="EST" itemValue="EST" />
+                <apex:selectOption itemLabel="MST" itemValue="MST" />
+                <apex:selectOption itemLabel="PST" itemValue="PST" />
+                <apex:selectOption itemLabel="Other" itemValue="Other" />
+                <apex:selectOption itemLabel="None" itemValue="None" />
+ </apex:selectList>
+ <apex:outputLabel >Filter</apex:outputLabel>
+ <apex:selectList value="{!SelectedFilter}" multiselect="false" size="1" label="Filter"  >              
+                 <apex:selectOption itemLabel="Not Called" itemValue="false" />
+                 <apex:selectOption itemLabel="Called" itemValue="true" />
+                 <apex:selectOption itemLabel="All" itemValue="None" />
+ </apex:selectList>
+ <apex:commandButton action="{!filterAccounts}"  Value="Show"/>
+            </apex:panelGrid>      
+</apex:pageblock>
+
+<apex:pageblock id="PB">
+<apex:outputText rendered="{!Not(acctsLst.size >0)}">No Records found with this Criteria</apex:outputText>
+
+ <apex:pageBlockTable value="{!acctsLst}" var="Con" title="Call List" id="pbtable" Rendered="{!acctsLst.size>0}" html-cid="accountsTable">
+ 
+ <apex:column headerValue="Called" value="{!Con.Worked__c}"/>
+ <apex:column headerValue="Contact Title" value="{!Con.Contact_Title__c}"/>
+ <apex:column headerValue="Contact Name" >
+ <apex:outputLink value="/{!Con.Contact__c}">{!Con.Contact__r.Name}</apex:outputLink>
+ </apex:column>
+
+ <apex:column headerValue="Account Name" >
+ <apex:outputLink value="/{!Con.Account_Name__c}">{!Con.account_Name__r.name}</apex:outputLink>
+ </apex:column>
+  <apex:column headerValue="Contact Status" value="{!Con.Assigned_Contact_Status__c}" id="cntsts"/>
+
+  <apex:column headerValue="Account Status" value="{!Con.Assigned_Account_Status__c}" id="acntsts"/>
+
+ 
+ <apex:column headerValue="Email" value="{!Con.Email__c}" />
+ <apex:column headerValue="Phone" value="{!Con.Phone__c}" />
+ <apex:column headerValue="Rep Name" value="{!Con.Name}" id="rep"/>
+ <apex:column headerValue="Time Zone" value="{!Con.TimeZone__c}" style="{!IF(Con.TimeZone__c ='CST','background-color:#5FE85A;',IF(Con.TimeZone__c ='EST','background-color:yellow;',IF(Con.TimeZone__c ='MST','background-color:#5AE8DA;',IF(Con.TimeZone__c ='PST','background-color:#F5BCF3;',IF(Con.TimeZone__c ='None','background-color:red;','background-color:orange;')))))}"/>
+ <apex:column headerValue="Last Activity Date" value="{!Con.Activity_Created_Date__c}"/>
+ 
+ <apex:column headerValue="Reason for not calling">
+    <apex:inputHidden value="{!Con.Id}" id="recId"/>
+    <apex:inputField id="pck" value="{!Con.Reason_for_not_calling__c}" onchange="updateReason('{!$Component.pck}','{!$Component.recId}');"/>
+  </apex:column> 
+
+
+ </apex:pageBlockTable>
+ </apex:pageblock>
+ </apex:form>
+</apex:page>

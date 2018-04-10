@@ -1,0 +1,54 @@
+.THIS .slds-timeline__icon {
+	z-index: 1;
+}
+.THIS .slds-media--timeline:before {
+	z-index: 0;
+}
+
+.THIS li:last-child .slds-media.slds-media--timeline:before {
+	width: 0px;
+}
+
+.THIS .slds-timeline__title {
+	position: relative;
+}
+
+.THIS .slds-timeline__title-content:after {
+	content: ' ';
+	position: absolute;
+	bottom: 0.4em;
+	margin-left: .5em;
+	width: 100%;
+}
+
+.THIS .error-text {
+	margin-top: -17px;
+}
+
+.THIS .slds-card__header {
+	margin-left: 2px;
+}
+
+.THIS .slds-text-heading--small {
+	vertical-align: middle;
+	margin-left: 2px;
+}
+
+.THIS .activity-count {
+	font-size: 14px;
+	font-weight: normal;
+	vertical-align: text-top;
+}
+
+.THIS .slds-hidden {
+	display: none;
+}
+
+.THIS .slds__spinner {
+	margin-left: 3.75rem;
+	margin-bottom: 1.5rem;
+}
+
+.THIS .slds-icon__spinner {
+	margin-right: 0.75rem;
+}

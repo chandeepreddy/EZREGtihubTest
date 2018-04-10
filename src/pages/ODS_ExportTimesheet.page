@@ -1,0 +1,53 @@
+<apex:page showHeader="false" action="{!GetWeeklyTimesheet}" sidebar="false" controller="ODS_ExportTimesheetController" renderAs="pdf">
+   <apex:form >
+    <html>
+         <head>
+        <style>
+              @page
+              {   
+                  size:landscape;
+              }                            
+        </style>
+       
+        
+    </head>
+    <body style="font-family: 'Open Sans', sans-serif; font-size:14px;">
+        <div class="mid-bg">
+        <div class="sub-warp">
+        
+        <div class="mid-white">
+        <div class="logo">
+        <a href=""><img src="{!URLFOR($Resource.ODS_Assets,'images/logo.png')}" alt="logo"  /></a>
+        </div>
+        
+        <h1 style="float:left; font-size:18px;"> Timesheet - {!TimesheetAccount} - {!TimesheetAccountService}</h1>
+        
+        <div class="mid-dateroll" style="float:right; margin-bottom:25px;">
+             <div style=" margin-top:5px;"><strong  style="text-align: right; width:100px; float: left;">Status:&nbsp;</strong><label style="font-weight:normal;" id="lblStatus">{!CurrentTimesheetStatus}</label> </div>  
+             
+             <div style=" margin-top:5px;"><strong style="text-align: right; width:100px; float: left;">From :&nbsp;</strong><label style="font-weight:normal;" id="lblStatus">{!FromDate}</label> </div>
+            <div   style=" margin-top:5px;"><strong  style="text-align: right; width:100px; float: left;">To :&nbsp;</strong><label style="font-weight:normal;" id="lblStatus">{!ToDate}</label> </div>
+           </div> 
+  
+             <div style="clear:both"></div>          
+             <apex:outputText value="{!TimesheetEntries}" escape="false"></apex:outputText>
+              
+            <div class="mid-dateroll" style=" margin-top: 15px;">
+             <div style="float:left;">
+              <div id="divStatus"  style=" margin-top:15px;"><strong>Approver Name:&nbsp;</strong><label style="font-weight:normal;" id="lblStatus">{!ManagerName}</label> </div>
+              <div id="divStatus"  style=" margin-top:5px;"><strong>Comments:&nbsp;</strong><label style="font-weight:normal;" id="lblStatus">{!Comments}</label> </div>
+               </div>
+             <div style="float:right;">
+             <div id="divStatus" style=" margin-top:15px;" ><strong>Signature:&nbsp;</strong><label style="font-weight:normal;" id="lblStatus">{!ApproverName}</label> </div>
+            <div id="divStatus" style=" margin-top:5px;" ><strong>Approved Date:&nbsp;</strong><label style="font-weight:normal;" id="lblStatus">{!CuDt}</label> </div>  
+             </div>
+             <div class="clr"></div>
+             </div>
+                    </div>
+                </div>
+            </div>
+      
+    </body> 
+    </html>
+    </apex:form>
+</apex:page>

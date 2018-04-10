@@ -1,0 +1,35 @@
+<apex:page standardController="Account">
+
+ <script type="text/javascript">
+ {
+ 
+        var currentdate = new Date( "{!now()}");
+        var ModDate = new Date("{!Account.Contact_Status_Changed_Time__c}");
+        var t1 = new Date(ModDate);
+        var t2 = new Date(currentdate);
+        var difContactStatus = t1.getTime() - t2.getTime();
+        var Seconds_from_T1_to_T2 = difContactStatus / 1000;
+        var Seconds_Between_Dates_contactStatus = Math.abs(Seconds_from_T1_to_T2);
+        
+        
+         //Actvity Popup Code
+         var ActvityModDate = new Date("{!Account.ODS_Call_1_Activity_CreatedDate__c}");
+         var t3 = new Date(ActvityModDate);
+         var difActivityStatus = t3.getTime() - t2.getTime();
+        var Seconds_from_T3_to_T2 = difActivityStatus / 1000;
+        var Seconds_Between_Dates_ActvityStatus = Math.abs(Seconds_from_T3_to_T2);
+        
+      if(Seconds_Between_Dates_contactStatus < 5)
+      {     
+          window.alert('"Important : Please make sure to update the newly created opportunity"');
+          var OpptId = "{!Account.Opportunity_Id__c}";
+          window.top.location = '/'+OpptId;           
+      }
+       if(Seconds_Between_Dates_ActvityStatus < 5)
+      {     
+          window.alert('"Important : Please make sure that the Contact ODS Status is updated"');
+      }
+   }
+ </script>
+ 
+</apex:page>

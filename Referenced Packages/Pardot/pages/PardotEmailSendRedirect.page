@@ -1,0 +1,61 @@
+<apex:page sidebar="false" controller="pi.PardotEmailRedirect_CTRL">
+	<body>
+		<div class="middleColumn">
+			<div class="checkbox">
+				<apex:image value="{!$Resource.pi__PardotRedirectSuccessMessageImg}" width="150"/>
+			</div>
+
+			<div class="messageContent">
+				<h1>Emails deployed successfully!</h1>
+				<apex:outputText escape="false" rendered="{!$CurrentPage.parameters.totalRecipients!=TEXT(1)}" value="<br /> <h3>You have {!HTMLENCODE($CurrentPage.parameters.remaining)} emails remaining for the day.</h3>" />
+
+			</div>
+		</div>
+		<div class="middleColumn linkArea">
+
+			<a id="redirect_link" href='#' class="styledLinks">
+				<span id="redirectMessage"></span>
+			</a>
+			<br /><br />
+			Or, you will be automatically redirected in <span class="seconds">5</span> seconds
+		</div>
+	</body>
+	 <style type="text/css">
+	 	.middleColumn {
+	 		background-color: #f8f8f8;
+	 		width: 600px;
+	 		margin: auto;
+	 		height: 100%;
+	 	}
+	 	.checkbox {
+	 		float: left;
+	 	}
+	 	.messageContent {
+	 		background-color: #f8f8f8;
+	 		padding-top: 25px;
+	 		font-size: 175%;
+	 		color: #50bf79;
+	 	}
+	 	.noSidebarCell {
+	 		background-color: #f8f8f8;
+	 		padding: 100px 10px;
+	 	}
+	 	.linkArea {
+	 		padding-top: 20px;
+	 	}
+	 	.styledLinks {
+	 		color: #d11d34;
+	 		font-size: 125%;
+	 	}
+	 	.bodyDiv .outerNoSidebar {
+	 		padding-bottom: 0;
+	 	}
+	</style>
+	<script>
+		window.prevRedirectUrl = '{!JSENCODE(prevRedirectUrl)}';
+		window.useCustomUrl = {!useCustomUrl};
+		window.prevPage = '{!$CurrentPage.parameters.prev}';
+		window.ObjectId = '{!$CurrentPage.parameters.objectId}';
+	</script>
+	<apex:includeScript value="{!URLFOR($Resource.pi__MicroCampaign, 'js/email_send_success_main.js')}"/>
+</apex:page>

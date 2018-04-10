@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>b2bma_canvas</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <namespacePrefix>b2bma</namespacePrefix>
+    <types>
+        <members>b2bma_canvas</members>
+        <name>Application</name>
+    </types>
+    <version>36.0</version>
+</Package>

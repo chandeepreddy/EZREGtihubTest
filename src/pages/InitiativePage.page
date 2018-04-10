@@ -1,0 +1,2046 @@
+<apex:page showHeader="false" sidebar="false" controller="ODS_InitiativeController">
+    <apex:form >
+
+        <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE; IE=10; IE=11; " />
+
+            <apex:includeScript value="https://code.jquery.com/jquery-latest.min.js" />
+            <!-------- Bootstrap ----->
+                        <script src="{!URLFOR($Resource.ODS_Assets,'js/amcharts.js')}"></script>
+            <script src="{!URLFOR($Resource.ODS_Assets,'js/serial.js')}"></script>
+            <script src="{!URLFOR($Resource.ODS_Assets,'js/light.js')}">
+            <script src="https://www.amcharts.com/lib/3/gauge.js"></script>
+            <script src="{!URLFOR($Resource.ODS_Assets,'guagejs/gauge.js')}"></script>
+            <link rel="stylesheet" href="{!URLFOR($Resource.ODS_Assets,'css/export.css')}" type="text/css" media="all" />
+            <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/bootstrap.css')}" />
+            <apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'js/bootstrap.js')}" />
+            <apex:stylesheet value="https://fonts.googleapis.com/css?family=Open+Sans:400,700" />
+            <apex:includeScript value="https://www.google.com/recaptcha/api.js" />
+            <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/style.css')}" />
+            <apex:stylesheet value="https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"  />
+            <apex:includeScript value="https://code.jquery.com/jquery-1.9.1.js" />
+            <apex:includeScript value="https://code.jquery.com/ui/1.10.3/jquery-ui.js" />
+            
+           <apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'ckeditor/ckeditor.js')}"/>
+
+            
+            <link href="font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+            <link href="{!URLFOR($Resource.ODS_Assets,'css/style_dev.css')}" rel="stylesheet" type="text/css" />
+            <style>
+                         .EstimatePanel{height:400px;}
+             .EstimatePanel .timeline-scroll{height:350px;}
+                .popupBackground {
+                    /* Background color */
+                    background-color: black;
+                    opacity: 0.20;
+                    filter: alpha(opacity=20);
+
+                    /* Dimensions */
+                    width: 100%;
+                    height: 500%;
+                    top: 0;
+                    left: 0;
+                    z-index: 998;
+                    position: absolute;
+                    font-family: sans-serif;
+                    /* Mouse */
+                    cursor: wait;
+                }
+                /* This is for the message DIV */
+
+                .PopupPanel {
+                    /* Background color */
+                    border: solid 2px skyblue;
+                    background-color: white;
+                    font-family: sans-serif;
+                    /* Dimensions */
+                    left: 50%;
+                    width: 100px;
+                    margin-left: -100px;
+                    top: 50%;
+                    height: 100px;
+                    margin-top: -25px;
+                    z-index: 999;
+                    position: fixed;
+
+                    /* Mouse */
+                    cursor: pointer;
+                }
+                .time-submit{width:100%}
+                #hide{display:none;}
+                #chartdiv .amcharts-main-div{top:-40px;}
+                .timeline{
+                          margin-top: 5px;
+                          float: left;
+                          min-width: 100px;
+                }
+                
+                .panel-heading span {
+                        margin-top: -10px;
+                        font-size: 15px;
+                }
+                .clickable {
+                        cursor: pointer;
+                }
+                                
+                 .mid-bg {
+                        background: #FFFFFF;
+                        width: 100%;
+                        padding: 30px 2% 15px 2%;
+                        float: left;
+                 }
+                 .timeline td input.width2 {
+                            width: 50px;
+                 }
+                 
+                 .ck_edit{
+                          width: 45%;
+                 }
+                      
+                 .col-md-7{
+                         width: 100%;
+                 } 
+                                 
+                
+                .timeline td input.width1 {
+                         width: 700px;
+                         height: 40px;
+                 }     
+                 
+                 
+                 .width1.txtTask{
+                         width: 350px; 
+                         margin: 0px; 
+                         height: 39px;
+                 }
+                 
+                 .width3.txtTask{
+                        width: 350px; 
+                        margin: 0px; 
+                        height: 39px;
+                 }
+                        
+            </style>
+            
+            <script type="text/javascript">
+    
+                   j$ = jQuery.noConflict();
+    
+                   j$(document).ready(function()  
+                    {
+                           j$( "#date_service, #date_service1").datepicker(
+                               {
+                                   dateFormat : 'mm/dd/yy',
+                                   changeMonth : true,
+                                   changeYear : true,
+                                                                      
+                               });
+                               
+                            j$("#date_service, #date_service1").bind('paste',function(e){
+                                e.preventDefault();  //disable paste in datePicker
+                            });
+                            
+                    });
+                    
+                    
+                     $(document).on('click', '.panel-heading span.clickable', function(e){
+                           var $this = $(this);
+                           if(!$this.hasClass('panel-collapsed')) {
+                                 $this.parents('.panel').find('.panel-body').slideUp();
+                                 $this.addClass('panel-collapsed');
+                                 $this.find('i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+                           } else {
+                                 $this.parents('.panel').find('.panel-body').slideDown();
+                                 $this.removeClass('panel-collapsed');
+                                 $this.find('i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+                           }
+                      })
+             </script>
+            
+            <script>
+                var StartDateOfWeek = new Date('{!CurrentDate}');
+                var EndDateOfWeek = new Date('{!CurrentDate}');
+                TuesdayDate = new Date('{!CurrentDate}');
+                WednesdayDate = new Date('{!CurrentDate}');
+                ThursdayDate = new Date('{!CurrentDate}');
+                FridayDate = new Date('{!CurrentDate}');
+                SaturdayDate = new Date('{!CurrentDate}');
+                SundayDate = new Date('{!CurrentDate}');
+                var PortalUserRole = '{!PortalUserRole}';
+                var IsDisableFields = false;
+                var timesheetstatus = '';
+                //alert('{!CurrentDate}');
+                                function getstartAndEndOfWeek(date) {
+                    //If no date object supplied, use current date
+                    // Copy date so dont modify supplied date
+                    var now = date ? new Date(date) : new Date('{!CurrentDate}');
+
+                    // set time to some convenient value
+                    now.setHours(0, 0, 0, 0);
+
+                    // Get the previous Monday
+                    var monday = new Date(now);
+                    monday.setDate(monday.getDate() - monday.getDay() + 1);
+
+                    // Get next Sunday
+                    var sunday = new Date(now);
+                    sunday.setDate(sunday.getDate() - sunday.getDay() + 7);
+
+                    // Return array of date objects
+                    return [monday, sunday];
+                }
+
+                
+                
+
+                $(document).ready(function() {
+                debugger;
+                 $("#initiative").addClass("active");
+                    var AccountID = $(".ddlstAccount").val();
+                    var ServiceID = $(".ddlstService").val();
+                    if(AccountID  == 'All' || ServiceID  == 'All'){
+                            $('#ContactClient').hide();
+                    }
+                    
+                    var myContent = CKEDITOR.instances.editor1.getData();
+                    
+                    $(".ddlstAccount").hide();
+                    $(".ddlstService").hide();
+                    $(".ApplyBtn").hide();
+                    $("#j_id0:j_id1:exportaspdf").hide();
+                    $("#j_id0:j_id1:exportasexcel").hide();
+                    
+                    $('#Status_new').show();
+                    $('#initiativeAlert').hide();
+                    $("#btnApprove").hide();
+                    $("#btnReject").hide();
+                    $('#Status').hide();
+                    $('#Status_Value').html('New');
+                                     
+                    document.getElementById("btnactivestatus").style.display = "none";
+                    $(".hrs").attr('maxlength', '3');
+                    $('#ActiveInitiative').hide();
+                    var initiativeStatusCheck = '{!InitiativeStatus}';
+                    
+                    if(initiativeStatusCheck  == 'Active Initiative'){
+                              $('#Status_Value').html(initiativeStatusCheck);
+                              $('#ActiveInitiative').show();
+                    }
+                    else if(initiativeStatusCheck  == 'Estimation Rejected'){
+                       $('#Status_Value').html('Re-evaluate Estimates');
+                    }
+                    else{
+                       $('#Status_Value').html(initiativeStatusCheck);
+                    }
+                    var IsCustomer = {!isCustomer};
+
+                    if (IsCustomer) {
+                        $("#mnuMyAccount").css("display", "block");
+
+                    } else {
+
+                        $("#mnuCustomer").css("display", "block");
+                    }
+                    $("#txtComments").prop('disabled', true);
+                    var portalRole = '{!PortalUserRole}';
+                    var portalApprover = '{!IsPortalApprover}';
+                    var timeshetStats = '{!CurrentTimeSheetStatus}';
+                    var passdFromDate = '{!PassedWeekFromDate}';
+                    
+                    if (timeshetStats == '') {
+
+                        $("divStatus").hide();
+
+                    }
+                    PortalUserRole = '{!PortalUserRole}';
+                    IsPortalApprover = '{!IsPortalApprover}';
+
+
+                    //  BindJSONDataToPage();
+                    // CustomizePageByTimesheetStatus(timeshetStats,PortalUserRole );
+
+                    BindJSONDataToInitiativePage();
+                    $("button.collapsed").click(function() {
+
+                        $(".header").toggleClass("header-fixed");
+                        $(".navbar-toggle").toggleClass("nav-btn-fixed");
+                        $(".mid-bg").toggleClass("mid-bg-fixed");
+                    });
+
+                    if (passdFromDate == '') {
+                        PopulateWeekDays(new Date('{!CurrentDate}'));
+                    } else {
+                        PopulateWeekDays(new Date(passdFromDate));
+                    }
+
+                    $(".hrs").each(function() {
+
+                        var that = this;
+                        $(this).keyup(function() {
+
+                            this.value = this.value.replace(/[^0-9\.]/g, '');
+
+                            newSum.call(that);
+                            totalSum.call(that);
+
+                        });
+                    });
+
+                    $(".hrs").blur(function() {
+                        this.value = this.value.replace(/[^0-9\.]/g, '');
+
+                        if (this.value != '') {
+
+                            //if((this.value > 24)||(this.value == 0))
+                            if (this.value > 24) {
+                                alert("Invalid Hours. It cannot be more than 24");
+                                //alert("Invalid Hours. It cannot be Zero or more than 24");
+                                this.value = "";
+
+                            }
+                        }
+                    });
+
+                    $("#Tbltimesheet").on("click", "a.delete-icon", function(e) {
+                        e.preventDefault();
+                        $(this).closest("tr").remove();
+                        CalculateColumnTotal();
+                    });
+                    debugger;
+                    
+                    $(".add-row").click(function(e) {
+                                        e.preventDefault();
+
+                    debugger;
+                        var rowCount = $(".timesheet > tbody >tr").length;
+                        var RowNo = rowCount;
+
+                        AddRowToAdditionalTable(RowNo);
+                        var elementid = '#ddlResName_' + RowNo;
+                         var elementid = '#ddlInitiative_' + RowNo;
+                        populateDynamicResoureNameByRow(elementid);
+                        populateDynamicInitiativeByRow(elementid);
+                        DisableFields(timesheetstatus);
+                    });
+
+
+                    $("#btnApprove").on("click", function(e) {
+                        e.preventDefault();
+                    });
+
+                    /*$("#btnReject").on("click", function(e){
+                         e.preventDefault();
+                    });*/
+              <!--      passWeekDateToController(FormatDate(new Date($("#weekStDate").html())), FormatDate(new Date($("#weekEndDate").html())))   -->
+
+                });
+
+                //// Bind Resource Name dropdown
+                function populateDynamicResoureName() {
+                    var jsonResourceName = $('#hdnResourceName').val();
+                    resourceNameArray = $.parseJSON(jsonResourceName);
+                    $(".ddlResource").append($("<option></option>").val('--Select--').html('--Select--'));
+                    $.each(resourceNameArray, function(key, value) {
+                        $(".ddlResource").append($("<option></option>").val(value.ResourceId).html(value.ResourceName));
+                    });
+                }
+
+                function populateDynamicResoureNameByRow(elementid) {
+                    var jsonResourceName = $('#hdnResourceName').val();
+                    resourceNameArray = $.parseJSON(jsonResourceName);
+                    $(elementid).append($("<option></option>").val('--Select--').html('--Select--'));
+                    $.each(resourceNameArray, function(key, value) {
+                        $(elementid).append($("<option></option>").val(value.ResourceId).html(value.ResourceName));
+                    });
+                }
+                
+                function populateDynamicInitiativeByRow(elementid) {
+                    var jsonInitiative = $('#hdnInitiativeName').val();
+                    InitiativeArray = $.parseJSON(jsonInitiative);
+                    $(elementid).append($("<option></option>").val('--Select--').html('--Select--'));
+                    $.each(InitiativeArray, function(key, value) {
+                        $(elementid).append($("<option></option>").val(value.InitiativeId).html(value.InitiativeName));
+                    });
+                }
+
+                function CommentValidation() {
+                    var cmnts = $('.Comments').val();
+                    if (cmnts.trim() == '')
+
+                    {
+                        alert('Please enter comments');
+                        return false;
+                    } else {
+                        HidePopup();
+                        RejectAction(cmnts);
+                        return true;
+                    }
+
+                }
+
+                function reloadpage() {
+                    window.location.reload(false);
+                }
+
+                function fnUpdateStatus(Statustype) {
+                    //alert(Statustype);
+                    if (Statustype == 'Approve') {
+                        HidePopup();
+                        ApproveAction();
+                    } else {
+
+                        var cmnts = $('.Comments').val();
+                        if (cmnts.trim() == '') {
+                            alert('Please enter comments');
+                            return false;
+                        } else {
+                            HidePopup();
+                            RejectAction(cmnts);
+                            return true;
+                        }
+                    }
+                }
+
+                function ClearTimeSheetComments(actiontype) {                    
+                    if (actiontype == 'Approve') {
+                        $('.btnApprove').show();
+                        $('.btnReject').hide();
+                        $('#lblHeading').html("Approve");
+
+                    } else {
+                        $('.btnReject').show();
+                        $('.btnApprove').hide();
+                        $('#lblHeading').html("Reject");
+                    }
+                    $("#myModal").find("textarea").val('').end();
+                    HidePopup();
+                }
+                
+                function CustomizePageByInitiativeStatus(status, PortalUserRole, IsPortalApprover) {              
+                      if(PortalUserRole === 'Customer'){                     
+                           $('#Status_new').show();
+                           $('#Status_Value').show();
+                           $('#Status_root').hide();
+                           $('#Test').hide();
+                           $('#initiativeAlert').hide();
+                           $(".panel-body :input").attr("disabled", true);
+                           $("#Description_Assumption :input").attr("disabled", true);  
+                           $("#description_content :input").attr("disabled", true);                            
+                           $(".actiontd").hide(); 
+                           $(".panel-body.EstimatePanel :input").attr("disabled", true);                                
+                           $(".add-row").hide(); 
+                           $('#btnSave').hide();
+                           $('#btnSubmit').hide();
+                           $('#btnCancel').hide();
+                           $("#btnApprove").hide();
+                           $("#btnReject").hide(); 
+                           $('#OnHold').hide();
+                           $('#ChangeStatus').hide();
+                           $('#ActiveInitiative').hide();                            
+                           $('#hide').show();                                                                          
+                           var IsInitiativeApprover = '{!IsInitiativeApprover}';                      
+                           if(status == 'Initiative Submitted' && IsInitiativeApprover == 'true'){                                                                                        
+                                                  $("#btnApprove").show();
+                                                  $("#btnReject").show();  
+                                                  $('#hide').hide();                                                              
+                           }                         
+                                                                                                                                                                     
+                      }
+                      else{
+                          $('#Status_new').hide();
+                          $('#Test').hide();
+                          $("#btnApprove").hide();
+                          $("#btnReject").hide();  
+                          $('#hide').hide();       
+                          $("#description_content :input").attr("disabled", true); 
+                          $('#editor1').attr("disabled", true);
+                
+                          if(status == 'Initiative Submitted' && (PortalUserRole == 'Technical Account Manager' || PortalUserRole == 'Practice Head') ){
+                                   $('#Status_new').show();
+                                   $('#Status_Value').show();
+                                   $('#Status_root').hide();
+                                   $("#initiative_name :input").attr("disabled", true);                               
+                                   $("#date_service :input").attr("disabled", true);                               
+                                   $("#date_service1 :input").attr("disabled", true);      
+                                   $(".col-md-8.col-sm-8.col-xs-12 :input").attr("disabled", true);      
+                                   $("#description_content :input").attr("disabled", true);                                                                  
+                                   $(".panel-body.EstimatePanel :input").attr("disabled", true);                              
+                                   $('.time-submit').show();                           
+                                   $('.actiontd').hide();
+                                   $('.add-row').hide();
+                                   $('#btnSave').hide();
+                                   $('#btnSubmit').hide();
+                                   $('#btnCancel').hide();
+                                   $("#btnBack :input").attr("disabled", false); 
+                                   $('#btnBack').show();
+                                   $('#OnHold').hide();
+                                   $('#hide').hide();                                  
+                                   $("#btnApprove").show();
+                                   $("#btnReject").show();                                                                
+                          }
+                       
+                          
+                          else if(status == 'Initiative Approved' || status == 'Initiative Submitted' && (PortalUserRole != 'Technical Account Manager' || PortalUserRole != 'Practice Head') || status ==  'Initiative Delivered' || status == 'Approved After Re-evaluation'){                                 
+                                   $('#Status_new').show();
+                                   $('#Status_Value').show();
+                                   $('#Status_root').hide();
+                                   $("#initiative_name :input").attr("disabled", true);                               
+                                   $("#date_service :input").attr("disabled", true);                               
+                                   $("#date_service1 :input").attr("disabled", true);      
+                                   $(".col-md-8.col-sm-8.col-xs-12 :input").attr("disabled", true);      
+                                   $("#description_content :input").attr("disabled", true);                                                   
+                                   $(".panel-body.EstimatePanel :input").attr("disabled", true);                              
+                                   $('.time-submit').show();                           
+                                   $('.actiontd').hide();
+                                   $('.add-row').hide();
+                                   $('#btnSave').hide();
+                                   $('#btnSubmit').hide();
+                                   $('#btnCancel').hide();
+                                   $("#btnBack :input").attr("disabled", false); 
+                                   $('#btnBack').show();
+                                   $('#OnHold').hide();
+                                   $('#hide').show();
+                                   $('#exportasexcel').show();
+                                   $("#btnApprove").hide();
+                                   $("#btnReject").hide();                                                                
+
+                          }
+                          if(status == 'Active Initiative'){
+                                   $('#Status_new').show();
+                                   $('#Status_Value').show();
+                                   $('#Status_root').hide();
+                                   $("#Description_Assumption :input").attr("disabled", true);
+                                   $(".form-horizontal :input").attr("disabled", true);
+                                   $("#ActiveInitiative :input").attr("disabled", false);      
+                                   $(".form-group :input").attr("disabled", true);
+                                   $(".panel-body.EstimatePanel :input").attr("disabled", true); 
+                                   $("#description_content :input").attr("disabled", true);                                                                                              
+                                   $("#Description_Assumption :input").attr("disabled", true);    
+                                   $(".timeline-scroll :input").attr("disabled", true);
+                                   $('#btnSave').hide();
+                                    $('.actiontd').hide();
+                                   $('.add-row').hide();
+                                   $('#btnSubmit').hide();
+                                   $('#btnCancel').hide();
+                                   $('#OnHold').hide();
+                                   $('#ActiveInitiative').show();
+                                   $("#btnApprove").hide();
+                                   $("#btnReject").hide();                                                                
+                          }
+                          if(status == 'On Hold'){
+                                   $('#Status_new').show();
+                                   $('#Status_Value').show();
+                                   $('#Status_root').hide();
+                                   $(".form-horizontal :input").attr("disabled", true);
+                                   $("#OnHold :input").attr("disabled", false);      
+                                   $("#Description_Assumption :input").attr("disabled", true);
+                                   $(".form-group :input").attr("disabled", true);
+                                   $(".panel-body.EstimatePanel :input").attr("disabled", true);      
+                                   $("#description_content :input").attr("disabled", true);                                                                                              
+                                   $(".timeline-scroll :input").attr("disabled", true);
+                                   $('#btnSave').hide();
+                                   $('#btnSubmit').hide();
+                                   $('#btnCancel').hide();
+                                   $('.actiontd').hide();
+                                   $('.add-row').hide();
+                                   $('#OnHold').show();
+                                   $('#btnactivestatus').show();   
+                                   $("#btnApprove").hide();
+                                   $("#btnReject").hide();                                                                
+                          }
+                          if(status == 'Initiative Rejected'){
+                                   $('#Status_new').show();
+                                   $('#Status_Value').show();
+                                   $('#Status_root').hide();
+                                   $('#OnHold').hide();
+                                   $("#Description_Assumption :input").attr("disabled", true);
+                                   $("#description_content :input").attr("disabled", false);                                                                 
+                                   $('#ActiveInitiative').hide();
+                                   $('#Status_root').html('Status');
+                                   $("#btnApprove").hide();
+                                   $("#btnReject").hide();                                                                
+                          }  
+                          if(status == 'Saved'){
+                                   $('#Status_new').show();
+                                   $('#Status_Value').show();
+                                   $('#Status_root').hide();
+                                   $('#OnHold').hide();
+                                   $('#ActiveInitiative').hide();
+                                   $("#description_content :input").attr("disabled", false);                                                                 
+                                   $('#Status_root').html('Status');
+                                   $("#btnApprove").hide();
+                                   $("#btnReject").hide(); 
+                                   $('#hide').show();
+                          }                       
+                          if(status == 'Re-evaluate'){
+                                   $('#Status_new').show();
+                                   $('#Status_Value').show();
+                                   $('#Status_root').hide();
+                                   $('#OnHold').hide();
+                                   $("#description_content :input").attr("disabled", false);                                                     
+                                   $('#ActiveInitiative').hide();
+                                   $('#Status_root').html('Status');
+                                   $("#btnApprove").hide();
+                                   $("#btnReject").hide();                                                                                                                               
+                          } 
+                          if(status == ''){
+                                   $('#Status_new').show();
+                                   $('#Status_Value').show();
+                                   $('#Status_Value').html('New');
+                                   $('#Status_root').hide();
+                                   $("#btnApprove").hide();
+                                   $("#btnReject").hide(); 
+                                   $("#description_content :input").attr("disabled", false); 
+                                                                                                  
+                          }
+
+                      }           
+                }
+
+                function CustomizePageByTimesheetStatus(status, PortalUserRole, IsPortalApprover) {
+                    debugger;
+                    if (PortalUserRole === 'Customer') {
+                        $(".timesheet").find("input").prop('disabled', true);
+                        $("#txtComments").hide();
+
+                        if (status == 'Approved') {
+                            $(".actiontd").hide();
+                            $("#addRowTd").attr("colspan", "1");
+
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+                            $(".timesheet").find("input").prop('disabled', true);
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").show();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'inline-block';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'inline-block';
+
+                        }
+                        if (status == 'Rejected') {
+                            $(".actiontd").hide();
+                            $("#addRowTd").attr("colspan", "1");
+
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+                            $(".timesheet").find("input").prop('disabled', true);
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").show();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'none';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'none';
+
+                        }
+                        if (status == 'Submitted') {
+                            $(".actiontd").hide();
+                            $("#addRowTd").attr("colspan", "1");
+
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+                            $(".timesheet").find("input").prop('disabled', true);
+
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+
+                            if (IsPortalApprover == "true") {
+                                $("#btnApprove").show();
+                                $("#btnReject").show();
+                            } else {
+                                $("#btnApprove").hide();
+                                $("#btnReject").hide();
+                            }
+                            $("#txtComments").hide();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'none';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'none';
+
+                        }
+                        if (status == 'Saved') {
+                            $(".actiontd").hide();
+                            $("#divStatus").hide();
+                            $("#addRowTd").attr("colspan", "1");
+
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+                            $(".timesheet").find("input").prop('disabled', true);
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").hide();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'none';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'none';
+                        }
+                        if (status == '') {
+                        debugger;
+                            $(".actiontd").hide();
+                            $("#divStatus").hide();
+                            $("#addRowTd").attr("colspan", "1");
+
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+                            $(".timesheet").find("input").prop('disabled', true);
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").hide();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'none';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'none';
+                            $("#btnReject").hide();
+                            $("#txtComments").hide();
+
+                        }
+                        $(".Rescol").hide();
+                        $("#tdColTotal").hide();
+                    } else {
+                        $("#txtComments").hide();
+                        if (status == 'Approved') {
+                            $(".actiontd").hide();
+                            $("#addRowTd").attr("colspan", "1");
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+                            $(".timesheet").find("input").prop('disabled', true);
+                            $(".ddlResource").prop('disabled', true);
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").show();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'inline-block';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'inline-block';
+                        }
+                        if (status == 'Rejected') {
+                            $(".actiontd").show();
+                            $("#addRowTd").attr("colspan", "2");
+
+                            $(".add-row").show();
+                            $(".delete-icon").show();
+
+                            $(".timesheet").find("input").prop('disabled', false);
+                            $(".ddlResource").prop('disabled', false);
+                            $("#btnSave").show();
+                            $("#btnSubmit").show();
+                            $("#btnCancel").show();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").show();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'none';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'none';
+
+                        }
+                        if (status == 'Submitted') {
+                            $(".actiontd").hide();
+                            $("#addRowTd").attr("colspan", "1");
+
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+
+
+                            $(".timesheet").find("input").prop('disabled', true);
+                            $(".ddlResource").prop('disabled', true);
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").hide();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'inline-block';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'inline-block';
+
+                        }
+                        if (status == 'Saved' || status == '') {
+                            $(".actiontd").show();
+                            $("#addRowTd").attr("colspan", "2");
+
+                            $(".add-row").show();
+                            $(".delete-icon").show();
+
+                            $("#Tbltimesheet").find("input").prop('disabled', false);
+                            //alert('1');
+                            $("#btnSave").show();
+                            $("#btnSubmit").show();
+                            $("#btnCancel").show();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").hide();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'none'; 
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'none';
+                            
+                            
+                        }  
+                                              
+                    }
+
+                }
+
+                function validateNewRows(element) {
+                    var elementvalue = $(element).val();
+                    var newelementvalue = elementvalue.replace(/[^0-9\.]/g, '');
+                    $(element).val(newelementvalue);
+                    if ($(element).val() > 24) {
+                        alert("Hours cannot be more than 24");
+                        $(element).val("");
+                    }
+                }
+
+                function newSum() {
+                    var sum = 0;
+                    var thisRow = $(this).closest("tr");
+                    thisRow.find("td .hrs").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            sum += parseFloat($(this).val());
+                        }
+                    });
+                    thisRow.find("td.total").html(sum); // It is an <input>, right?
+                }
+
+                function newSumInAddRow(element) {
+                    var sum = 0;
+                    var thisRow = $(element).closest("tr");
+                    thisRow.find("td .hrs").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            sum += parseFloat($(this).val());
+
+                        }
+                    });
+                    thisRow.find("td.total").html(sum); // It is an <input>, right?
+                }
+
+                function totalSum() {
+                    var sum = 0;
+                    var table = $(".timesheet");
+                    table.find("td.total").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).html()))) {
+                            sum += parseFloat($(this).html());
+                        }
+                    });
+                    $("#tdTotalSum").html(sum);
+                }
+                
+                
+                 function CalculateColumnTotalTimesheet() {
+                    var MonSum = 0;
+                    var TueSum = 0;
+                    var WedSum = 0;
+                    var ThuSum = 0;
+                    var FriSum = 0;
+                    var SatSum = 0;
+                    var SunSum = 0;
+
+                    var table = $(".timesheet");
+
+                    table.find("td .mondate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            MonSum += parseFloat($(this).val());
+                        }
+                    });
+                    table.find("td .tuedate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            TueSum += parseFloat($(this).val());
+                        }
+                    });
+                    table.find("td .weddate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            WedSum += parseFloat($(this).val());
+                        }
+                    });
+                    table.find("td .thudate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            ThuSum += parseFloat($(this).val());
+                        }
+                    });
+                    table.find("td .fridate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            FriSum += parseFloat($(this).val());
+                        }
+                    });
+                    table.find("td .satdate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            SatSum += parseFloat($(this).val());
+                        }
+                    });
+                    table.find("td .sundate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            SunSum += parseFloat($(this).val());
+                        }
+                    });
+                    
+                    $("#tdMonSum").html(MonSum);
+                    $("#tdTueSum").html(TueSum);
+                    $("#tdWedSum").html(WedSum);
+                    $("#tdThuSum").html(ThuSum);
+                    $("#tdFriSum").html(FriSum);
+                    $("#tdSatSum").html(SatSum);
+                    $("#tdSunSum").html(SunSum); 
+                }
+
+                function PopulateWeekDays(DateValue) {
+                    var shortMonth = new Array();
+                    shortMonth[0] = "JAN";
+                    shortMonth[1] = "FEB";
+                    shortMonth[2] = "MAR";
+                    shortMonth[3] = "APR";
+                    shortMonth[4] = "MAY";
+                    shortMonth[5] = "JUN";
+                    shortMonth[6] = "JUL";
+                    shortMonth[7] = "AUG";
+                    shortMonth[8] = "SEP";
+                    shortMonth[9] = "OCT";
+                    shortMonth[10] = "NOV";
+                    shortMonth[11] = "DEC";
+                    var startEndDateofWeek = [];
+
+
+                    startEndDateofWeek = getstartAndEndOfWeek(new Date(DateValue));
+                    WeekDay1 = "";
+                    WeekDay2 = "";
+                    WeekDay3 = "";
+                    WeekDay4 = "";
+                    WeekDay5 = "";
+                    WeekDay6 = "";
+                    WeekDay7 = "";
+                    WeekStartDayYear = "";
+                    WeekEndDayYear = "";
+                    locale = "en-us"
+                    $.each(startEndDateofWeek, function(index, value) {
+                        eachDate = new Date(value);
+                        if (index == 0) {
+                            StartDateOfWeek = eachDate;
+                            //WeekDay1 = eachDate.toLocaleString(locale, { month: "short" }) +" " +eachDate.getDate();   
+                            WeekDay1 = shortMonth[eachDate.getMonth()] + " " + eachDate.getDate();
+                            //alert(shortMonth[eachDate.getMonth()]);                   
+                            WeekStartDayYear = shortMonth[eachDate.getMonth()] + " " + eachDate.getDate() + " " + eachDate.getFullYear();
+                        } else if (index == 1) {
+                            EndDateOfWeek = eachDate;
+                            WeekDay7 = shortMonth[eachDate.getMonth()] + " " + eachDate.getDate();
+                            WeekEndDayYear = shortMonth[eachDate.getMonth()] + " " + eachDate.getDate() + " " + eachDate.getFullYear();
+                        }
+                    });
+                    TuesdayDate = new Date(StartDateOfWeek);
+                    WednesdayDate = new Date(StartDateOfWeek);
+                    ThursdayDate = new Date(StartDateOfWeek);
+                    FridayDate = new Date(StartDateOfWeek);
+                    SaturdayDate = new Date(StartDateOfWeek);
+                    SundayDate = new Date(StartDateOfWeek);
+
+                    TuesdayDate.setDate(StartDateOfWeek.getDate() + 1);
+                    WednesdayDate.setDate(StartDateOfWeek.getDate() + 2);
+                    ThursdayDate.setDate(StartDateOfWeek.getDate() + 3);
+                    FridayDate.setDate(StartDateOfWeek.getDate() + 4);
+                    SaturdayDate.setDate(StartDateOfWeek.getDate() + 5);
+                    SundayDate.setDate(StartDateOfWeek.getDate() + 6);
+
+
+
+                    WeekDay2 = shortMonth[TuesdayDate.getMonth()] + " " + TuesdayDate.getDate(); // AssignWeekValueToSet(StartDateOfWeek.getDate()+ 1,StartDateOfWeek,EndDateOfWeek); 
+                    WeekDay3 = shortMonth[WednesdayDate.getMonth()] + " " + WednesdayDate.getDate(); //  AssignWeekValueToSet(StartDateOfWeek.getDate()+ 2,StartDateOfWeek,EndDateOfWeek);
+                    WeekDay4 = shortMonth[ThursdayDate.getMonth()] + " " + ThursdayDate.getDate(); //  AssignWeekValueToSet(StartDateOfWeek.getDate()+ 3,StartDateOfWeek,EndDateOfWeek);
+                    WeekDay5 = shortMonth[FridayDate.getMonth()] + " " + FridayDate.getDate(); //  AssignWeekValueToSet(StartDateOfWeek.getDate()+ 4,StartDateOfWeek,EndDateOfWeek);
+                    WeekDay6 = shortMonth[SaturdayDate.getMonth()] + " " + SaturdayDate.getDate(); // AssignWeekValueToSet(StartDateOfWeek.getDate()+ 5,StartDateOfWeek,EndDateOfWeek);
+                    //alert(WeekDay2)
+
+                    $("#HdrDay1").html(WeekDay1 + "<br/> MON");
+                    $("#weekStDate").html(WeekStartDayYear);
+                    $("#HdrDay2").html(WeekDay2 + "<br/> TUE");
+                    $("#HdrDay3").html(WeekDay3 + "<br/> WED");
+                    $("#HdrDay4").html(WeekDay4 + "<br/> THU");
+                    $("#HdrDay5").html(WeekDay5 + "<br/> FRI");
+                    $("#HdrDay6").html(WeekDay6 + "<br/> SAT");
+                    $("#HdrDay7").html(WeekDay7 + "<br/> SUN");
+
+                    $("#weekEndDate").html(WeekEndDayYear);
+                    $(".mondate").attr("DateValue", FormatDate(StartDateOfWeek));
+                    $(".tuedate").attr("DateValue", FormatDate(TuesdayDate));
+                    $(".weddate").attr("DateValue", FormatDate(WednesdayDate));
+                    $(".thudate").attr("DateValue", FormatDate(ThursdayDate));
+                    $(".fridate").attr("DateValue", FormatDate(FridayDate));
+                    $(".satdate").attr("DateValue", FormatDate(SaturdayDate));
+                    $(".sundate").attr("DateValue", FormatDate(SundayDate));
+                }
+
+               
+
+                function AssignMonthValueToSet(valToSet, dateVal) {
+                    var days = getDaysInMonth(dateVal.getMonth() + 1, dateVal.getFullYear());
+                    if (valToSet > days) {
+                        return dateVal.getMonth() + 2;
+                    } else {
+                        return dateVal.getMonth() + 1;
+                    }
+                }
+                
+                 function AssignWeekValueToSet(valToSet, dateVal, dateSetVal) {
+                    var shortMonth = new Array();
+                    shortMonth[0] = "JAN";
+                    shortMonth[1] = "FEB";
+                    shortMonth[2] = "MAR";
+                    shortMonth[3] = "APR";
+                    shortMonth[4] = "MAY";
+                    shortMonth[5] = "JUN";
+                    shortMonth[6] = "JUL";
+                    shortMonth[7] = "AUG";
+                    shortMonth[8] = "SEP";
+                    shortMonth[9] = "OCT";
+                    shortMonth[10] = "NOV";
+                    shortMonth[11] = "DEC";
+
+                    var days = getDaysInMonth(dateVal.getMonth() + 1, dateVal.getFullYear());
+                    if (valToSet <= days) {
+                        //return (new Date(dateVal) ).toLocaleString(locale, { month: "short" }) +" " +valToSet;
+                        return shortMonth[dateVal.getMonth()] + " " + valToSet;
+                    } else {
+                        //return (new Date(dateSetVal)).toLocaleString(locale, { month: "short" }) +" " +(valToSet - days);
+                        return shortMonth[dateSetVal.getMonth()] + " " + (valToSet - days);
+                    }
+                }
+
+              
+
+                var getDaysInMonth = function(month, year) {
+                    return new Date(year, month, 0).getDate();
+                }
+
+                function FormatDate(datevalue) {
+                    var dd = datevalue.getDate();
+                    var mm = datevalue.getMonth() + 1;
+                    var y = datevalue.getFullYear();
+                    var FormattedDate = mm + "/" + dd + "/" + y;
+                    return FormattedDate;
+                }
+                
+               
+     
+                
+                function ValidateInitiativeRows(status){
+                     var initiativename =  $('#initiative_name').val().trim();
+                     if(initiativename.length < 2){
+                            alert("Initiative Name Should Be Mandatory");
+                            return false;
+                     }
+                     var firstValue = $('#date_service').val().split('/');
+                     var secondValue = $('#date_service1').val().split('/');
+                     
+                     var StartDate = $('#date_service').val();
+                     var EndDate = $('#date_service1').val();
+                     
+                     if(StartDate.length == 0){
+                         alert('Probable Start Date should not be empty');
+                         return false;
+                     }
+                     
+                     if(EndDate.length == 0){
+                        alert('Probable End Date should not be empty');
+                        return false;
+                     }
+                     
+                     var probableStart = new Date(StartDate);
+                     var probableEnd = new Date(EndDate);
+                     
+                     if(probableStart > probableEnd){ 
+                          alert('Probable End date should be more than Probable Start date');
+                          return false;
+                     }
+
+                     
+                      var total_Count = parseInt($('#tdColTotal').html());
+                      
+                      if(status != 'Saved'){
+                             if(total_Count == 0){
+                                    alert('Estimates Should not be Empty');
+                                    return false;
+                             }
+                      }
+                                         
+                     return true;
+                }
+                
+                function ActiveStatus(status){
+                       ActiveStatusMethod(status);
+                }
+                
+                
+                function FetchInitiativeValues(stats){
+                    var InitiativeEstimateJSON = {};
+                    $("#hdnAction").val(stats);
+                    InitiativeEstimateJSON.Estimate = [];
+                    var initiative_Removequotes = $('#initiative_name').val().trim().replace(/\'/g, "");
+                    var Initiative_Name = initiative_Removequotes.replace(/\"/g, ""); 
+               /*     var Initiative_Name= $('#initiative_name').val().trim();   */
+                    
+                    var StartDate = $('#date_service').val();
+                    var EndDate = $('#date_service1').val();
+                    var ContactAccService = document.getElementById("j_id0:j_id1:ContactClient").value;
+                    
+             /*     var BriefDescription = $('#Brief_Description').val();
+                    var myContent = CKEDITOR.instances.editor1.getData();
+                    var content_len = myContent.length;
+                    alert(content_len);
+                    var ActualContent = myContent.slice(3,content_len-5); 
+                    alert(ActualContent);
+                    var Assumption = CKEDITOR.instances.editor2.getData();
+                    alert(Assumption);   */
+                    
+                    var BriefDescription;
+                    var Content_BriefDescription = CKEDITOR.instances.editor1.getData();
+                    var ContentDescription_len = Content_BriefDescription.length;
+                    if(ContentDescription_len  > 0 ){
+                              BriefDescription = Content_BriefDescription.slice(3,ContentDescription_len-5);}
+                    else{
+                              BriefDescription = Content_BriefDescription;
+                    }
+                    
+                    var Assumption;
+                    var Content_Assumption =  CKEDITOR.instances.editor2.getData();
+                    var Assumption_len = Content_Assumption.length;
+                    if(Assumption_len  > 0){
+                              Assumption = Content_Assumption.slice(3,Assumption_len-5);}
+                    else{
+                              Assumption = Content_Assumption;
+                    }
+                    
+                    
+                    var Status = $('#Status').val();
+                    InitiativeEstimateJSON.InitiativeName =  Initiative_Name;
+                    InitiativeEstimateJSON.StartDate  = StartDate;
+                    InitiativeEstimateJSON.EndDate  = EndDate;
+                    InitiativeEstimateJSON.ContactAccService = ContactAccService;
+                    InitiativeEstimateJSON.BriefDescription = BriefDescription;
+                    InitiativeEstimateJSON.Assumption = Assumption;
+                    InitiativeEstimateJSON.Status = Status ;
+                    InitiativeEstimateJSON.stats = stats;
+                    var validation = ValidateInitiativeRows(stats);
+                    var confirmresult = false;
+                    var table = $('#addtionalTable'); 
+                    var checkTask = 0;    
+                    var checkHours = 0;  
+                    var checkContact = 1;                              
+                    table.find(".width1.txtTask").each(function(i,el){                          
+                                  if($(el).val().trim().length == 0){
+                                                           checkTask ++;
+                                                           return false;
+                                                    }
+                                      });
+                                      table.find(".width2.txtTask").each(function(i,el){                          
+                                                    if($(el).val().trim().length == 0 || $(el).val() == null || $(el).val() == '' || $(el).val() == 0){
+                                                           checkHours++;
+                                                           return false;
+                                                    }
+                                      });
+                                      if(checkTask > 0){
+                                          alert('Task/Components should not be empty!!');
+                                      }
+                                      if(checkHours > 0){
+                                          alert('Hours should not be empty!!');
+                                      }
+                                      if($('select.qq option').length == 0){
+                                            alert('Client side contact should not be empty!!');
+                                            checkContact = 0;
+                                      }
+                    if (validation && checkTask == 0 && checkHours == 0 && checkContact != 0) {
+                               debugger;
+                               if (stats == "Submitted") {                                  
+                                               confirmresult = confirm("Are you sure want to submit the Initiative Page");
+                                      
+                               } else {
+                                      confirmresult = true;
+                               }
+                               if (confirmresult) {
+                                              var table = $(".timesheet");
+                                              table.find("tr").each(function(i, el) {
+                                              var RowNo = $(this).attr("RowNo");
+                                              var EstimateJsonValue = {};
+                                                    if (RowNo > 0) {
+                                                              var Phase = $("#ddlInitiative_" + RowNo).find('option:selected').val();
+                                                              
+                                                              var remove_Lines = $("#txtTask_" + RowNo).val().trim().replace(/\n/g, "");
+                                                              var remove_space = remove_Lines.replace(/'/g, '');
+                                                              var remove_doublespace = remove_space.replace(/"/g, '');    
+                                                              var remove_exceptcharanddigits = remove_doublespace.replace(/[^\w\s]/g,''); 
+                                                              var remove_tabs = remove_doublespace.replace(/\t/g, '');                                                       
+                                                              var TaskName = remove_tabs ;
+                                                              
+                                                              var remove_assumLines = $("#assumption_" + RowNo).val().trim().replace(/\n/g, "");
+                                                              var remove_assumspace = remove_assumLines.replace(/'/g, '');
+                                                              var remove_assumdoublespace = remove_assumspace.replace(/"/g, '');    
+                                                              var remove_assumexceptcharanddigits = remove_assumdoublespace.replace(/[^\w\s]/g,''); 
+                                                              var remove_assumtabs = remove_assumdoublespace.replace(/\t/g, '');
+                                                              
+                                                              var assumption = remove_assumtabs;
+
+                                                              var Hours = $("#txtTask1_" + RowNo).val();                                                   
+                                                              EstimateJsonValue.Phase = Phase;
+                                                              EstimateJsonValue.TaskName = TaskName;
+                                                              EstimateJsonValue.Assumption= assumption;
+                                                              EstimateJsonValue.Hours = Hours;
+                                                              InitiativeEstimateJSON.Estimate.push(EstimateJsonValue);
+                                                              // Save Object as a value for the key - row no
+                                                     }
+                                              debugger;
+                                             });
+                                             var strUpdatedList = JSON.stringify(InitiativeEstimateJSON);
+                                             //alert(strUpdatedList);
+                                             debugger;
+                                             PassJSONToInitiativeController(strUpdatedList);
+                                       /*      if(($('#Status_Value').val() != "Saved" || $('#Status_Value').val() != "Initiative Submitted") ){
+                                                       $('#Status_Value').html('New');
+                                             }   */
+
+
+                              /*               var Check_Duplicate= '{!Check_duplicate}';
+                                             alert(Check_Duplicate);
+                                             if (stats == "Submitted") {
+                                                     $('#Status_Value').html('Initiative Submitted');
+                                             }
+                                             if (stats == "Saved" && Check_Duplicate != 'true'){
+                                                     $('#Status_Value').html('Saved');
+                                             }
+                                             if(Check_Duplicate == 'true'){
+                                                     $('#Status_Value').html('New');
+                                             }  */
+                               }
+                    } 
+                    
+                }   
+                
+                
+
+                 function populatePreviousWeekDates() {
+                    $(".total").html('');
+                    $(".ColTotal").html('');
+                    $(".spanTotal").html('');
+                    $("#tdTotalSum").html('');
+                    var currDate = $("#weekStDate").html();
+                    var currDateSplit = currDate.split(" ");
+                    var shortMonth = currDateSplit[0];
+                    var monthstring = getMonthFromString(shortMonth) + 1;
+                    var dayString = parseFloat(currDateSplit[1]) - 7;
+                    var yearString = currDateSplit[2];
+                    if (dayString <= 0) {
+                        monthstring = monthstring - 1;
+                        //var days = Math.round(((new Date(yearString, monthstring))-(new Date(yearString, monthstring-1)))/86400000);
+                        var days = new Date(yearString, monthstring, 0).getDate();
+                        dayString = dayString + days;
+                        if (monthstring == 0) {
+                            monthstring = 12;
+                            yearString = yearString - 1;
+                        }
+                    }
+                    var currWeekDate = monthstring + '/' + dayString + '/' + yearString;
+                    var datecurr = new Date(currWeekDate);
+                    var WeekDate = FormatDate(datecurr);
+
+                    PopulateWeekDays(WeekDate);
+                    $("#Tbltimesheet").find("input").val('');
+                    //DisableFields();
+                    passWeekDateToController(FormatDate(new Date($("#weekStDate").html())), FormatDate(new Date($("#weekEndDate").html())))
+                }
+
+                //To Disable the Previous Month Fields
+                function DisableFields(tstatus) {
+
+                    //To get the Current and Previous Month
+
+
+                    var currentMonthdate = new Date('{!CurrentDate}');
+
+
+                    var previousMonth = new String(currentMonthdate.getMonth());
+                    var currentMonth = new String(currentMonthdate.getMonth() + 1);
+                    var currentYear = new String(currentMonthdate.getFullYear());
+                    if (previousMonth == "0") {
+                        previousMonth = 12;
+                    }
+
+                    $(".timesheet").children("tr").each(function() {
+
+                        $('td', this).each(function() {
+                            var timeValue = $(this).find(":input").attr("Datevalue");
+                            var currentRowDate = new Date(timeValue);
+                            // alert(currentRowDate);             
+                            //$(this).find(":input").prop('disabled', true);
+                            if (typeof timeValue !== "undefined") {
+                                var splitTimeValue = timeValue.split("/");
+
+                                if (currentRowDate > currentMonthdate) {
+                                    if (tstatus == '' || tstatus == 'Saved') {
+                                        $(this).find(":input").prop('disabled', true);
+                                        $(this).find(":input").parent().prop('disabled', true);
+                                    }
+
+                                }
+                                if (previousMonth == 12) {
+                                    if ((splitTimeValue[0] != previousMonth.valueOf() && splitTimeValue[0] != currentMonth.valueOf())) {
+                                        if (tstatus == '' || tstatus == 'Saved') {
+                                            $(this).find(":input").prop('disabled', true);
+                                            $(this).find(":input").parent().prop('disabled', true);
+                                        }
+                                    }
+
+                                } else if ((splitTimeValue[0] != previousMonth.valueOf() && splitTimeValue[0] != currentMonth.valueOf()) || (splitTimeValue[2] != currentYear.valueOf())) {
+                                    if (tstatus == '' || tstatus == 'Saved') {
+                                        $(this).find(":input").prop('disabled', true);
+                                        $(this).find(":input").parent().prop('disabled', true);
+                                    }
+                                } else {
+                                    if (tstatus == '' || tstatus == 'Saved') {
+                                        $(this).find(":input").prop('disabled', false);
+                                        $(this).find(":input").parent().prop('disabled', false);
+                                    }
+                                }
+
+                            }
+
+                        })
+
+                        //TO Check whether all the hours entry fields are disabled. If disabled then we are disabling the task and resource fields  
+                        if ($(".mondate").prop("disabled") == true && $(".tuedate").prop("disabled") == true && $(".weddate").prop("disabled") == true && $(".thudate").prop("disabled") == true && $(".fridate").prop("disabled") == true && $(".satdate").prop("disabled") == true && $(".sundate").prop("disabled") == true) {
+                            if (tstatus == '' || tstatus == 'Saved') {
+                                $(".txtTask").prop('disabled', true);
+                                $(".ddlResource").prop('disabled', true);
+                            }
+
+                        } else {
+                            if (tstatus == '' || tstatus == 'Saved') {
+                                $(".txtTask").prop('disabled', false);
+                                $(".ddlResource").prop('disabled', false);
+                            }
+                        }
+                    })
+                }
+
+                function populateNextWeekDates() {
+                    var currDate = $("#weekEndDate").html();
+                    var currDateSplit = currDate.split(" ");
+                    var shortMonth = currDateSplit[0];
+                    var monthstring = getMonthFromString(shortMonth) + 1;
+                    var dayString = parseFloat(currDateSplit[1]) + 1;
+                    var yearString = currDateSplit[2];
+                    var days = new Date(yearString, monthstring, 0).getDate();
+                    if (dayString > days) {
+                        dayString = dayString - days;
+                        monthstring = monthstring + 1;
+                        if (monthstring == 13) {
+                            yearString = yearString + 1;
+                        }
+                    }
+                    var currWeekDate = monthstring + '/' + dayString + '/' + yearString;
+                    var datecurr = new Date(currWeekDate);
+                    var TodayDate = new Date('{!CurrentDate}');
+                    if (datecurr > TodayDate) {
+
+                        return false;
+                    }
+
+                    $(".total").html('');
+                    $(".ColTotal").html('');
+                    $("#tdTotalSum").html('');
+                    var WeekDate = FormatDate(datecurr);
+                    //alert(WeekDate);
+                    PopulateWeekDays(WeekDate);
+                    $("#Tbltimesheet").find("input").val('');
+                    passWeekDateToController(FormatDate(new Date($("#weekStDate").html())), FormatDate(new Date($("#weekEndDate").html())));
+                }
+            
+
+                //To Get the Month Value from Short Month Name
+                function getMonthFromString(mon) {
+                    var months = new Array("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC");
+                    var result = getPosition(mon.toUpperCase(), months);
+                    return result;
+                }
+
+                //To get the Position of the Month
+                function getPosition(elementToFind, arrayElements) {
+                    var i;
+                    for (i = 0; i < arrayElements.length; i += 1) {
+
+                        var strarrayElements = arrayElements[i];
+                        var strelementToFind = elementToFind;
+
+                        if (strarrayElements.localeCompare(strelementToFind) == 0) {
+                            return i;
+                        }
+                    }
+                    return null; //not found
+                }
+
+
+                function CancelTimesheet() {
+                    location.reload();
+                }
+
+                function HidePopup() {
+                    $("#myModal").hide();
+                    $(".modal-backdrop").removeClass("modal-backdrop");
+                }
+
+                function ApplySearch() {
+                    var AccountID = $(".ddlstAccount").val();
+                    var ServiceID = $(".ddlstService").val();
+
+                    ApplySearchAction(AccountID, ServiceID)
+                }
+
+                function SetVisiblityForNextWeek(CurrentWeekEndDate) {
+                    var nextWeekEndDate = new Date('{!CurrentDate}');
+                    var TodayDate = new Date('{!CurrentDate}');
+                    nextWeekEndDate.setDate(CurrentWeekEndDate.getDate() + 6);
+                    if (TodayDate < nextWeekEndDate) {
+                        $("#nextWeekID").hide();
+                    } else {
+                        $("#nextWeekID").show();
+                    }
+                }
+            </script>
+
+            <apex:outputPanel id="jsPanel">
+                <script>
+                    function BindJSONDataToPage() {
+
+                        timesheetstatus = '';
+                        var jResponse = '{!TimeshtJSONtoBind}';
+                        jResponse = jResponse.replace(/'/g, "\\'");
+                        console.log('jResponse'+jResponse);
+                        var jsonFromCtrl = '';
+                        var Comments = '';
+
+                        if (jResponse != '') {
+                            jsonFromCtrl = jResponse.split('~')[0];
+                            console.log('jsonFromCtrl'+jsonFromCtrl);
+                            timesheetstatus = jResponse.split('~')[1];
+                            console.log('timesheetstatus'+timesheetstatus);
+                            Comments = jResponse.split('~')[2];
+
+                        }
+                        $("#txtComments").val(Comments);
+                        if (!timesheetstatus) {
+                            $("#divStatus").hide();
+                        } else {
+                            $("#divStatus").show();
+                            $("#lblStatus").html(timesheetstatus);
+                        }
+                        $(".staticRows").remove();
+                        if (jsonFromCtrl != '') {
+
+                            var timeshtArray = $.parseJSON(jsonFromCtrl);
+
+                            $.each(timeshtArray, function(key, value) {
+                                var rowno = timeshtArray[key].Row_No__c;
+
+                                if (rowno > 0) {
+                                    if ($('#txtTask_' + rowno).length == 0) {
+                                        AddRowToAdditionalTable(rowno);
+                                        var elementid = '#ddlResName_' + rowno;
+                                        populateDynamicResoureNameByRow(elementid);
+                                    }
+                                }
+                                var TaskName = timeshtArray[key].Task_Name__c;
+                                TaskName = TaskName.replace('$#$', "'");
+
+                                $('#txtTask_' + rowno).val(TaskName);
+                                $('#ddlResName_' + rowno).val(timeshtArray[key].Resource_Id__c);
+                                var timeshtDate = timeshtArray[key].Timesheet_Date__c;
+
+                                var timeDate = new Date(toMmDdYy(timeshtDate));
+                                var dayName = timeDate.getDay();
+                                switch (dayName) {
+                                    case 1:
+                                        $('#txtMonHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtMonHrs_' + rowno).keyup();
+                                        break;
+                                    case 2:
+                                        $('#txtTueHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtTueHrs_' + rowno).keyup();
+                                        break;
+                                    case 3:
+                                        $('#txtWedHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtWedHrs_' + rowno).keyup();
+                                        break;
+                                    case 4:
+                                        $('#txtThuHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtThuHrs_' + rowno).keyup();
+                                        break;
+                                    case 5:
+                                        $('#txtFriHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtFriHrs_' + rowno).keyup();
+                                        break;
+                                    case 6:
+                                        $('#txtSatHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtSatHrs_' + rowno).keyup();
+                                        break;
+                                    default:
+                                        $('#txtSunHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtSunHrs_' + rowno).keyup();
+                                        break;
+                                }
+                            });
+                        } else {
+                            AddRowToAdditionalTable(1);
+                            AddRowToAdditionalTable(2);
+                            AddRowToAdditionalTable(3);
+                            AddRowToAdditionalTable(4);
+                            AddRowToAdditionalTable(5);
+                            populateDynamicResoureName();
+                            $("#Tbltimesheet").find("input").val('');
+                        }
+
+                        CustomizePageByTimesheetStatus(timesheetstatus, PortalUserRole, IsPortalApprover);
+                        if (PortalUserRole != 'Customer') {
+                            DisableFields(timesheetstatus);
+                        }
+                    }
+
+                    function PostSaveTimesheet() {
+
+                        //var accid = '{!AccountId}';
+                        //alert(BindJSONDataToPage);
+                        //alert(FetchTimesheetValues);
+                        //alert(   $("#hdnAction").val());
+                        if ($("#hdnAction").val() == 'Saved') {
+                            alert("Timesheet has been saved successfully");
+                        } else {
+                            window.location.href = "ViewTimesheet";
+
+                        }
+                        //accntId ='+AccountId+'&srvcId='+'serviceId
+
+                    }
+                    
+                    function PostSaveInitiative(){
+                         window.location.href = "ViewInitiative";
+                    }
+
+                    var toMmDdYy = function(input) {
+                        var ptrn = /(\d{4})\-(\d{2})\-(\d{2})/;
+                        if (!input || !input.match(ptrn)) {
+                            return null;
+                        }
+                        return input.replace(ptrn, '$2/$3/$1');
+                    };
+
+                    function AddRowToAdditionalTable(RowNo) {
+                          var table = $('#addtionalTable');
+                          
+                          var table_length = $("#addtionalTable tr").length;
+                            
+                          $("#addtionalTable").append("<tr class='staticRows'    RowNo=" + RowNo + ">  <td class = 'Rescol'><select id='ddlInitiative_" + RowNo + "' class='' style='width:165px' > <option value='Analysis'>Analysis</option> <option value='Design'>Design</option> <option value='Development'>Development</option> <option value='System Testing'>System Testing</option> <option value='Deployment'>Deployment</option>  </select></td> <td><textarea type='text' maxlength = '1500' title = 'Max chars 150' id='txtTask_" + RowNo + "' class='width1 txtTask'  /></td> <td><textarea type='text' maxlength = '1500' title = 'Max chars 150' id='assumption_" + RowNo + "' class='width3 txtTask'  /></td> <td><input type='text' maxlength = '4' title = 'Max chars 150' id='txtTask1_" + RowNo + "' class='width2 txtTask'  onkeyup='CalculateColumnTotal()' /></td> <td class='actiontd'> <a href='#' class='delete-icon'><i class='fa fa-trash-o' aria-hidden='true'></i></a> </td>  </tr>");
+
+                      debugger;
+                        
+                    
+                    }
+                    
+                    function CalculateColumnTotal() {
+                         debugger;
+                         var table = $('#addtionalTable');
+
+                         var count = 0;
+                                                 
+                         table.find(".width2.txtTask").each(function(i,el){  
+                                   if($(el).val().trim().length != 0){    
+                                           count += parseFloat($(el).val());
+                                   }
+                         });
+                         
+                         
+                         var total_Count= parseFloat(count).toFixed( 2 );
+
+                         
+                         $('#tdColTotal').html(total_Count);
+                    }
+                    
+                    function logout() {
+                        window.location.replace("{!$Site.Prefix}/secur/logout.jsp");
+                    }
+
+                    function Redirect() {
+                        window.location.href = "ViewTimesheet";
+                    }
+                </script>
+            </apex:outputPanel>
+            
+            
+            
+            <apex:outputPanel id="jsInitiativePanel">
+               <script>
+                    function BindJSONDataToInitiativePage() {
+                                 
+                                  var jInitiativeResponse = '{!Initiative_JSONtoBind}';
+                                  
+                                                                                                                                       
+                                  jInitiativeResponse = jInitiativeResponse.replace(/'/g, "\\'");
+                                  var jEstimateResponse = '{!EstimateJSONtoBind}';
+                                  jEstimateResponse = jEstimateResponse.replace(/'/g, "\\'");
+                                  var jsonFromInitiativeCtrl = '';
+                                  var jsonFromEstimateCtrl = '';
+                                  var initiativestatus = '';
+                                  var estimatestatus = '';
+                                  var splitDate  = '';
+                                  var formatDate = '';
+                                  var RowNo = 2;
+                                  if(jInitiativeResponse != ''){
+                                         jsonFromInitiativeCtrl = jInitiativeResponse.split('~')[0];
+                                         console.log('@@@@jsonFromInitiativeCtrl '+jsonFromInitiativeCtrl);       
+                                         jsonFromInitiativeCtrl = '['+jsonFromInitiativeCtrl+']'
+                                         initiativestatus = jInitiativeResponse.split('~')[1];
+                                  }
+ 
+                                  if(jEstimateResponse  != ''){
+                                         jsonFromEstimateCtrl = jEstimateResponse.split('~')[0];
+                                         console.log('@@@@jsonFromEstimateCtrl  '+jsonFromEstimateCtrl);       
+                                         estimatestatus =  jEstimateResponse.split('~')[1];
+                                              
+                                  }
+                                                                  
+                                  
+
+                                  if(jsonFromInitiativeCtrl != ''){
+                                         var initiativeArray = $.parseJSON(jsonFromInitiativeCtrl);
+                                         
+                                         $('#initiative_name').val(initiativeArray[0].Name);
+                                        
+                                         var startDate = initiativeArray[0].Probable_Start_Date__c;
+                                         
+                                         splitDate = startDate.split('-');
+
+                                         formatDate = splitDate[1]+"/"+splitDate[2]+"/"+splitDate[0];
+                                         $('#date_service').val(formatDate);
+                                         var endDate = initiativeArray[0].Probable_End_Date__c;
+                                         splitDate = '';
+                                         splitDate = endDate.split('-');
+
+                                         formatDate = '';
+                                         formatDate = splitDate[1]+"/"+splitDate[2]+"/"+splitDate[0];
+                                         $('#date_service1').val(formatDate);
+                                         $('#Status').val(initiativeArray[0].Status__c);
+                                        
+                                        
+                                         CKEDITOR.instances.editor1.setData('{!JSENCODE(Initiative_Description)}'); 
+                                         
+                                         CKEDITOR.instances.editor2.setData('{!JSENCODE(Initiative_Assumption)}'); 
+                                          
+                                  }
+   
+                                  if(jsonFromEstimateCtrl  != ''){
+                                         var estimateArray = $.parseJSON(jsonFromEstimateCtrl);
+                                         console.log('@@@@@@@estimateArray'+estimateArray);
+                                         $.each(estimateArray, function(key, value) {
+                                                AddRowToAdditionalTable(RowNo);
+                                                $('#ddlInitiative_'+RowNo).val(estimateArray[key].Phase__c); 
+                                                $('#txtTask_'+RowNo).val(estimateArray[key].Task_Components__c);                                            
+                                                $('#assumption_'+RowNo).val(estimateArray[key].Assumptions__c);                                               
+                                                $('#txtTask1_'+RowNo).val(estimateArray[key].Hours__c);
+                                                
+                                                RowNo++;
+                                         });
+                                 }
+                                
+                                CustomizePageByInitiativeStatus(initiativestatus, PortalUserRole, IsPortalApprover);
+                                CalculateColumnTotal();
+                    }
+               </script>          
+            </apex:outputPanel>
+                        <style>
+                #chartdiv {
+                width: 100%;
+                height: 420px;
+                 float: right;            
+                }            
+            </style>
+            <script>
+            var utilizationHurs=0.0; 
+            window.onload=function(){
+                hrs();
+                toHide()
+            }
+</script>   
+
+
+            <script>    
+            function hrs(){
+                var crntInvId =  '{!$CurrentPage.parameters.CurrenInitiativeId}';
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.ODS_InitiativeController.initiativeStatus}', 
+                    crntInvId,
+                    function(result, event){
+                        if(result === null)
+                        {
+                            utilizationHurs = 0.0;
+                        }
+                        else
+                        {
+                            utilizationHurs = result;
+                            
+                        }
+                    });
+                
+            }
+            
+            var chart = AmCharts.makeChart("chartdiv", {
+                "theme": "light",
+                "type": "gauge",
+                "axes": [{
+                    "topTextFontSize": 20,
+                    "topTextYOffset": 70,
+                    "axisColor": "#31d6ea",
+                    "axisThickness": 1,
+                    "endValue": 100,
+                    "gridInside": true,
+                    "inside": true,
+                    "radius": "50%",
+                    "valueInterval": 10,
+                    "tickColor": "#67b7dc",
+                    "startAngle": -90,
+                    "endAngle": 90,
+                    "unit": "%",
+                    "bandOutlineAlpha": 0,
+                    "bands": [{
+                        "color": "#4ECAF4",
+                        "endValue": 100,
+                        "innerRadius": "105%",
+                        "radius": "130%",
+                        "gradientRatio": [0, 0, 0],
+                        "startValue": 0
+                    }, {
+                        "color": "#4ECAF4",
+                        "endValue": 0,
+                        "innerRadius": "105%",
+                        "radius": "130%",
+                        "gradientRatio": [0.5, 0, -0.5],
+                        "startValue": 0
+                    }]
+                }],
+                "arrows": [{
+                    "alpha": 1,
+                    "innerRadius": "35%",
+                    "nailRadius": 0,
+                    "radius": "130%"
+                }]
+            });
+            
+            setInterval(randomValue, 50);
+            
+            // set random value
+            function randomValue() {
+                var value = utilizationHurs;
+                chart.arrows[0].setValue(value);
+                chart.axes[0].setTopText(value + " %");
+                // adjust darker band to new value
+                chart.axes[0].bands[1].setEndValue(value);
+            }
+            function toHide(){
+                var status =  '{!$CurrentPage.parameters.Status}'; 
+                if(status == '' ||status == 'Re-evaluate' || status == 'New' || status == 'Initiative Submitted' || status == 'Saved'  ){
+                    $('#chartdiv').hide();
+                    $('#chartdiv2').hide(); 
+                    
+                }
+            }
+            </script>
+           
+
+            <!-------- Fonts Awesome ----->
+            <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'font-awesome/css/font-awesome.css')}" />
+            <title>ON DEMAND SERVICES </title>
+        </head>
+
+        <body>
+            <apex:pageMessages id="showmsg"></apex:pageMessages>
+
+            <apex:actionFunction name="PassJSONToInitiativeController" action="{!SaveInitativeAndEstimate}" status="statusSaveTrip" rerender="showmsg" >
+                 <apex:param name="PassedInitiativeEstimateJSON" assignTo="{!PassedInitiativeEstimateJSON}" value="InitiativeController"/>
+            </apex:actionFunction>
+            
+            <apex:actionFunction name="ActiveStatusMethod" action="{!SaveActiveInitiativeStatus}" status="statusSaveTrip" rerender="" oncomplete="location.reload();">
+                 <apex:param name="PassedActiveStatus" assignTo="{!PassedActiveStatus}" value="ActiveStatusVariable"/>
+            </apex:actionFunction>       
+ 
+           
+
+            <apex:actionFunction name="ApproveRejectAction" action="{!GetTimeSheetIdFromAction}" rerender="SearchResultsPanel, myModal" immediate="true">
+                <apex:param name="CurrentTimesheetId" value="" assignTo="{!CurrenTimesheetId}" />
+            </apex:actionFunction>
+
+            <apex:actionFunction name="RejectAction" action="{!RejectInitiative}" reRender="SearchResultsPanel" status="statusSaveTrip" oncomplete="reloadpage();">
+                <apex:param name="timeshtCmnts" value="" assignTo="{!TimesheetComments}" />
+            </apex:actionFunction>
+            <apex:actionFunction name="ApproveAction" action="{!ApproveInitiative}" reRender="SearchResultsPanel" status="statusSaveTrip" oncomplete="reloadpage();" />
+
+            <div class="shadow-show"></div>
+            <c:ODS_HeaderComponent />
+            <apex:actionStatus id="statusSaveTrip" stopText="">
+                <apex:facet name="start">
+                    <div>
+                        <div class="popupBackground" />
+                        <div class="PopupPanel">
+                            <table border="0" width="100%" height="100%">
+                                <tr>
+                                    <td align="center"><b>Please Wait</b></td>
+                                </tr>
+                                <tr>
+                                    <td align="center"><img src="{!$Resource.ODS_Statussign}" /></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </apex:facet>
+            </apex:actionStatus>
+            
+           
+            
+            <div class="clr"></div>
+
+            <div class="clr"></div>
+            
+            
+            
+             <div class="mid-bg">
+                <div class="sub-warp">
+                     <div class="panel panel-default">          
+                          <div class="panel-heading" style="color: #FFFFFF;background-color: #4ECAF4">
+                               <h3 class="panel-title">INITIATIVE</h3>
+                             <span style="padding-left:457px">    <label class="panel-title" id="Account_NameHeader">Account:</label>  </span>
+                                 <label class="panel-title" id="Account_Name">{!PassAccountName}</label>
+                           <span style="padding-left:20px">      <label class="panel-title" id="Service_NameHeader">Service:</label>  </span>
+                                 <label class="panel-title" id="Service_Name">{!PassServiceName}</label>
+                       
+                               <h3 id= "initiativeAlert"> CLIENT SIDE CONTACT SHOULD NOT BE EMPTY </h3>   
+                               <span class="pull-right clickable" style="margin-top: 0.2px;" ><i class="fa fa-chevron-up" aria-hidden="true"></i></span>
+                          </div>   
+                         <div class="panel-body">
+                                  <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <div class="form-horizontal"> 
+                                                     <div class="form-group">
+                                                           <label class="col-md-4 col-sm-4 col-xs-12 control-label" width = "10%">Initiative Name<span style="color:#ff9797; font-size:15px; cursor:default;" title="Mandatory">*</span></label>
+                                            <div class="col-md-8 col-sm-8 col-xs-12">
+                                                  <input class="form-control" id="initiative_name" name="initiativename" type="text" value="" />
+                                            </div>
+                                  </div>
+                        <div class="form-group">
+                                 <label class="col-md-4 col-sm-4 col-xs-12 control-label">Probable Start Date<span style="color:#ff9797; font-size:15px; cursor:default;" title="Mandatory">*</span></label>
+                                   <div class="col-md-8 col-sm-8 col-xs-12">                                                   
+                                           <input type="text" name="txt_from" class="tfrom_date" placeholder="From Date" id="date_service" onkeypress="return isNumber(event)" autocomplete = "off" />                                                                 
+                                   </div>
+                       </div>
+                       <div class="form-group">
+                                <label class="col-md-4 col-sm-4 col-xs-12 control-label">Probable End Date<span style="color:#ff9797; font-size:15px; cursor:default;" title="Mandatory">*</span></label>
+                                  <div class="col-md-8 col-sm-8 col-xs-12">                     
+                                      <input type="text" name="txt_to" class="tto_date" placeholder="To Date" id="date_service1" onkeypress="return isNumber(event)" autocomplete = "off"/>                                                                
+                                  </div> 
+                       </div>
+                       <div class="form-group">
+                                <label class="col-md-4 col-sm-4 col-xs-12 control-label">Approver<span style="color:#ff9797; font-size:15px; cursor:default;" title="Mandatory">*</span></label>
+                                   <div class="col-md-8 col-sm-8 col-xs-12">
+                                         <apex:selectList styleClass="form-control qq"  id="ContactClient" value="{!ClientContact}" size="1"> 
+                                                      <apex:selectOptions value="{!ContactAccountServices}"></apex:selectOptions>
+                                         </apex:selectList>
+                                   </div>
+                       </div>
+                       
+                       <div class="form-horizontal">
+                         
+                        <div class="form-group">
+                                     <label class="col-md-4 col-sm-4 col-xs-12 control-label " id="Status_new">Status:</label>
+                                     <label class="col-md-4 col-sm-4 col-xs-12 control-label " id="Status_root" style="left: -150px;">Status</label>
+                                     <label class="col-md-4 col-sm-4 col-xs-12 control-label " id="Status_Value" style="text-align: left !important;" ></label>  
+                                     
+                        </div>
+                       
+                                                           
+                 </div>    
+                 <div id = "ActiveInitiative" style="position: absolute;left: 226px;display: block;">
+                                           <input type="button" id="btnOnhold" class="save-submit" value="Mark As On Hold" onclick="return ActiveStatus('On Hold')" />
+                                           <input type="button" id="btnDelivered" class="save-submit" value="Mark As Delivered" onclick="return ActiveStatus('Initiative Delivered')" />
+                 </div> 
+                 <div id = "OnHold" style = "position: absolute;left: 226px;display: block;">
+                               <input type="button" id="btnactivestatus"  class="save-submit" value="Make Active" onclick="return ActiveStatus('Active Initiative')" />
+                 </div>   
+
+                        
+                       
+                 </div>
+            </div>
+            <div id= "Initiative_Description">
+                  <div class="col-md-6 col-sm-6 col-xs-12">                                 
+                          <div id="brief_description">
+                                        <p id = "description_content">
+                                             <b>               Brief Description: </b><br />
+                                             <textarea id="editor1" name="editor1"></textarea>
+                                             <script type="text/javascript">
+                                                    CKEDITOR.replace( 'editor1' );
+                                             </script>
+                                        </p>
+                         </div>     
+                 </div>      
+           </div>
+             
+                    
+           </div>     
+                                            
+        </div>
+         <div id= "Test">
+         <div class="panel panel-default">
+               <div class="panel-heading" style="color: white;background-color: #3399cc;">
+                               <h3 class="panel-title">BRIEF DESCRIPTION AND ASSUMPTION</h3>                            
+                               <span class="pull-right clickable" style="margin-top: 0.2px;" ><i class="fa fa-chevron-up" aria-hidden="true"></i></span>
+               </div>
+              
+               <div class="panel-body">
+                   <div id = "Description_Assumption">
+                        <div class="col-md-6">
+                             <div id="brief_description1">
+                                     <p id = "description_content1">
+                                         <b>Brief Description: </b><br />
+                                         <textarea id="editor3" name="editor3"></textarea>
+                                         <script type="text/javascript">
+                                                 CKEDITOR.replace( 'editor3' );
+                                         </script>
+                                     </p>
+                             </div>
+                        </div>
+                        <div class="col-md-6">
+                               <div id="assumption">
+                                      <p id = "assumption_content">                               
+                                               <b>Assumption: </b><br />
+                                               <textarea id="editor2" name="editor2"></textarea>
+                                               <script type="text/javascript">
+                                                          CKEDITOR.replace( 'editor2' );
+                                               </script>
+                                      </p>
+                               </div>            
+                        </div>
+                 </div>
+                 </div>
+             </div>
+       </div>
+       
+       
+     
+          
+          <div class="" >
+              <div class="panel panel-default">   
+                             <div class="panel-heading" style="color: white;background-color: #4ECAF4;">
+                                       <h3 class="panel-title">ESTIMATE</h3>
+                                       <span class="pull-right clickable" style="margin-top: 0.2px;"><i class="fa fa-chevron-up" aria-hidden="true"></i></span>
+                             </div>                  
+                             <div class="panel-body EstimatePanel" >                                        
+                                     <div class="mid-white">                   
+                                            <div class="timeline-scroll">
+                                                 <div class="col-md-6 col-sm-6 col-xs-12">
+                                                           <table class="timeline timesheet" id="Tbltimesheet" cellpadding="0" cellspacing="0" width="190%">
+                                                                 <tr RowNo="0">                                 
+                                                                     <th Class="Rescol"><strong>Phase <span style="color:#ff9797; font-size:15px;" > </span> </strong>
+                                                                     </th>
+                                                                     <th ><strong>Task/Components <span style="color:#ff9797; font-size:15px; cursor:default;" title="Mandatory">*</span></strong>
+                                                                     </th>
+                                                                     <th ><strong>Assumptions<span style="color:#ff9797; font-size:15px; cursor:default;" title="Mandatory"></span></strong>
+                                                                     </th>
+
+                                                                     <th  Class="Rescol"><strong>Hours <span style="color:#ff9797; font-size:15px;" title="Mandatory">*</span> </strong>
+                                                                     </th>
+                                    
+                                                                     <th  class="actiontd"><strong>ACTION</strong>
+                                                                     </th>
+                                                                 </tr>
+                                
+                                                                 <tbody id="addtionalTable" class="timesheet"> </tbody>
+                                                                    <tr class="total-bg">
+                                                                       <td colspan="3" style="text-align:left" id="addRowTd">
+                                                                            <a href="#" id="add-row1" class="add-row"><i class="fa fa-plus" aria-hidden="true"></i> Add Row</a>  
+
+                                                                          <span style="text-align: right"> TOTAL </span>
+                                                                       </td>
+                                                                       <td  colspan="3" id="tdColTotal" ></td>                                                                      
+                                                                   </tr>
+                                                                   <div class="col-md-6 col-sm-6 col-xs-12"> </div>                         
+                                                            </table>
+                                                 </div>                            
+                                                 <textarea id="txtComments" style="display:none" class="edit-timesheet-com" placeholder="Comments"></textarea>
+                                          </div>
+                                   </div>                          
+                            </div>    
+                   </div>
+             </div>
+        
+                        
+             <div id="chartdiv2" class="panel panel-default">          
+                     <div  class="panel-heading" style="color: #FFFFFF;background-color: #4ECAF4;">
+                          <h3 class="panel-title">PROGRESS</h3>
+                         <span class="pull-right clickable" style="margin-top: 0.2px;"><i class="fa fa-chevron-up" aria-hidden="true"></i></span>
+                     </div>
+                 
+                       
+                     <div class="panel-body">                                        
+                        <div id="chartdiv"></div>
+                     </div>
+            </div>  
+             
+             
+                           
+             
+             <div class="time-submit">
+                            <div class="pull-right">                          
+                                         <input type="button" id="btnSave" class="save-submit" value="Save" onclick="return FetchInitiativeValues('Saved')"  />
+                                         <input type="button" id="btnSubmit" class="save-submit" value="Submit" onclick="return FetchInitiativeValues('Submitted')" />
+                                         <input type="hidden" id="hdnAction" value="" />
+                                         <input type="button" id="btnApprove" class="save-submit" value="Approve Initiative" onclick="ClearTimeSheetComments('Approve')" data-toggle="modal" data-target="#myModal" />
+                                         <input type="button" id="btnReject" class="save-submit" value="Re-evaluate Estimates" onclick="ClearTimeSheetComments('Reject')" data-toggle="modal" data-target="#myModal" style="background: #ee2c2c;" />
+                                         <input type="button" id="btnCancel" class="cancel" value="Cancel" onclick="CancelTimesheet();" />
+                            </div>                             
+                            <div id="hide"  class="pull-right">
+                                         <apex:commandButton id="exportasexcel" value="Export TO Excel" styleclass="save-submit" action="{!exportAsExcel}" immediate="True" reRender="redirectToTimeSheet" /> 
+                            </div>
+                            <div class="pull-right">
+                                         <apex:commandLink action="{!redirectToInitiative}">
+                                                    <input type="button" id="btnBack" class="cancel" value="Back" style="margin-right: 10px;" />
+                                         </apex:commandLink>
+                            </div>                  
+                 </div>
+              
+           </div>  
+                                       
+        </div>
+              
+              
+              
+        <div class="footer-bg">
+                <div class="copyright">COPYRIGHT © 2018 DEMANDBLUE. ALL RIGHTS RESERVED</div>
+        </div>
+
+
+       
+      </body>
+        
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+                <div class="modal-content">
+                    <h1><span id="lblHeading">Approve </span> </h1>
+                    <apex:inputTextarea html-placeholder="Comments" id="Comments" styleclass="Comments" value="{!TimesheetComments}" />
+                    <div class="clr"></div>
+                    <div class="popup-btn">
+                        <input type="button" id="btnApprove" class="popup-add btnApprove" value="Approve Initiative" onclick="return fnUpdateStatus('Approve')" />
+                        <input type="button" id="btnReject" class="popup-cancel btnReject" value="Re-evaluate Estimates" style="background:#ee2c2c;" onclick="return fnUpdateStatus('Reject')" />
+                        <button type="button" class="btn btn-default" data-dismiss="modal">CLOSE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,23 @@
+<aura:component controller="pi.EHMailAppController"
+				implements="clients:availableForMailAppAppPage,clients:hasItemContext"
+				access="global">
+
+	<aura:dependency resource="markup://pi:EngagementHistoryList" type="COMPONENT" />
+	<aura:dependency resource="markup://pi:EngagementHistoryMailRecordSelect" type="COMPONENT" />
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+	<aura:handler name="change" value="{!v.people}" action="{!c.handlePeopleChanged}" />
+
+	<aura:attribute name="history" type="Aura.Component" />
+	<aura:attribute name="select" type="Aura.Component" />
+
+	<aura:method name="notifySelectChange" action="{!c.handleSelectChange}">
+		<aura:attribute name="id" type="String" />
+		<aura:attribute name="type" type="String" />
+	</aura:method>
+
+	<div aura:id="override" class="override">
+		{!v.history}
+	</div>
+
+</aura:component>

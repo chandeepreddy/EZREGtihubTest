@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Prospector</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <namespacePrefix>jigsaw_team</namespacePrefix>
+    <types>
+        <members>Jigsaw_Prospector</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>Jigsaw_Build_a_List</members>
+        <members>Jigsaw_Search</members>
+        <name>CustomTab</name>
+    </types>
+    <types>
+        <members>Jigsaw</members>
+        <name>Document</name>
+    </types>
+    <types>
+        <members>Jigsaw_Build_a_List</members>
+        <members>Jigsaw_Search</members>
+        <name>Scontrol</name>
+    </types>
+    <types>
+        <members>Account.Add_Contacts_from_Jigsaw</members>
+        <members>Account.Send_to_Jigsaw</members>
+        <members>Account.Update_from_Jigsaw</members>
+        <members>Contact.Send_to_Jigsaw</members>
+        <members>Contact.Update_from_Jigsaw</members>
+        <members>Lead.Send_to_Jigsaw</members>
+        <members>Lead.Update_from_Jigsaw</members>
+        <name>WebLink</name>
+    </types>
+    <version>36.0</version>
+</Package>

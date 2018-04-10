@@ -1,0 +1,654 @@
+<apex:page showHeader="false" sidebar="false" standardController="Account" extensions="ODS_WorkorderDetailsController" contentType="application/vnd.ms-excel#Internal Work Order_{!ProjectName}_{!ProjectSubCategory}_{!ProjectType}.xls">
+    <apex:form >
+        <table width="55%" cellpadding="0" cellspacing="0" border="1px">
+            <tr>
+                <td height="70" style="background-color:#a2c0f2;">
+                    <img src="https://preludesys--dbluedev--c.cs20.content.force.com/servlet/servlet.ImageServer?id=015m0000000443C&oid=00Dm0000000D3pe&lastMod=1520508892000" alt="Prelude"/>       
+                </td>
+                <td  style="background-color:#a2c0f2;font-size:16pt; color:Red; font-weight:bold;">                                        
+                    INTERNAL WORK ORDER TEMPLATE
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ACCOUNT MANAGER NAME
+                </td>
+                <td style="text-align:left;">
+                    {!AccountManagerName}
+                </td>
+            </tr>            
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ACCOUNT PARTNER NAME
+                </td>
+                <td style="text-align:left;">
+                    {!AccountPartnerName}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    EXECUTION PARTNER NAME
+                </td>
+                <td style="text-align:left;">
+                    {!ExecutionPartnerName}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    WORK ORDER CATEGORY
+                </td>
+                <td style="text-align:left;">
+                    {!WorkOrderCategory}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    WORK ORDER HEAD
+                </td>
+                <td style="text-align:left;">
+                    {!WorkOrderHead}
+                </td>
+            </tr>
+            <!--<tr>
+                <td width="50%">                    
+                </td>
+                <td style="font-size:9pt; font-weight:bold;">
+                    Note: 1) If you select "PROJECT" please fill in only the Deliverable Information column below. 2) If you select "STAFFING" please fill in only the Consultant Information column below
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="font-size:11pt; font-weight:bold; text-align:center; background-color:#efcbd9;">
+                    CONSULTANT INFORMATION (Staffing)
+                </td>               
+            </tr>           
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    NAME
+                </td>
+                <td>
+                    {!ConsultantName}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ADDRESS 1
+                </td>
+                <td>
+                    {!ConsultantAddress1}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ADDRESS 2
+                </td>
+                <td>
+                    {!ConsultantAddress2}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    CITY
+                </td>
+                <td>
+                    {!ConsultantCity}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    STATE
+                </td>
+                <td>
+                    {!ConsultantState}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ZIP CODE
+                </td>
+                <td>
+                    {!ConsultantZipCode}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    SSN#
+                </td>
+                <td>
+                    {!ConsultantSsn}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PHONE# (Work)
+                </td>
+                <td>
+                    {!ConsultantWorkPhone}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PHONE# (Mobile)
+                </td>
+                <td>
+                    {!ConsultantMobilePhone}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    EMAIL ADDRESS
+                </td>
+                <td>
+                    {!ConsultantEmail}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PAY RATE - (For Contractors)
+                </td>
+                <td>
+                    {!ConsultantPayRate}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ANNUAL SALARY (For Fulltime Employees)
+                </td>
+                <td>
+                    {!ConsultantAnnualSalary}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PERDIEM (For Fulltime Employees)
+                </td>
+                <td>
+                    {!ConsultantPerdiem}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    STATUS ( Fulltime/W2/1099/Corp-Corp) 
+                </td>
+                <td>
+                    {!ConsultantStatus}
+                </td>
+            </tr>-->
+            <tr>
+                <td colspan="2" style="font-size:11pt; font-weight:bold; text-align:center; background-color:#f4b87f;">
+                    DELIVERABLE INFORMATION (Project)
+                </td>               
+            </tr>           
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PROJECT TYPE
+                </td>
+                <td style="text-align:left;">
+                    {!ProjectType}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PROJECT SUB CATEGORY
+                </td>
+                <td style="text-align:left;">
+                    {!ProjectSubCategory}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PROJECT NAME
+                </td>
+                <td style="text-align:left;">
+                    {!ProjectName}
+                </td>
+            </tr>
+            <!--<tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    DELIVERABLE NAME
+                </td>
+                <td>
+                    {!DeliverableName}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    DESCRIPTION
+                </td>
+                <td>
+                    {!Description}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="font-size:11pt; font-weight:bold; text-align:center; background-color:#7ab7f4;">
+                    VENDOR INFORMATION - (If the status is 'Corp-Corp')
+                </td>               
+            </tr>           
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    VENDOR NAME
+                </td>
+                <td>
+                    {!VendorName}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ADDRESS 1
+                </td>
+                <td>
+                    {!VendorAddress1}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ADDRESS 2
+                </td>
+                <td>
+                    {!VendorAddress2}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    CITY
+                </td>
+                <td>
+                    {!VendorCity}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    STATE
+                </td>
+                <td>
+                    {!VendorState}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ZIP CODE
+                </td>
+                <td>
+                    {!VendorZipCode}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    Contact Person Name for invoice and payments
+                </td>
+                <td>
+                    {!VendorContactPerson}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    EMAIL ADDRESS
+                </td>
+                <td>
+                    {!VendorEmail}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PHONE# (Work)
+                </td>
+                <td>
+                    {!VendorWorkPhone}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PHONE# (Mobile)
+                </td>
+                <td>
+                    {!VendorMobilePhone}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    FAX
+                </td>
+                <td>
+                    {!VendorFax}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PAY RATE
+                </td>
+                <td>
+                    {!VendorPayRate}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    BILLING TERMS
+                </td>
+                <td>
+                    {!VendorBillingTerms}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PAYMENT TERMS
+                </td>
+                <td>
+                    {!VendorPaymentTerms}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    COMMENTS 
+                </td>
+                <td>
+                    {!VendorComments}
+                </td>
+            </tr>-->
+            <tr>
+                <td colspan="2" style="font-size:11pt; font-weight:bold; text-align:center; background-color:#b7a5ef;">
+                    CLIENT INFORMATION
+                </td>               
+            </tr>           
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    CLIENT NAME
+                </td>
+                <td style="text-align:left;">
+                    {!ClientName}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ADDRESS 1
+                </td>
+                <td style="text-align:left;">
+                    {!ClientAddress1}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ADDRESS 2
+                </td>
+                <td style="text-align:left;">
+                    {!ClientAddress2}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    CITY
+                </td>
+                <td style="text-align:left;">
+                    {!ClientCity}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    STATE
+                </td>
+                <td style="text-align:left;">
+                    {!ClientState}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ZIP CODE
+                </td>
+                <td style="text-align:left;">
+                    {!ClientZipCode}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="font-size:11pt; font-weight:bold; text-align:center; background-color:#a5dbef;">
+                    WORK ORDER DETAILS
+                </td>               
+            </tr>           
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold; text-align:left;">
+                    BILL RATE
+                </td>
+                <td style="text-align:left;">
+                    {!workorderBillRate}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    BILLING FREQUENCY
+                </td>
+                <td style="text-align:left;">
+                    {!WorkorderBillFrequency}
+                </td>
+            </tr>
+            <!--<tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    If others, please provide your comments
+                </td>
+                <td>
+                    {!OtherBillFrequency}
+                </td>
+            </tr>-->
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    SUBSCRIPTION FEE
+                </td>
+                <td style="text-align:left;">
+                    {!''+SubscriptionFee+''}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold; text-align:left;">
+                    SUBSCRIPTION FEE - FREQUENCY
+                </td>
+                <td style="text-align:left;">
+                    {!SubscriptionFeeFrequency}
+                </td>
+            </tr>
+            <!--<tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    If there are exceptions in Subscription Fee, please mention
+                </td>
+                <td>
+                    {!OtherSubscriptionFrequency}
+                </td>
+            </tr>-->
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    MINIMUM BILLABLE HOURS PER MONTH (Only for ODS)
+                </td>
+                <td style="text-align:left;">
+                    {!MinimumBillableHoursPerMonth}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PAYMENT TERMS
+                </td>
+                <td style="text-align:left;">
+                    {!WorkorderPaymentTerms}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold; text-align:left;">
+                    PROJECT START DATE
+                </td>
+                <td style="text-align:left;">
+                    {!ProjectStartDate}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold; text-align:left;">
+                    PROJECT END DATE
+                </td>
+                <td style="text-align:left;">
+                    {!ProjectEndDate}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;text-align:left;">
+                    LCA Required
+                </td>
+                <td style="text-align:left;">
+                    {!LcaRequired}
+                </td>
+            </tr>
+            <!--<tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    WORK LOCATION
+                </td>
+                <td>
+                    {!WorkLocation}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    Work Order Changes Effective Date
+                </td>
+                <td>
+                    {!WorkOrderChangesEffectiveDate}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PO Number Available
+                </td>
+                <td>
+                    {!PoNumberAvailable}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    If Yes, Mention the PO# 
+                </td>
+                <td>
+                    {!PONumber}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    Should PO# to be mentioned in the invoices
+                </td>
+                <td>
+                    {!IsPONumberMentioned}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td>                   
+                </td>
+            </tr>-->
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    INVOICE SUBMISSION MODE
+                </td>
+                <td style="text-align:left;">    
+                    {!InvoiceSubmissionMode}
+                </td>
+            </tr>            
+            <tr>
+                <td colspan="2" style="font-size:11pt; font-weight:bold; text-align:center; background-color:#ffd8e6;">
+                    CONTACT TO SEND THE INVOICE
+                </td>               
+            </tr>           
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    NAME
+                </td>
+                <td style="text-align:left;">
+                    {!InvoiceContactName}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    EMAIL ADDRESS
+                </td>
+                <td style="text-align:left;">
+                    {!InvoiceContactEmail}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ADDRESS 1
+                </td>
+                <td style="text-align:left;">
+                    {!InvoiceContactAddress1}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ADDRESS 2
+                </td>
+                <td style="text-align:left;">
+                    {!InvoiceContactAddress2}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    CITY
+                </td>
+                <td style="text-align:left;">
+                    {!InvoiceContactCity}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    STATE
+                </td>
+                <td style="text-align:left;">
+                    {!InvoiceContactState}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    ZIP CODE
+                </td>
+                <td style="text-align:left;">
+                    {!InvoiceContactZipCode}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="font-size:11pt; font-weight:bold; text-align:center; background-color:#ffd8e6;">
+                    CONTACT FOR PAYMENT FOLLOW-UP
+                </td>               
+            </tr>  
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    NAME
+                </td>
+                <td style="text-align:left;">
+                    Same as above
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    EMAIL ADDRESS
+                </td>
+                <td style="text-align:left;">
+                    {!FollowupContactEmail}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PHONE# (Work)
+                </td>
+                <td style="text-align:left;">
+                    {!FollowupContactWorkPhone}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    PHONE# (Mobile)
+                </td>
+                <td style="text-align:left;">
+                    {!FollowupContactMobilePhone}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="font-size:10pt; font-weight:bold;">
+                    Comments, if any
+                </td>
+                <td style="text-align:left;">
+                    {!FollowupContactComments}
+                </td>
+            </tr>           
+        </table>
+    </apex:form>
+</apex:page>

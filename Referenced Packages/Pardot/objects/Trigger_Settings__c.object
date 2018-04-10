@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>List</customSettingsType>
+    <description>Settings for LogObjectTriggerHandler for leads and contacts. Defines whether it should use async processing  or not.</description>
+    <enableFeeds>false</enableFeeds>
+    <fields>
+        <fullName>Is_Async_Processing_Enabled__c</fullName>
+        <defaultValue>true</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Is Async Processing Enabled</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Is Async Processing Enabled</inlineHelpText>
+        <label>Enable Async</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <label>Public Setting for LogObjectTrigger</label>
+    <visibility>Public</visibility>
+</CustomObject>

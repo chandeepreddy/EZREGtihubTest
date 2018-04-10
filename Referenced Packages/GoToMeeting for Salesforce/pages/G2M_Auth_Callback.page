@@ -1,0 +1,1 @@
+<apex:page controller="G2M4Force.G2M_Callback_Controller" action="{!initialize}"/>

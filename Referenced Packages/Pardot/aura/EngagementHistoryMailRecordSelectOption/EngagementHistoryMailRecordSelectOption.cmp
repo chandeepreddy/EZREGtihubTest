@@ -1,0 +1,53 @@
+<aura:component >
+	<aura:attribute name="person" type="Object" required="true" />
+	<aura:attribute name="index" type="Integer" required="true" />
+	<aura:attribute name="selected" type="Boolean" default="false" />
+
+	<aura:registerEvent name="EngagementHistoryPersonSelected" type="pi:EngagementHistoryPersonSelected"/>
+
+	<li role="presentation" class="slds-listbox__item" onclick="{!c.handleRecordClick}">
+
+		<span class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta">
+			<span class="slds-media__figure">
+				<aura:if isTrue="{!v.selected}">
+					<lightning:icon iconName="utility:check"
+									size="xx-small"
+									class="slds-icon_container"/>
+				</aura:if>
+			</span>
+			<span class="slds-media__body">
+				<span class="bold slds-listbox__option-text slds-listbox__option-text_entity">
+					{!v.person.Name}
+					<aura:if isTrue="{!v.person.Type == 'Contact'}">
+						<lightning:icon iconName="action:new_contact"
+										class="type-icon" size="xx-small" />
+					</aura:if>
+					<aura:if isTrue="{!v.person.Type == 'Lead'}">
+						<lightning:icon iconName="action:new_lead"
+										class="type-icon" size="xx-small" />
+					</aura:if>
+				</span>
+				<span class="slds-listbox__option-meta slds-listbox__option-meta_entity">
+					<!-- score/title/last active -->
+					<div class="slds-tile__detail slds-text-body_small">
+						<aura:if isTrue="{!v.person.pi__score__c}">
+							<span class="bold">
+								Pardot Score: {!v.person.pi__score__c}
+							</span><br />
+						</aura:if>
+						<aura:if isTrue="{!v.person.Position}">
+							{!v.person.Position}<br />
+						</aura:if>
+						<aura:if isTrue="{!v.person.pi__last_activity__c}">
+							Last Active:
+							<lightning:formattedDateTime value="{!v.person.pi__last_activity__c}"
+														 year="numeric"
+														 month="numeric" day="numeric"
+														 hour="2-digit" minute="2-digit" timeZoneName="short" />
+						</aura:if>
+					</div>
+				</span>
+			</span>
+		</span>
+	</li>
+</aura:component>

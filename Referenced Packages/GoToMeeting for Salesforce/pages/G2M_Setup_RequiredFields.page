@@ -1,0 +1,43 @@
+<apex:page >
+ <!-- Render a select Option for Objects -->
+ <!-- 
+ <apex:form >
+      <apex:sectionHeader title="Citrix GoToMeeting® Salesforce Integration"/>
+       <!-- Define Objects for required fields --
+       <apex:pageBlock mode="edit" title="Required Field Management" rendered="{!NOT(requiredFieldsLoaded)}">
+        <apex:pageBlockButtons >
+            <apex:commandButton action="{!loadRequiredFields}" value="Next"/>
+            <apex:commandButton action="{!returnToAdmin}" value="Cancel" immediate="true"/>
+        </apex:pageBlockButtons>
+         <apex:pageblockSection title="Choose Object - Step 1 of 2" columns="1" id="chooseObject">
+           <apex:selectList value="{!selectedObject}" title="Object List" size="1">
+              <apex:selectOptions value="{!supportedObjects}"/>
+           </apex:selectList>
+         </apex:pageblockSection>
+      </apex:pageBlock>
+      
+      <!-- List required fields for selected object for leads --
+      <apex:pageBlock mode="edit" title="Required Field Management for {!selectedObject}(s)" rendered="{!requiredFieldsLoaded}">
+        
+        <apex:pageBlockButtons >
+            <apex:commandButton action="{!saveRequiredFieldValues}" value="Save"/>
+            <apex:commandButton action="{!returnToAdmin}" value="Cancel" immediate="true"/>
+            <apex:commandButton action="{!returnToObjectSelection}" value="Back" immediate="true"/>
+        </apex:pageBlockButtons>
+        <apex:pageblockSection title="Notifications" columns="1" id="exceptions">
+         <apex:pageMessages />
+        </apex:pageblockSection>
+         <apex:pageblockSection title="Define Required Fields for {!selectedObject} - Step 2 of 2" columns="1" id="chooseReqFields" rendered="{!NOT(noRequiredFields)}">
+           <apex:repeat value="{!fieldNameList}" var="fieldName">
+             <apex:inputField value="{!sObjectInstance[fieldName]}"/>
+           </apex:repeat>
+         </apex:pageblockSection>
+         
+         
+      </apex:pageBlock>
+      
+       
+      
+ </apex:form>
+ -->
+</apex:page>

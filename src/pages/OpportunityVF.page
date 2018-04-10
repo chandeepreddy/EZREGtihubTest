@@ -1,0 +1,3 @@
+<apex:page standardController="opportunity" >
+<apex:enhancedList height="600" type="opportunity" width="902"/>
+ </apex:page>

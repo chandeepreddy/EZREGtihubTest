@@ -1,0 +1,7 @@
+<design:component label="Engagement History">
+    <sfdc:objects >
+        <sfdc:object >Contact</sfdc:object>
+        <sfdc:object >Lead</sfdc:object>
+        <sfdc:object >Account</sfdc:object>
+    </sfdc:objects>
+</design:component>

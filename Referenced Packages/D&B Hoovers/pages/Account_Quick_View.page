@@ -1,0 +1,32 @@
+<apex:page standardController="Account" extensions="iSell.AccountWidgetController">
+    <apex:iframe src="{!widgetUrl + $Api.Partner_Server_URL_190}" height="500px" width="100%"></apex:iframe>
+    
+    <style>
+        /* for classic view */
+        body.hasMotif {
+            margin: 0;
+        }
+        /* for lightning view */
+        html body.sfdcBody{
+            padding: 0;
+        }
+    </style>
+    
+    <apex:includeScript value="{!URLFOR($Resource.iSell__jquery)}"/>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        function refreshListener(e){
+          var event = e.originalEvent;
+          if ( event.origin !== "https://crm.avention.com" && event.origin !== "https://osnp4crm.avention.com"){
+            return;
+          }
+          if(event.data == 'refresh'){
+            window.top.location = '/{!recordId}';
+          }
+        }
+         
+        $(window).on('message onmessage', refreshListener);
+      });
+    </script>
+    
+</apex:page>

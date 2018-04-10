@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>G2MEmailSubject</fullName>
+        <categories>Email</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>EmailSubject</shortDescription>
+        <value>Error Encountered:</value>
+    </labels>
+    <labels>
+        <fullName>G2MHtmlBody</fullName>
+        <categories>Email</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>HtmlBody</shortDescription>
+        <value>User Generated Error:</value>
+    </labels>
+    <labels>
+        <fullName>G2MSenderDisplayName</fullName>
+        <categories>Email</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SenderDisplayName</shortDescription>
+        <value>Salesforce Error</value>
+    </labels>
+    <labels>
+        <fullName>G2M_Event_Meeting_Type</fullName>
+        <categories>Event</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>G2M Event Meeting Type when creating new G2M events</shortDescription>
+        <value>G2M Meeting Type</value>
+    </labels>
+    <labels>
+        <fullName>G2M_Exception_Category_Technical</fullName>
+        <categories>Exception, Classification</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>G2M Exception Category Technical</shortDescription>
+        <value>Technical</value>
+    </labels>
+    <labels>
+        <fullName>G2M_Log_Status_Completed</fullName>
+        <categories>Log Status</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>G2M Log Status Completed</shortDescription>
+        <value>Completed</value>
+    </labels>
+    <labels>
+        <fullName>G2M_Log_Status_Logging</fullName>
+        <categories>Log status</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>G2M Log Status Logging</shortDescription>
+        <value>Logging</value>
+    </labels>
+    <labels>
+        <fullName>G2M_Meeting_Status_Created</fullName>
+        <categories>Meeting Status</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>G2M Meeting Status Created</shortDescription>
+        <value>Created</value>
+    </labels>
+    <labels>
+        <fullName>G2M_Notification_InValidFetchInterval</fullName>
+        <categories>Exception, Notifications</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>G2M Notification InValidFetchInterval</shortDescription>
+        <value>The interval value specified is incorrect. It needs to be atleast</value>
+    </labels>
+    <labels>
+        <fullName>G2M_Notification_NoPageMessage</fullName>
+        <categories>User Notification, Exception Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>G2M Notification NoPageMessage</shortDescription>
+        <value>We do not have any notifications for you at this point.</value>
+    </labels>
+    <labels>
+        <fullName>G2M_Notification_UserUnAuthorized</fullName>
+        <categories>User Notification, Exception Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>G2M Notification UserUnAuthorized</shortDescription>
+        <value>To setup the integration click on ‘Setup Integration’ then click on ‘Connect an Account’ and follow the prompts to connect your GoToMeeting Account</value>
+    </labels>
+    <labels>
+        <fullName>G2M_Notification_UserUnAuthorized_Redirect</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>G2M Notification UserUnAuthorized Redirect</shortDescription>
+        <value>GoToMeeting for Salesforce has not been setup. To setup the integration click &lt;a href=&quot;/apex/G2M_Admin&quot; target=&quot;_self&quot; style=&quot;font-size:100%; margin-left:0px&quot;&gt;here.&lt;/a&gt;</value>
+    </labels>
+</CustomLabels>

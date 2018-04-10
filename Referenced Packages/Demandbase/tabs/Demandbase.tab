@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <frameHeight>600</frameHeight>
+    <hasSidebar>false</hasSidebar>
+    <label>Demandbase</label>
+    <mobileReady>false</mobileReady>
+    <motif>Custom8: Diamond</motif>
+    <url>http://demandbase.demandbase.com/DBSalesForce.jsp?serverUrl={!API.Partner_Server_URL_90}&amp;sessionId={!API.Session_ID}</url>
+    <urlEncodingKey>UTF-8</urlEncodingKey>
+</CustomTab>

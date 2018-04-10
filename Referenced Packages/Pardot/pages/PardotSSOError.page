@@ -1,0 +1,91 @@
+<apex:page sidebar="false" showHeader="false">
+
+  <head>
+        <apex:stylesheet value="{!URLFOR($Resource.pi__SalesEdgeErrPage, 'css/options.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.pi__SalesEdgeErrPage, 'assets/font-awesome/css/font-awesome.min.css')}"/>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>Sales Edge Error</title>
+        <meta name="description" content=""/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    </head>
+    
+
+  <body>
+    <div class="main-content rounded-corners-3">
+      
+            <apex:image styleClass="img-logo" alt="Pardot Logo" url="{!URLFOR($Resource.pi__SalesEdgeErrPage, 'img/logo.png')}"/>
+      <!--<img src="img/logo.png" alt="Pardot Logo" class="img-logo" />-->
+      <div class="login">
+
+        <div class="user-info">
+                    <img class="img-thumbnail pull-left js-thumbnail js-loggedin js-expired" style="display:none" />
+          <p class="js-username js-loggedin js-expired"></p>
+                    <a class="sf-domain" href="#">
+            <button class="btn-pd btn-primary-pd btn-block-pd rounded-corners-3 js-login js-loggedout">Return to home page</button>
+                    </a>
+
+        </div>
+
+        <p class="js-loggedout js-loggedin js-expired clear-both">Please contact your salesforce administrator if you have any issues or questions.</p>
+
+                <hr class="shorten"/>
+
+        <div class="text-center js-noLicense" style="display:none">
+          <p><i class="fa fa-warning fa-5x"></i></p>
+          <h4>License Needed</h4>
+          <p>You need a Sales Edge License to view this content</p>
+        </div>
+
+        <div class="text-center js-unlinkedAccount" style="display:none">
+          <p><i class="fa fa-warning fa-5x"></i></p>
+          <h4>Unlinked account</h4>
+          <p>You must link your Pardot and salesforce account to view this content</p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <apex:includeScript value="{!URLFOR($Resource.pi__SalesEdgeErrPage, 'assets/jquery/jquery.js')}"/>
+
+    <script>
+    (function($) {
+      var isMobile;
+      var errType = '{!$CurrentPage.parameters.type}';
+      var noLicense = $('.js-noLicense');
+      var unlinkedAccount = $('.js-unlinkedAccount');
+      
+      var isMobile = function() {
+        if ((typeof sforce != 'undefined') && (sforce != null)) {
+          isMobile = true;
+        } else {
+          isMobile = false;
+        }
+      };
+        
+      function showErrorType() {
+
+        if(errType == 'acc') {
+          unlinkedAccount.show();
+        }else if(errType == 'lic') {
+          noLicense.show();
+        }
+      };
+      
+      showErrorType();
+      isMobile();
+
+      $('.sf-domain').click(function(){
+          if(!isMobile){
+              window.location.replace('https://' + document.domain);
+          }else {
+              $('.back').addClass('hideEl');
+              $('.toggleNav').removeClass('hideEl');
+              sforce.one.navigateToURL('/home/home.jsp', true);
+          }
+      });
+    })(jQuery);
+    </script>
+  </body>
+</apex:page>

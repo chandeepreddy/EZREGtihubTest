@@ -1,0 +1,29 @@
+<apex:page showHeader="false" title="Default Error">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+<link href="{!URLFOR($Resource.ODS_Assets,'css/style.css')}" rel="stylesheet" type="text/css"  />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet"/>
+<script src="https://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<title>ON>DEMAND SERVICES </title>
+</head>
+
+<body class="login-bg">
+    <div class="wrap">
+        <div class="login-logo"><a href="#"><img src="{!URLFOR($Resource.ODS_Assets,'images/DB_Login.png')}" alt="logo"  /></a></div>
+        <div class="login">
+            <!-- <div class="forgot-text" style="color:#419b1d; font-size:18px; text-align:center; "><strong>Please Contact DemandBlue</strong></div>-->
+            <div class="forgot-text" style="color:#419b1d; font-size:18px; text-align:center; width:450px; padding-top:0; ">
+                 <apex:image value="{!URLFOR($Resource.ODS_Assets,'images/sad-icon.png')}"/><br/><br/><strong>
+                 OOPS! Something went wrong. Please contact DemandBlue!! </strong>
+            </div>
+           
+        </div>
+        <div class="copyright">Copyright © 2018 DemandBlue. All rights reserved</div>
+    </div>
+</body>
+</html>
+</apex:page>

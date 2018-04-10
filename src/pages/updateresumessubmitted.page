@@ -1,0 +1,5 @@
+<apex:page controller="updateresumessubmitted">
+    <apex:form >
+      <apex:commandButton action="{!updateresumessubmitted}" id="btnresumes" value="update resumes submitted"/>
+    </apex:form>
+</apex:page>

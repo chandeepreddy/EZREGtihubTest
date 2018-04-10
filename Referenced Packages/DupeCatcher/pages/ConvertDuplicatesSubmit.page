@@ -1,0 +1,522 @@
+<apex:page showHeader="true" controller="SFSSDupeCatcher.ConvertDuplicatesSubmitController">
+     <apex:stylesheet value="{!URLFOR($Resource.SFSSDupeCatcher__Styles, 'assets/styles/salesforce-lightning-design-system.min.css')}" />
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <style>
+        .dingoBkWhite{ background-color: #ffffff; }
+        .dingoGray{ color: #b8c3ce; }
+        .dingoLiGray:before{ color: #b8c3ce; }
+        .dingoBkGray{ background-color: #b8c3ce; }                
+        .dingoA{ background-color: #5a9cdd; }
+        .dingoBlue{ color: #5a9cdd; }                
+        .dingoLiBlue:before{ color: #5a9cdd; }
+        .dingoBkBlue{ background-color: #5a9cdd; }                
+        .dingoB{ background-color: #00c6b7; }
+        .dingoLightBlue{ color: #00c6b7; }                
+        .dingoLiLightBlue:before{ color: #00c6b7; }
+        .dingoBkLightBlue{ background-color: #00c6b7; }                
+        .dingoC{ background-color: #88c651; }
+        .dingoGreen{ color: #88c651; }                
+        .dingoLiGreen:before{ color: #88c651; }
+        .dingoBkGreen{ background-color: #88c651; }                
+        .dingoD{ background-color: #f39e58; }
+        .dingoOrange{ color: #f39e58; }                
+        .dingoLiOrange:before{ color: #f39e58; }
+        .dingoBkOrange{ background-color: #f39e58; }                
+        .dingoF{ background-color: #00c6b7; }
+        .dingoRed{ color: #ef6e64; }                
+        .dingoLiRed:before{ color: #ef6e64; }
+        .dingoBkRed{ background-color: #ef6e64; }
+        .dingoRedAlt{ color: rgb(194, 57, 52); }                
+        .dingoLiRedAlt:before{ color: rgb(194, 57, 52); }
+        .dingoBkRedAlt{ background-color: rgb(194, 57, 52); }
+        .dingoInactive{
+            background-color: rgb(194, 57, 52);
+        }                
+        .dingoActive{
+            background-color: rgb(75, 202, 129)
+        }
+        .dingoState {
+            border-radius: .25em;
+            color: #ffffff;
+            padding: 25px;
+            margin: 25px;
+            display: inline-block;
+            text-align: left;
+            width: 250px;
+            position: relative;
+            float:left;
+            height: 200px;
+        } 
+        .dingoStatusHldr{
+            border-radius: .25em;
+            padding: 25px;
+            margin: 25px;
+            display: inline-block;
+            text-align: left;
+            width: 250px;
+            position: relative;
+            float:left;                    
+        }
+        .dingoStatusLine{
+            float:left;
+            border-radius: .125rem;
+            height: 10px;
+            margin-right: 5px;
+            margin-left: 5px;
+            margin-bottom: 5px;
+            margin-top: 18px;
+            width: 50px;
+        }
+        .dingoCurrentState {                    
+            float:left;
+            border-radius: 50%;
+            padding: 15px;
+        } 
+        .dingoWorkList{
+        }
+        .dingoWorkList li{
+            height: 50px;
+            padding-top: 15px;
+        }
+        .cloudingoLink {
+            text-decoration: none !important;
+            font-weight: bold;
+        }
+        .cloudingoWork{
+            float:left; 
+            top: 25px; 
+            position: relative;
+            border: 1px solid rgb(216, 221, 230);
+            border-radius: .25em;
+        }
+        .cloudingoWork .slds-panel{
+            min-height: 200px;
+        }
+        .cloudingoWorkLiImg{
+            float:left;
+            margin-top:-10px;
+            padding-right:10px;
+        }
+        .cloudingoButton{
+            padding-left: 10px !important; 
+            padding-right: 10px !important; 
+            background: none !important;
+        }
+        .cloudingoButtonWhite{
+            padding-left: 10px !important; 
+            padding-right: 10px !important; 
+            background-color: #ffffff !important;
+            background-image: none !important;
+        }
+        .slds-table th, .slds-table td {
+            padding: .15rem;
+        }
+        .required {
+            float:left;
+            padding-right:2px;
+            color: rgb(194,57,52);
+            font-weight:700;
+        }
+        .slds-chk-div {
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            padding: .5rem 1rem 0 .75rem;
+        }
+    </style>
+
+<script>        
+    function SSDupeCatcherHandleReminderDateRequired(remindersetfieldid, reminderdateelementid, remindertimeid)
+    {
+        var remindersetfieldelement = document.getElementById(remindersetfieldid);
+        var reminderdateelement = document.getElementById(reminderdateelementid);
+        var remindertimeelement = document.getElementById(remindertimeid);
+        
+        reminderdateelement.disabled = ! remindersetfieldelement.checked;
+        remindertimeelement.disabled = ! remindersetfieldelement.checked;        
+        
+        if (reminderdateelement.value == '')
+        {
+            var currentDate = '{!CurrentDate}';
+            reminderdateelement.value = currentDate;
+        }
+        
+    }
+    function unselectDupeCatcherRadioButtons(idsearchstring)
+    {
+        var inputelements = document.getElementsByTagName('input')
+        
+        var item = null;
+        
+        if (inputelements != null)
+        {
+            for (i=0;i< inputelements.length;i++)
+            {
+                item = inputelements[i];
+                if (item.id.indexOf(idsearchstring) != -1)
+                    item.checked = false;
+            }
+        }
+    }
+
+    function dupeCatcherOwnerIdOnChangeEvent(value)
+    {    
+        var ownerId = document.getElementById('owner_id_lkid').value;       
+        
+        sendOwnerIdToController(ownerId);       
+    }
+    
+    function setDupeCatcherDisabledOnTextBoxContainingStringInNameAttribute(idsearchstring, disable)
+    {    
+        var inputelements = document.getElementsByTagName('input');
+        var item = null;       
+        if (inputelements != null)
+        {
+            for (i=0;i< inputelements.length;i++)
+            {
+                item = inputelements[i];
+                if (item.id.indexOf(idsearchstring) != -1)
+                {
+                    item.disabled = disable;
+                    break;
+                }
+            } // for 
+        }
+    }
+           
+    function dupeCatcherAccountOptionsSelected ()
+    {
+        // find input tag of type radio with id containing dupecatcheruserentryaccountoption                
+        unselectDupeCatcherRadioButtons('dupecatcheruserentryaccountoption');
+    }
+    
+    function dupeCatcherUserEntryAccountOptionsSelected ()
+    {
+        // find input tag of type radio with id containing dupecatcheraccountoptions                
+        unselectDupeCatcherRadioButtons('dupecatcheraccountoptions');
+
+    }
+    function escapeUTF(a){var b="";for(i=0;i<a.length;i++){var c=a.charCodeAt(i);127>=c?b+=escape(a.charAt(i)):2047>=c?b+="%"+(c>>6|192).toString(16)+"%"+(c&63|128).toString(16):2048<=c&&(b+="%"+(c>>12|224).toString(16)+"%"+(c>>6&63|128).toString(16)+"%"+(c&63|128).toString(16))}return b}
+    function setLastMousePosition(a){-1!=navigator.appName.indexOf("Microsoft")&&(a=window.event);lastMouseX=a.screenX;lastMouseY=a.screenY}
+</script>
+<apex:pageMessages />
+    <apex:form title="DupeCatcher Lead Convert Submit" >
+        <!-- Hidden elements for proper lookup assign button functionality -->
+        <input type="hidden" name="owner_id_lkid" id="owner_id_lkid" value="{!proxyUser.Id}" />
+        <input type="hidden" name="owner_id_lkold" id="owner_id_lkold" value="{!proxyUser.FirstName} {!proxyUser.LastName}" />
+        <input type="hidden" name="owner_id_lktp" id="owner_id_lktp" value="StandardUserLookup" />
+        <input type="hidden" name="owner_id_lspf" id="owner_id_lspf" value="0" />
+        <input type="hidden" name="owner_id_lspfsub" id="owner_id_lspfsub" value="0" />
+        <input type="hidden" name="owner_id_mod" id="owner_id_mod" value="0" />
+        <div class="cloudingoWork" style="margin: 10px; top: 0px; margin-bottom: 75px;">
+            <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap" rendered="{!NOT(showPageError)}">
+                <div class="slds-form--stacked slds-grow slds-scrollable--y">
+                    <div id="convertSubmitHeader" class="slds-panel__section slds-has-divider--bottom" style="background: rgb(247, 249, 251); color: rgb(22, 50, 92);">
+                        <div class="slds-media slds-tile">             
+                            <p class="tile__title slds-truncate slds-text-heading--medium">
+                                DupeCatcher Lead Convert Submit
+                            </p>
+                        </div>
+                    </div>
+                    <div id="convertSubmitContent" class="slds-panel__section">                    
+                        <div>
+                            <p><font size="2"><b>  
+                                {!alertDeletionMessage}<br/>
+                            </b></font></p>
+                        </div>                       
+                        <div style="text-align:center; width:100%;">          
+                            <apex:commandButton value="Submit" action="{!convert}" styleClass="btn cloudingoButton slds-button slds-button--neutral"/>
+                            <apex:commandButton value="Cancel" action="{!cancel}"  styleClass="btn cloudingoButton slds-button slds-button--neutral" immediate="true" />
+                        </div>
+                        <div style="margin-top: 10px;">
+                       <apex:outputPanel rendered="{!showAccountOptions}">
+                            <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container" style="border-top: 1px solid #d8dde6;">
+                                <span class="test-id__section-header-title section-header-title slds-p-horizontal--small slds-truncate" >
+                                    Convert-Leads Account Options
+                                </span>
+                            </h3>
+                       </apex:outputPanel>     
+                            <div class="dingoWorkList slds-panel__section">
+                                <div class="slds-form--horizontal">
+                                    <div class="slds-form-element">
+                                        <apex:selectRadio id="dupecatcheraccountoptions" onclick="dupeCatcherAccountOptionsSelected()" layout="pageDirection" value="{!accountSelectionOption}" rendered="{!showAccountOptions}" styleClass="slds-input">
+                                            <apex:selectOptions value="{!accountSelectionOptions}"></apex:selectOptions>
+                                            <apex:actionSupport event="onclick" rerender="dupecatcheruserentryaccountnamefieldid"  />
+                                        </apex:selectRadio><p/><p/><br/>
+                                    </div>
+                                    <div class="slds-form-element">
+                                        <apex:selectRadio id="dupecatcheruserentryaccountoption" onclick="dupeCatcherUserEntryAccountOptionsSelected()" layout="pageDirection" value="{!userEnteredAccountNameOption}" rendered="{!showAccountOptions}" styleClass="slds-input">
+                                            <apex:selectOptions value="{!userEnteredAccountNameOptions}">                           
+                                            </apex:selectOptions>
+                                            <apex:actionSupport event="onclick" rerender="accountoptions"  />
+                                        </apex:selectRadio>
+                                    </div>
+                                    <div class="slds-form-element" >                                    
+                                        <apex:outputLabel value="" for="dupecatcheruserentryaccountnamefieldid" />
+                                        <div class="slds-form-element__control">
+                                            <apex:inputText id="dupecatcheruserentryaccountnamefieldid" styleClass="slds-input" disabled="false" value="{!accountName}"  required="{!enableUserEnteredAccountName}" rendered="{!showAccountOptions}" >
+                                        </apex:inputText>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                    
+                        <div style="margin-top: 10px;">
+                            <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container">
+                                <span class="test-id__section-header-title section-header-title slds-p-horizontal--small slds-truncate">
+                                    Convert Leads Information
+                                </span>
+                            </h3>
+                            <div class="dingoWorkList slds-panel__section">
+                                <div class="slds-form--vertical">
+                                    <div style="display: table; width: 100%;">
+                                        <div style="display: table-row;">
+                                            <div style="display:table-cell; width:50%; padding-right: 25px;">
+                                                <div class="slds-form-element" rendered="{!NOT(showAccountOptions)}">
+                                                    <label class="slds-form-element__label" for="dupecatcheraccountnamefieldid">
+                                                        Account Name
+                                                    </label>
+                                                    <div class="slds-form-element">
+                                                        <apex:inputText id="dupecatcheraccountnamefieldid" disabled="true" styleClass="slds-input" value="{!accountName}">
+                                                        </apex:inputText>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element" rendered="{!displayOwnerId}">
+                                                    <label class="slds-form-element__label" for="owner_id">
+                                                        <span class="required">*</span>Record Owner
+                                                    </label>
+                                                    <div class="slds-form-element">
+                                                        <span class="lookupInput">
+                                                            <input  id="owner_id" maxlength="255" name="owner_id"  onchange="document.getElementById('owner_id_lkid').value=''document.getElementById('owner_id_mod').value='1';setTimeout('dupeCatcherOwnerIdOnChangeEvent()', 1000)" size="20" type="text" value="{!proxyUser.FirstName} {!proxyUser.LastName}" class="slds-input" />
+                                                            
+                                                            <a href="javascript: openLookup('/_ui/common/data/LookupPage?lkfm=editPage&lknm=owner_id&lktp=' + document.getElementById('owner_id_lktp').value,670,'1','&lksrch=' + escapeUTF(document.getElementById('owner_id').value.substring(0, 80)))" id="owner_id_lkwgt" onclick="setLastMousePosition(event)" title="Record Owner Lookup (New Window)">
+                                                                <img src="/s.gif" alt="Record Owner Lookup (New Window)"  class="lookupIcon" onblur="this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';" title="Record Owner Lookup (New Window)"/>   
+                                                            </a>
+                                                        </span>
+                                                    </div>
+                                                </div>                                                                
+                                                <div class="slds-form-element" rendered="{!displayOwnerId}">
+                                                    <label class="slds-form-element__label" for="convertedstatusfieldid">
+                                                        Converted Status
+                                                    </label>
+                                                    <div class="slds-form-element">
+                                                        <apex:selectList id="convertedstatusfieldid" size="1" required="true" value="{!convertedStatus}" styleClass="slds-select" >
+                                                           <apex:selectOptions value="{!convertedStatusOptions}" /> 
+                                                       </apex:selectList>
+                                                    </div>
+                                                </div> 
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label" for="opportunitynamefieldid">
+                                                        Opportunity Name
+                                                    </label>
+                                                    <div class="slds-form-element">
+                                                        <apex:inputText id="opportunitynamefieldid"  required="false" styleClass="slds-input" value="{!opportunityName}" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="display:table-cell; padding-left: 25px;">
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label" for="donotcreateopportunintyfieldid">
+                                                        Do Not Create Opportunity
+                                                    </label>
+                                                    <div class="slds-form-element slds-chk-div">
+                                                        <apex:inputCheckbox id="donotcreateopportunintyfieldid" styleClass="slds-checkbox" value="{!doNotCreateOpportunity}">
+                                                            <apex:actionSupport event="onclick" rerender="opportunitynamefieldsectionitem"  />
+                                                        </apex:inputCheckbox>
+                                                    </div>
+                                                </div>                                                               
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label" for="sendemailtoownersfieldid">
+                                                        Send Email To Owners
+                                                    </label>
+                                                    <div class="slds-form-element slds-chk-div">
+                                                        <apex:inputCheckbox id="sendemailtoownersfieldid" styleClass="slds-checkbox" value="{!sendEmailToOwners}" />
+                                                    </div>
+                                                </div>                                
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label" for="overwriteleadsourcefieldid">
+                                                        Overwrite Lead Source
+                                                    </label>
+                                                    <div class="slds-form-element slds-chk-div">
+                                                        <apex:inputCheckbox id="overwriteleadsourcefieldid" styleClass="slds-checkbox" value="{!overwriteLeadSource}" />
+                                                    </div>
+                                                </div>  
+                                            </div>
+                                        </div>                                    
+                                    </div>
+                                </div>
+                            </div>
+                       </div>
+                       <div style="margin-top: 10px;">
+                            <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container">
+                                <span class="test-id__section-header-title section-header-title slds-p-horizontal--small slds-truncate">
+                                    Task Information
+                                </span>
+                            </h3>
+                            <div class="dingoWorkList slds-panel__section">
+                                <div class="slds-form--vertical">
+                                    <div style="display: table; width: 100%;">
+                                        <div style="display: table-row;">
+                                            <div style="display:table-cell; width:50%; padding-right: 25px;">
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label" for="tasksubjectfieldid">
+                                                        <span class="required">*</span>Subject
+                                                    </label>
+                                                      <div class="slds-form-element">
+                                                        <apex:inputField id="tasksubjectfieldid" required="true" value="{!proxyTask.Subject}" styleClass="slds-select"/>
+                                                       </div>
+                                                </div> 
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label" for="tasksubjectfieldid">
+                                                        Due Date
+                                                    </label>
+                                                    <div class="slds-form-element">
+                                                        <apex:inputField id="taskduedatefieldid" required="false" value="{!proxyTask.ActivityDate}" styleClass="slds-input"/>
+                                                    </div>
+                                                </div>
+                                            </div>                                    
+                                            <div style="display:table-cell; padding-left: 25px;">
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label" for="proxytaskstatus">
+                                                        Status
+                                                    </label>
+                                                    <div class="slds-form-element">
+                                                         <apex:selectList id="proxytaskstatus" size="1" accesskey="" required="true"  styleClass="slds-select">
+                                                            <apex:selectOptions value="{!taskStatusOptions}"/>
+                                                        </apex:selectList>
+                                                    </div>
+                                                </div>                                
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label" for="proxytaskpriority">
+                                                        Priority
+                                                    </label>
+                                                    <div class="slds-form-element">
+                                                        <apex:selectList id="proxytaskpriority" size="1" required="true" value="{!proxyTask.Priority}"  styleClass="slds-select">
+                                                            <apex:selectOptions value="{!taskPriorityOptions}"/>
+                                                        </apex:selectList>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>                          
+                        <div style="margin-top: 10px;">
+                            <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container">
+                                <span class="test-id__section-header-title section-header-title slds-p-horizontal--small slds-truncate">
+                                    Task Email Description Information
+                                </span>
+                            </h3>
+                            <div class="dingoWorkList slds-panel__section">
+                                <div class="slds-form--vertical">
+                                    <div class="slds-form-element">
+                                        <label class="slds-form-element__label" for="sendemailtotaskownerfieldid">
+                                            Send Notification Email
+                                        </label>
+                                        <div class="slds-form-element slds-chk-div">
+                                            <apex:inputCheckbox id="sendemailtotaskownerfieldid" styleClass="slds-checkbox" value="{!sendEmailToTaskOwner}" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dingoWorkList slds-panel__section">
+                                <div class="slds-form--vertical">
+                                    <div class="slds-form-element">
+                                        <label class="slds-form-element__label" for="commentsforfieldid">
+                                            Comments For Task
+                                        </label>
+                                        <div class="slds-form-element slds-chk-div">
+                                            <apex:inputTextArea id="commentsforfieldid"  cols="80" rows="5" styleClass="slds-input" value="{!proxyTask.Description}" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                                
+                        <div style="margin-top: 10px;">
+                            <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container">
+                                <span class="test-id__section-header-title section-header-title slds-p-horizontal--small slds-truncate">
+                                    Task Reminder
+                                </span>
+                            </h3>
+                            <div class="dingoWorkList slds-panel__section">
+                                <div class="slds-form--vertical">
+                                    <div style="display: table; width: 100%;">
+                                        <div style="display: table-row;">
+                                            <div style="display:table-cell; padding-right: 25px;">
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label" for="remindersetfieldid">
+                                                        Reminder Set
+                                                    </label>
+                                                    <div class="slds-form-element slds-chk-div">
+                                                        <apex:inputField styleClass="slds-checkbox" value="{!proxyTask.IsReminderSet}" onclick="SSDupeCatcherHandleReminderDateRequired('{!$Component.taskreminder.remindersetfieldid}', '{!$Component.taskreminder.taskreminderdateid}', '{!$Component.taskreminder.taskremindertimeid}')" id="remindersetfieldid" required="false">
+                                                        </apex:inputField> 
+                                                    </div>
+                                                </div>                                             
+                                            </div>                                    
+                                            <div style="display:table-cell; padding-left: 25px;">
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label" for="taskreminderdateid">
+                                                        <span class="required">*</span>Reminder Date
+                                                    </label>
+                                                    <div class="slds-form-element">
+                                                         <apex:inputField id="taskreminderdateid" label="" styleClass="slds-input" value="{!proxyRequiredFieldSupport.SFSSDupeCatcher__Reminder_Date__c}" required="{!proxyTask.IsReminderSet}" />
+                                                    </div>
+                                                </div>    
+                                            </div>
+                                            <div style="display:table-cell; padding-left: 25px;">                            
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label" for="taskremindertimeid">
+                                                        Time
+                                                    </label>
+                                                    <div class="slds-form-element">
+                                                        <apex:selectList id="taskremindertimeid" size="1" value="{!taskReminderTimeOption}" styleClass="slds-select">
+                                                            <apex:selectOptions value="{!taskReminderTimeOptions}"/>
+                                                        </apex:selectList>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align:center; width:100%;padding-top: 10px;">          
+                            <apex:commandButton value="Submit" action="{!convert}" styleClass="btn cloudingoButton slds-button slds-button--neutral"/>
+                            <apex:commandButton value="Cancel" action="{!cancel}"  styleClass="btn cloudingoButton slds-button slds-button--neutral" immediate="true" />
+                        </div>
+                        <apex:actionFunction action="{!handleOwnerId}" name="sendOwnerIdToController" rerender="displayowneridfield" immediate="true">
+                            <apex:param name="OwnerId" assignTo="{!OwnerId}" value="firstParam" />
+                        </apex:actionFunction>
+                    </div>
+                </div>
+            </div> 
+        </div>         
+        <apex:outputPanel id="theErrorPanel" rendered="{!showPageError}" >
+            <div class="cloudingoWork" style="margin: 10px; top: 0px;">
+                <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap">
+                    <div class="slds-form--stacked slds-grow slds-scrollable--y">
+                        <div class="slds-panel__section slds-has-divider--bottom" style="background: rgb(247, 249, 251); color: rgb(22, 50, 92);">
+                            <div class="slds-media slds-tile">             
+                                <p class="tile__title slds-truncate slds-text-heading--medium">
+                                    DupeCatcher Lead Convert Submit
+                                </p>
+                            </div>                
+                        </div>
+                        <div class="slds-panel__section">
+                            <p class="tile__title slds-truncate slds-text-heading--small">                             
+                                <font size="4"><b>  
+                                    An error has occurred and the conversion submit page cannot be displayed. If you continue to see this message, please notify your system administrator.
+                                </b></font>                            
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

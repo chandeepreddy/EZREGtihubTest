@@ -1,0 +1,14 @@
+<apex:page Controller="EZRE_CandidateResumeReports">
+<apex:form >
+
+ <apex:outputLabel style="font-weight:bold" >Please click the button to export Candidate Without Resume</apex:outputLabel>&nbsp;&nbsp;&nbsp;
+
+ <apex:commandButton value="ExportCandidates" action="{!ExportCandidatesWithoutResume}"/>
+ <br/>
+ <br/>
+  <apex:outputLabel style="font-weight:bold" >Please click the button to export Resume Without Candidate </apex:outputLabel>&nbsp;&nbsp;&nbsp;
+
+ <apex:commandButton value="ExportResume" action="{!ExportResumeWithoutCandidates}"/>
+
+</apex:form>
+</apex:page>

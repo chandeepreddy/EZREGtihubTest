@@ -1,0 +1,262 @@
+<apex:page controller="SFSSDupeCatcher.DCApplicationSettings">
+    <apex:stylesheet value="{!URLFOR($Resource.SFSSDupeCatcher__Styles, 'assets/styles/salesforce-lightning-design-system.min.css')}" />
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <style>
+        .dingoBkWhite{ background-color: #ffffff; }
+        .dingoGray{ color: #b8c3ce; }
+        .dingoLiGray:before{ color: #b8c3ce; }
+        .dingoBkGray{ background-color: #b8c3ce; }                
+        .dingoA{ background-color: #5a9cdd; }
+        .dingoBlue{ color: #5a9cdd; }                
+        .dingoLiBlue:before{ color: #5a9cdd; }
+        .dingoBkBlue{ background-color: #5a9cdd; }                
+        .dingoB{ background-color: #00c6b7; }
+        .dingoLightBlue{ color: #00c6b7; }                
+        .dingoLiLightBlue:before{ color: #00c6b7; }
+        .dingoBkLightBlue{ background-color: #00c6b7; }                
+        .dingoC{ background-color: #88c651; }
+        .dingoGreen{ color: #88c651; }                
+        .dingoLiGreen:before{ color: #88c651; }
+        .dingoBkGreen{ background-color: #88c651; }                
+        .dingoD{ background-color: #f39e58; }
+        .dingoOrange{ color: #f39e58; }                
+        .dingoLiOrange:before{ color: #f39e58; }
+        .dingoBkOrange{ background-color: #f39e58; }                
+        .dingoF{ background-color: #00c6b7; }
+        .dingoRed{ color: #ef6e64; }                
+        .dingoLiRed:before{ color: #ef6e64; }
+        .dingoBkRed{ background-color: #ef6e64; }
+        .dingoRedAlt{ color: rgb(194, 57, 52); }                
+        .dingoLiRedAlt:before{ color: rgb(194, 57, 52); }
+        .dingoBkRedAlt{ background-color: rgb(194, 57, 52); }
+        .dingoInactive{
+            background-color: rgb(194, 57, 52);
+        }                
+        .dingoActive{
+            background-color: rgb(75, 202, 129)
+        }
+        .dingoState {
+            border-radius: .25em;
+            color: #ffffff;
+            padding: 25px;
+            margin: 25px;
+            display: inline-block;
+            text-align: left;
+            width: 250px;
+            position: relative;
+            float:left;
+            height: 200px;
+        } 
+        .dingoStatusHldr{
+            border-radius: .25em;
+            padding: 25px;
+            margin: 25px;
+            display: inline-block;
+            text-align: left;
+            width: 250px;
+            position: relative;
+            float:left;                    
+        }
+        .dingoStatusLine{
+            float:left;
+            border-radius: .125rem;
+            height: 10px;
+            margin-right: 5px;
+            margin-left: 5px;
+            margin-bottom: 5px;
+            margin-top: 18px;
+            width: 50px;
+        }
+        .dingoCurrentState {                    
+            float:left;
+            border-radius: 50%;
+            padding: 15px;
+        } 
+        .dingoWorkList{
+        }
+        .dingoWorkList li{
+            height: 50px;
+            padding-top: 15px;
+        }
+        .cloudingoLink {
+            text-decoration: none !important;
+            font-weight: bold;
+        }
+        .cloudingoWork{
+            float:left; 
+            top: 25px; 
+            position: relative;
+            border: 1px solid rgb(216, 221, 230);
+            border-radius: .25em;
+        }
+        .cloudingoWork .slds-panel{
+            min-height: 200px;
+        }
+        .cloudingoWorkLiImg{
+            float:left;
+            margin-top:-10px;
+            padding-right:10px;
+        }
+        .cloudingoButton{
+            padding-left: 10px !important; 
+            padding-right: 10px !important; 
+            background: none !important;
+        }
+        .cloudingoButtonWhite{
+            padding-left: 10px !important; 
+            padding-right: 10px !important; 
+            background-color: #ffffff !important;
+            background-image: none !important;
+        }
+        .slds-table th, .slds-table td {
+            padding: .15rem;
+        }
+        .required {
+            float:left;
+            padding-right:2px;
+            color: rgb(194,57,52);
+            font-weight:700;
+        }
+        .slds-chk-div {
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            padding: .5rem 1rem 0 .75rem;
+        }
+    </style>
+    <apex:sectionHeader title="" subTitle="" />
+    <apex:pageMessages />
+     <apex:form title="" >
+        <div class="cloudingoWork" style="margin: 10px; top: 0px;">
+            <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap">
+                <div class="slds-form--stacked slds-grow slds-scrollable--y">
+                    <div id="convertSubmitHeader" class="slds-panel__section slds-has-divider--bottom" style="background: rgb(247, 249, 251); color: rgb(22, 50, 92);">
+                        <div class="slds-media slds-tile">             
+                            <p class="tile__title slds-truncate slds-text-heading--medium">
+                                DupeCatcher Application Settings
+                            </p>
+                        </div>
+                    </div>
+                    <div id="applicationSettingsContent" class="slds-panel__section">
+                        <div style="width: 100%;text-align:center; margin-bottom: 25px"> 
+                            <apex:commandButton id="savebutton" value="Save" styleClass="btn cloudingoButton slds-button slds-button--neutral" action="{!save}">
+                            </apex:commandButton> 
+                             <apex:commandButton id="dataqualitybutton" value="Data Quality Report" styleClass="btn cloudingoButton slds-button slds-button--neutral" action="{!dataQualityReport}"> 
+                             </apex:commandButton>              
+                        </div>
+                        <div style="display: table;">
+                            <div style="display: table-row;">
+                                <div style="display: table-cell; width: 50%;">
+                                    <div class="slds-form-element"><!-- rendered="{!NOT(showAccountOptions)}"-->
+                                        <label class="slds-form-element__label" title="Web to Lead Sources: (one per line) Lead Sources entered here will ALWAYS generate alerts instead of blocking duplicates even if update/insert actions are used in a filter.">
+                                            Web Lead Sources (one per line)
+                                        </label>
+                                        <div class="slds-form-element" style="padding-left:15px;">
+                                            <apex:inputTextArea id="dcwebsleadsources"   rows="8" cols="50" value="{!WLS}">
+                                            </apex:inputTextArea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display: table-cell; width: 50%;">
+                                    <div class="slds-form-element"><!-- rendered="{!NOT(showAccountOptions)}"-->
+                                        <label class="slds-form-element__label" title="Domains ignored: 
+                                                                                                                      Yahoo.com,
+                                                                                                                      Yahoo.co.uk,
+                                                                                                                      Yahoo.ca,
+                                                                                                                      Yahoo.de,
+                                                                                                                      Yahoo.co.jp,
+                                                                                                                      Ymail.com,
+                                                                                                                      Rocketmail.com,
+                                                                                                                      msn.com,
+                                                                                                                      Hotmail.com,
+                                                                                                                      Live.com,
+                                                                                                                      Aol.com,
+                                                                                                                      Gmail.com,
+                                                                                                                      Gmail.co.uk,
+                                                                                                                      Gmail.ca,
+                                                                                                                      Gmail.de,
+                                                                                                                      Gmail.co.jp,
+                                                                                                                      Inbox.com,
+                                                                                                                      Mail.com,
+                                                                                                                      Lycos.com,
+                                                                                                                      FastMail.fm,
+                                                                                                                      hotmail.co.uk,
+                                                                                                                      me.com...(For complete list please refer to DupeCatcher getting started tab.)">
+                                            Ignore Public email domains on domain based matches (Yahoo, Gmail, Hotmail, etc.)
+                                        </label>
+                                        <div class="slds-form-element slds-chk-div">
+                                            <apex:inputCheckBox id="dcPublicEmailDomainsToIgnoreblock" value="{!PublicEmailDomainsToIgnore}">
+                                            </apex:inputCheckBox>      
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: table-row;">
+                                <div style="display: table-cell">
+                                    <label class="slds-form-element__label" title="To bypass all DupeCatcher filters for specific users, enter the Salesforce usernames each on a line. This can be used if you have any automated process that creates Leads, Contact or Accounts that you would like to be exempt for DupeCatcher Filters.">
+                                        Bypass all filters for the following Salesforce usernames. (one per line)
+                                    </label>
+                                    <div class="slds-form-element" style="padding-left:15px;">
+                                        <apex:inputTextArea id="dcuserstoignore" rows="8" cols="50" value="{!UTI}">
+                                        </apex:inputTextArea>
+                                    </div>
+                                </div>
+                                <div style="display: table-cell">
+                                    <label class="slds-form-element__label" title="For Filter Rules that match on email domain, you can limit results by entering domains of common, web-based, email systems (Gmail, Hotmail, Yahoo, etc.) on separate lines.  DupeCatcher will then ignore these domains when performing its scan. Example: enter gmail.com to prevent returning all email addresses with the domain at gmail.com as duplicates.">
+                                        Additional email domains to ignore on domain based matches. (one per line) Example: mycompany.com
+                                    </label>
+                                    <div class="slds-form-element" style="padding-left:15px;">
+                                        <apex:inputTextArea id="dcemaildomainstoignore"  rows="8" cols="50" value="{!EDTI}">
+                                        </apex:inputTextArea>
+                                    </div>
+                                </div>
+                            </div>                            
+                            <div style="display: table-row;">
+                                <div style="display: table-cell">
+                                    <label class="slds-form-element__label" title="Check this to enable immediate reminders on DupeCatcher tasks">
+                                       Set Immediate Reminder For Tasks
+                                    </label>
+                                    <div class="slds-form-element slds-chk-div">
+                                        <apex:inputCheckBox id="dcsetreminder" value="{!Reminder}">
+                                        </apex:inputCheckBox>
+                                    </div>
+                                </div>
+                                <div style="display: table-cell">
+                                </div>
+                            </div>
+                            <div style="display: table-row;">
+                                <div style="display: table-cell" rendered="{!displayOverride}">
+                                    <label class="slds-form-element__label" title="Check this to enable immediate reminders on DupeCatcher tasks">
+                                       Allow Override of Blocked Duplicates
+                                    </label>
+                                    <div class="slds-form-element slds-chk-div">
+                                         <apex:inputCheckBox id="dcoverrideblock" value="{!OverrideBlock}">
+                                        </apex:inputCheckBox>      
+                                    </div>
+                                </div>
+                                <div style="display: table-cell" rendered="{!DisplayPersonAccountSupport}">
+                                    <label class="slds-form-element__label" title="A workaround for Known Issue: Reference W-2812314 which blocks html in on screen messages. This forces DupeCatcher to emit non-clickable text (no links) to get around this Salesforce bug. Please vote on the known issue here: https://success.salesforce.com/issues_view?id=a1p30000000jaTX">
+                                        Disable HTML if incorrectly displayed
+                                    </label>
+                                    <div class="slds-form-element slds-chk-div">
+                                        <apex:inputCheckBox id="dcpersonaccountblock" value="{!PersonAccountSupport}">
+                                        </apex:inputCheckBox>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width: 100%; margin-top: 25px; margin-bottom: 25px;">
+                            <apex:outputLink value="http://www.cloudingo.com/" id="CommandLink1" target="_blank"> 
+                                <apex:image id="imgLogo1" value="https://www.cloudingo.com/assets/images/cloudingobanner_dupecatcher.png" style="display:block;margin-left:auto;margin-right:auto;" />  
+                            </apex:outputLink>
+                        </div>
+                    </div>
+                </div>
+            </div>                
+        </div>                  
+    </apex:form> 
+</apex:page>

@@ -1,0 +1,401 @@
+<apex:page id="page" standardController="Contact" extensions="RK_LinkedIn.LinkedInProfileDetailController" tabStyle="Contact" standardStylesheets="false" showHeader="false">
+	<meta http-equiv="p3p" content="CP='IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT'" />
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+	<script type="text/javascript" src="{!$Resource.jquery_loadmask_min_js}"></script>
+	<script type="text/javascript" src="{!$Resource.LinkedInConnectorCookieLib_js}"></script>
+	<apex:stylesheet value="{!URLFOR($Resource.RK_LinkedIn__LinkedInConnectorResources, 'css/jquery.loadmask.css')}"/>
+	<apex:stylesheet value="{!URLFOR($Resource.RK_LinkedIn__LinkedInConnectorResources, 'css/connectorBase.css')}"/>
+	<apex:stylesheet value="{!URLFOR($Resource.RK_LinkedIn__LinkedInConnectorResources, 'css/profile.css')}"/>
+	<apex:form id="form">
+		<!--  Common OAuth Markup / javascript -->
+		<apex:actionFunction action="{!setControllerValues}" name="setControllerValues" reRender="ControllerValues, pageContent"
+			onComplete="storeToken();checkThrottlePopup();">
+			<apex:Param name="cookie" assignTo="{!tokenCookie}" value="" />
+			<apex:Param name="SFDCPod" assignTo="{!SfdcPod}" value="" />
+		</apex:actionFunction>
+		<apex:panelGrid id="ControllerValues"  columns="10" width="100%">
+			<apex:inputHidden id="OAuthTokenCookie" value="{!tokenCookieReadOnly}"/>
+			<apex:inputHidden id="AuthUrl" value="{!LinkedInAuthURL}"/>
+			<apex:inputHidden id="ShowThrottlePopup" value="{!showThrottlePopup}"/>
+		</apex:panelGrid>
+		<script type="text/javascript">
+			var DEBUG = false;
+			
+			jQuery.noConflict();
+			jQuery(document).ready(function(){
+				setupController();
+			});
+			
+			function setupController(){
+				var rkLinkedInCookie = getCookie("RK_LinkedIn");
+				setControllerValues(rkLinkedInCookie, "https://"+document.location.hostname);
+			}
+			function storeToken(){
+				
+				if (DEBUG) alert('In storeToken');
+				var cookieHidden = document.getElementById("{!$Component.OAuthTokenCookie}");
+				// Set cookie - Cookie Name, Value, Expiration in Days, and relative scope of the cookie
+				setCookie("RK_LinkedIn", cookieHidden.value, 1461, "/");
+			}
+			function checkThrottlePopup(){
+				if (DEBUG) alert('In checkThrottlePopup');
+
+				var throttlePopup =  document.getElementById("{!$Component.ShowThrottlePopup}");
+				if (DEBUG) alert(throttlePopup.value);
+				if (throttlePopup.value == 'true'){
+					alert('{!$Label.Profile_APILimit_RefreshPopup}');
+				}
+			}
+			function openAuthWindow(){
+				var urlHidden =  document.getElementById("{!$Component.AuthUrl}");
+				//window.open(urlHidden.value,"","status=1,location=1,height=400,width=500" );
+				parent.top.location.href = urlHidden.value;
+			}
+			function resizeIframe(iframeName) {
+				if(self==parent) return false; /* Checks that page is in iframe. */
+				else if(document.getElementById&&document.all) /* Sniffs for IE5+.*/
+			
+				var FramePageHeight = framePage.scrollHeight + 10; /* framePage
+					is the ID of the framed page's BODY tag. The added 10 pixels prevent an
+					unnecessary scrollbar. */
+			
+				parent.document.getElementByName(iframeName).style.height=FramePageHeight;
+				/* "iframeID" is the ID of the inline frame in the parent page. */
+			}
+		</script>
+		<!--  END - Common OAuth Markup / javascript -->
+
+		<apex:outputPanel id="pageContent"><div id="page-content" >
+			<apex:messages />
+
+<!--  LinkedIn Authorization Content -->
+			<apex:outputPanel rendered="{!showLogin}" layout="block" styleClass="actionable-area box-fill">
+			<div class="actionable-area-content">
+				<apex:outputPanel rendered="{!showTokenInvalid}" layout="block">
+					<apex:outputText escape="false" value="{!$Label.rk_linkedin__Auth_ExpiredToken}"/>
+				</apex:outputPanel>
+				<apex:outputText escape="false" value="{!$Label.rk_linkedin__Auth_LoginMessage}"/>
+				<div class="actionable-area-action">
+					<apex:CommandLink action="{!initiatieLinkedInLogin}" reRender="ControllerValues" 
+						onComplete="storeToken();openAuthWindow();">
+						<img alt="{!$Label.Auth_LoginButton}"
+							src="{!URLFOR($Resource.LinkedInConnectorResources,'image/log-in-linkedin-small.png')}"/>
+					</apex:CommandLink>
+				</div>
+			</div>
+			</apex:outputPanel>
+<!-- End LinkedIn Authorization Content -->
+
+<!--  Find LinkedIn Person -->
+			<apex:outputPanel rendered="{!showFindProfile}" layout="block" styleClass="actionable-area box-fill">
+			<div class="actionable-area-content">
+				<apex:outputText escape="false" value="{!$Label.rk_linkedin__Profile_FindProfileMessage}"/>
+				<div class="actionable-area-action">
+					<apex:outputLink value="{!findLinkedInProfileUrl}" target="_top">
+						{!$Label.rk_linkedin__Profile_FindProfileLink}
+					</apex:outputLink>
+				</div>
+			</div>
+			</apex:outputPanel>
+<!--  End find LinkedIn Person -->
+
+<!--  LinkedIn Person Profile Error -->
+			<apex:outputPanel rendered="{!showErrorOccurred}" layout="block">
+				<div class="actionable-area box-fill">
+				<div class="actionable-area-content">
+					<div><apex:outputText escape="false" value="{!$Label.rk_linkedin__Error_GenericMessage}" /></div>
+					<div class="error-show-detail-link-div actionable-area-action">
+						<apex:outputLink value="#" onClick="jQuery('#ErrorDetailDiv').slideToggle();return false;" >
+							{!$Label.rk_linkedin__Error_ShowDetailLink}
+						</apex:outputLink>
+					</div>
+				</div>
+				</div>
+
+				<div id="ErrorDetailDiv" style="display:none">
+					<div class="error-detail-div box-list-body box-pad"><pre>
+{!errorDetail}
+					</pre></div>
+				</div>
+			</apex:outputPanel>
+<!--  End LinkedIn Person Profile Error -->
+
+<!--  LinkedIn Person Profile Error -->
+			<apex:outputPanel rendered="{!showThrottleAndNoProfile}" layout="block" styleClass="actionable-area box-fill">
+			<div class="actionable-area-content">
+					<apex:outputText escape="false" value="{!$Label.rk_linkedin__Profile_APILimit_NoProfile}" />
+			</div>
+			</apex:outputPanel>
+<!--  End LinkedIn Person Profile Error -->
+
+
+<!--  Linked In Profile Content -->
+			<apex:outputPanel id="profile-panel" rendered="{!showProfile}">
+				<div id="profile-content" class="profile-area">
+	<!-- LinkedIn Header ---------------->
+					<c:LinkedInPageHeader title="{!$Label.rk_linkedin__Profile_Title}" />
+					
+					<div class="profile-header">
+						<div class="profile-basic-info non-box-pad">
+							<table border="0" cellspacing="0" cellpadding="0"><tr>
+		<!-- Profile Picture ---------------->
+								<td class="profile-image-area">
+									<c:LinkedInPersonProfilePicture person="{!PersonProfile}" />
+								</td>
+		<!-- Profile Name, Distance, Links, Title, Location, Industry, Connections ---------------->
+								<td>
+									<c:LinkedInPersonProfileBasicInfo person="{!PersonProfile}" showInviteLink="true" /> 
+								</td>
+
+							</tr></table>
+						</div>
+		<!-- Profile Status ---------------->
+						<apex:outputPanel rendered="{!(PersonProfile.currentStatus!='')}" 
+							layout="block" styleClass="profile-status box-fill-light box-pad">
+							<p>
+								<span class="status">
+									<span class="person-name">{!PersonProfile.firstName} {!PersonProfile.lastName}</span> 
+									<span class="text">{!PersonProfile.currentStatus}</span>
+								</span>
+								<span class="timestamp">{!PersonProfile.currentStatusTimeString}</span>
+							</p>
+						</apex:outputPanel>
+						
+		<!-- Profile Current, Past, Education, Websites ---------------->
+						<div id="profile-overview" class="box-list-body"><apex:panelGrid columns="2">
+							<apex:outputPanel styleClass="overview-heading box-pad-left" layout="block" >
+			<!-- Current -->
+								<a href="{!PersonProfile.siteStandardUrl}#profile-experience" target="_blank">Current</a>
+							</apex:outputPanel>
+							<apex:outputPanel styleClass="overview-detail box-pad-right" layout="block" >
+								<apex:outputPanel rendered="{!(PersonProfile.positions.currentPositionsTop.size<=0)}">
+									<div class="bullet">None</div>
+								</apex:outputPanel>
+								<apex:outputPanel rendered="{!(0<PersonProfile.positions.currentPositionsTop.size)}">
+									<apex:repeat value="{!PersonProfile.positions.currentPositionsTop}" var="currTop" >
+										<div class="bullet">{!currTop.profileTitle}</div>
+									</apex:repeat>
+									
+									<apex:outputPanel rendered="{!(0<PersonProfile.positions.currentPositionsMore.size)}">
+										<div id="currMoreDiv" style="display:none">
+											<apex:repeat value="{!PersonProfile.positions.currentPositionsMore}" var="currMore" >
+												<div class="bullet">{!currMore.profileTitle}</div>
+											</apex:repeat>
+										</div>
+										<a id="currMoreLink" href="#" class="seeMoreLink"
+											onClick="jQuery('#currMoreLink .seeMoreLinkLabel').toggle();jQuery('#currMoreDiv').slideToggle();return false;">
+											
+											<span class="seeMoreLinkLabel">
+												<apex:outputText value="{!$Label.rk_linkedin__Profile_SeeAllLink}">
+													<apex:param value="{!PersonProfile.positions.currentPositionsMore.size+3}" />
+												</apex:outputText>
+											</span>
+											<span class="seeMoreLinkLabel" style="display:none">{!$Label.rk_linkedin__Profile_SeeLessLink}</span>
+										</a>
+									</apex:outputPanel>
+								</apex:outputPanel>
+							</apex:outputPanel>
+
+							<apex:outputPanel styleClass="overview-heading box-pad-left" layout="block" rendered="{!(0<PersonProfile.positions.pastPositionsTop.size)}">
+			<!-- Past -->
+								<a href="{!PersonProfile.siteStandardUrl}#profile-experience" target="_blank">Past</a>
+							</apex:outputPanel>
+							<apex:outputPanel styleClass="overview-detail box-pad-right" layout="block" rendered="{!(0<PersonProfile.positions.pastPositionsTop.size)}">
+								<apex:repeat value="{!PersonProfile.positions.pastPositionsTop}" var="pastTop" >
+									<div class="bullet">{!pastTop.profileTitle}</div>
+								</apex:repeat>
+								
+								<apex:outputPanel rendered="{!(0<PersonProfile.positions.pastPositionsMore.size)}">
+									<div id="pastMoreDiv" style="display:none">
+										<apex:repeat value="{!PersonProfile.positions.pastPositionsMore}" var="pastMore" >
+											<div class="bullet">{!pastMore.profileTitle}</div>
+										</apex:repeat>
+									</div>
+									<a id="pastMoreLink" href="#" class="seeMoreLink"
+										onClick="jQuery('#pastMoreLink .seeMoreLinkLabel').toggle();jQuery('#pastMoreDiv').slideToggle();return false;">
+										
+										<span class="seeMoreLinkLabel">
+											<apex:outputText value="{!$Label.rk_linkedin__Profile_SeeAllLink}">
+												<apex:param value="{!PersonProfile.positions.pastPositionsMore.size+3}" />
+											</apex:outputText>
+										</span>
+										<span class="seeMoreLinkLabel" style="display:none">{!$Label.rk_linkedin__Profile_SeeLessLink}</span>
+									</a>
+								</apex:outputPanel>
+							</apex:outputPanel>
+							<apex:outputPanel styleClass="overview-heading box-pad-left" layout="block" rendered="{!(0<PersonProfile.educations.educationsTop.size)}">
+			<!-- Educations -->
+								<a href="{!PersonProfile.siteStandardUrl}#profile-education" target="_blank">Education</a>
+							</apex:outputPanel>
+							<apex:outputPanel styleClass="overview-detail box-pad-right" layout="block" rendered="{!(0<PersonProfile.educations.educationsTop.size)}">
+								<apex:repeat value="{!PersonProfile.educations.educationsTop}" var="edu" >
+									<div class="bullet">{!edu.schoolName}</div>
+								</apex:repeat>
+								
+								<apex:outputPanel rendered="{!(0<PersonProfile.educations.educationsMore.size)}">
+									<div id="eduMoreDiv" style="display:none">
+										<apex:repeat value="{!PersonProfile.educations.educationsMore}" var="eduMore" >
+											<div class="bullet">{!eduMore.schoolName}</div>
+										</apex:repeat>
+									</div>
+									<a id="eduMoreLink" href="#" class="seeMoreLink"
+										onClick="jQuery('#eduMoreLink .seeMoreLinkLabel').toggle();jQuery('#eduMoreDiv').slideToggle();return false;">
+										
+										<span class="seeMoreLinkLabel">
+											<apex:outputText value="{!$Label.rk_linkedin__Profile_SeeAllLink}">
+												<apex:param value="{!PersonProfile.educations.educationsMore.size+3}" />
+											</apex:outputText>
+										</span>
+										<span class="seeMoreLinkLabel" style="display:none">{!$Label.rk_linkedin__Profile_SeeLessLink}</span>
+									</a>
+								</apex:outputPanel>
+							</apex:outputPanel>
+							<apex:outputPanel styleClass="overview-heading box-pad-left" layout="block" rendered="{!(0<PersonProfile.memberUrlResources.memberUrlResourcesTop.size)}">
+			<!-- Websites -->
+								<a href="{!PersonProfile.siteStandardUrl}#profile-additional" target="_blank">Websites</a>
+							</apex:outputPanel>
+							<apex:outputPanel styleClass="overview-detail box-pad-right" layout="block" rendered="{!(0<PersonProfile.memberUrlResources.memberUrlResourcesTop.size)}">
+								<apex:repeat value="{!PersonProfile.memberUrlResources.memberUrlResourcesTop}"	var="memberUrlResource" >
+									<div class="bullet">
+										<a href="{!memberUrlResource.url}" target="_blank">{!memberUrlResource.name}</a>
+									</div>
+								</apex:repeat>
+								
+								<apex:outputPanel rendered="{!(0<PersonProfile.memberUrlResources.memberUrlResourcesMore.size)}">
+									<div id="urlMoreDiv" style="display:none">
+										<apex:repeat value="{!PersonProfile.memberUrlResources.memberUrlResourcesMore}" var="urlMore" >
+											<div class="bullet">
+												<a href="{!urlMore.url}" target="_blank">{!urlMore.name}</a>
+											</div>
+										</apex:repeat>
+									</div>
+									<a id="urlMoreLink" href="#" class="seeMoreLink"
+										onClick="jQuery('#urlMoreLink .seeMoreLinkLabel').toggle();jQuery('#urlMoreDiv').slideToggle();return false;">
+										
+										<span class="seeMoreLinkLabel">
+											<apex:outputText value="{!$Label.rk_linkedin__Profile_SeeAllLink}">
+												<apex:param value="{!PersonProfile.memberUrlResources.memberUrlResourcesMore.size+3}" />
+											</apex:outputText>
+										</span>
+										<span class="seeMoreLinkLabel" style="display:none">{!$Label.rk_linkedin__Profile_SeeLessLink}</span>
+									</a>
+								</apex:outputPanel>
+							</apex:outputPanel>
+						</apex:panelGrid></div>
+					</div>
+		<!-- Profile Connections ---------------->
+					<apex:outputPanel rendered="{!2<=PersonProfile.distance}" layout="block" styleClass="connections-info" >
+						<div class="connections-header box-list-header box-pad">
+							<apex:outputLink value="#" onClick="javascript:jQuery('.connections-body').slideToggle();return false;">
+								<apex:outputText escape="false" value="{!$Label.rk_linkedin__Profile_Connections_Title}">
+									<apex:param value="{!PersonProfile.firstName}" />
+								</apex:outputText>
+							</apex:outputLink>
+						</div>
+						<div class="connections-body box-list-body box-list-body-pad" style="display:none">
+							<apex:panelGrid columns="1" width="100%">
+								<apex:outputPanel styleClass="connections-body-target" >
+									<apex:outputText escape="false" value="{!$Label.rk_linkedin__Profile_Connections_You}" />
+								</apex:outputPanel>
+								<apex:outputPanel >
+									<apex:image value="{!URLFOR($Resource.RK_LinkedIn__LinkedInConnectorResources ,'image/ArrowDown_20x20.png')}" />
+								</apex:outputPanel>
+								<apex:outputPanel >
+									<apex:repeat value="{!PersonProfile.connections.connectionPersons}" var="connPer">
+										<div>
+											<apex:outputPanel rendered="{!connPer.contactId==null}">{!connPer.firstName} {!connPer.LastName}</apex:outputPanel>
+											<apex:outputLink rendered="{!connPer.contactId!=null}" target="_top"
+												title="{!$Label.rk_linkedin__Profile_Connections_LinkTitle}" value="/{!connPer.contactId}">
+												
+												{!connPer.firstName} {!connPer.LastName}
+											</apex:outputLink>
+										</div>
+									</apex:repeat>
+									<apex:outputPanel rendered="{!(PersonProfile.connections.connectionPersons.size<PersonProfile.connections.total)}">
+										...<apex:outputLink value="{!PersonProfile.siteStandardUrl}#linkpath" target="_blank">
+											<apex:outputText escape="false" value="{!$Label.rk_linkedin__Profile_Connections_ViewAllInLinkedIn}">
+												<apex:param value="{!PersonProfile.connections.total}" />
+											</apex:outputText>
+										</apex:outputLink>
+									</apex:outputPanel>
+								</apex:outputPanel>
+								<apex:outputPanel >
+									<apex:image value="{!URLFOR($Resource.RK_LinkedIn__LinkedInConnectorResources ,'image/ArrowDown_20x20.png')}" />
+								</apex:outputPanel>
+								<apex:outputPanel rendered="{!3<=PersonProfile.distance}">
+									<apex:outputText escape="false" value="{!$Label.rk_linkedin__Profile_Connections_TargetsConections}">
+										<apex:param value="{!PersonProfile.firstName}" />
+									</apex:outputText>
+								</apex:outputPanel>
+								<apex:outputPanel rendered="{!3<=PersonProfile.distance}">
+									<apex:image value="{!URLFOR($Resource.RK_LinkedIn__LinkedInConnectorResources ,'image/ArrowDown_20x20.png')}" />
+								</apex:outputPanel>
+								<apex:outputPanel styleClass="connections-body-target" layout="block">
+									{!PersonProfile.firstName} {!PersonProfile.lastName}
+									<apex:outputPanel layout="inline" rendered="{!PersonProfile.distance==2}" >
+										<img height="24" width="24" title="{!PersonProfile.firstName} is a 2nd degree contact" 
+											alt="{!PersonProfile.firstName} is a 2nd degree contact" 
+											src="{!URLFOR($Resource.LinkedInConnectorResources, 'image/distance_2_24x24.png')}" />
+									</apex:outputPanel>
+									<apex:outputPanel layout="inline" rendered="{!PersonProfile.distance==3}" >
+										<img height="24" width="24" title="{!PersonProfile.firstName} is a 3rd degree contact" 
+											alt="{!PersonProfile.firstName} is a 3rd degree contact" 
+											src="{!URLFOR($Resource.LinkedInConnectorResources, 'image/distance_3_24x24.png')}" />
+									</apex:outputPanel>
+								</apex:outputPanel>
+							</apex:panelGrid>
+						</div>
+					</apex:outputPanel>
+
+		<!-- Profile Summary  ------------------->
+					<apex:outputPanel rendered="{!(PersonProfile.summary!='')}" styleClass="section non-box-pad" layout="block">
+					<div id="profile-summary">
+						<div class="section-heading">{!$Label.rk_linkedin__Profile_Summary_Title}</div> 
+						<p class="section-content"><apex:outputText escape="false" value="{!PersonProfile.summary}"/></p>
+					</div>
+					</apex:outputPanel>
+		<!-- Profile Specialties ---------------->
+					<apex:outputPanel rendered="{!(PersonProfile.specialties!='')}" styleClass="section non-box-pad" layout="block">
+					<div id="profile-specialties">
+						<div class="section-heading">{!$Label.rk_linkedin__Profile_Specialties_Title}</div>
+						<p class="section-content">{!PersonProfile.specialties}</p>
+					</div>
+					</apex:outputPanel> 
+		<!--  Profile Footer  -------------------------------->			
+				    <div class="footer">
+				    	<div id="footerTools"><table><tr>
+					        <td class="footer-tools-left">
+						        <apex:outputPanel rendered="false" ><div id="profile-as-of">
+						        	<apex:outputText rendered="true" styleClass="footer-text" 
+						        		escape="false" value="{!$Label.rk_linkedin__Profile_Footer_ProfileAsOf}">
+						        		
+						        		<apex:param value="{!ProfileAsOf}" />
+						        	</apex:outputText>
+						        	<apex:commandLink action="{!refreshProfile}" value="{!$Label.rk_linkedin__Profile_Footer_Refresh}" reRender="pageContent, ControllerValues"
+						        		onClick="jQuery('#profile-content').mask('{!$Label.rk_linkedin__Profile_Footer_RefreshLoadMessage}');" 
+						        		onComplete="jQuery('#profile-content').unmask();checkThrottlePopup();" />
+						        </div></apex:outputPanel>
+						        
+						        <apex:outputPanel rendered="{!showTempSearchDataMessage}"><div id="tempSearchDataMessage">
+						        	<apex:outputText escape="false" value="{!$Label.rk_linkedin__Profile_APILimit_ShowingSearchResults}" />
+						        </div></apex:outputPanel>
+						        
+						        <apex:outputPanel rendered="{!NOT(showTempSearchDataMessage)}" layout="block" 
+						        	styleClass="disclaimer" style="margin-top:0px;">{!$Label.rk_linkedin__Info_LinkedIn_Data}</apex:outputPanel>
+					        </td>
+					        <td class="footer-tools-right">
+						        <div id="incorrect-profile">
+						        	<span class="footer-text">{!$Label.rk_linkedin__Profile_Footer_SearchMessage}</span>
+						        	<apex:outputLink value="{!relinkLinkedInProfileUrl}" target="_top">{!$Label.rk_linkedin__Profile_Footer_SearchLink}</apex:outputLink>
+						        </div>
+					        </td>
+				        </tr></table></div>
+						<apex:outputPanel rendered="{!showTempSearchDataMessage}" layout="block" styleClass="disclaimer">{!$Label.rk_linkedin__Info_LinkedIn_Data}</apex:outputPanel>
+				    </div>	
+    			</div>
+			</apex:outputPanel>
+<!--  End Linked In Profile Content -->
+
+		</div></apex:outputPanel>
+	</apex:form>
+</apex:page>

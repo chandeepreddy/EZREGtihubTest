@@ -1,0 +1,24 @@
+<apex:page controller="EZRE_CntctsRprtOnAccntRltdCmpgnCntrllr" cache="true" contentType="application/vnd.ms-excel#Contact Report_{!selectedRep}.xls" showHeader="false" sidebar="false" readOnly="true">
+ <apex:pageblock >
+<apex:pageblocksection >
+
+ <apex:pageblockTable value="{!contactsListToShow}" var="con">
+          <apex:column value="{!con.Account.Name}"/>
+          <apex:column value="{!con.Account.Account_Status__c}"/>
+          <apex:column value="{!con.FirstName}"/>
+          <apex:column value="{!con.LastName}"/>
+          <apex:column value="{!con.phone}"/>
+          <apex:column value="{!con.MobilePhone}"/>
+          <apex:column value="{!con.Email}"/> 
+          <apex:column value="{!con.ODS_AWS_Status__c}" rendered="{!isODSAWS}"/>
+          <apex:column value="{!con.Title_Insurance_Status__c}" rendered="{!isTitleInsurance}"/>
+          <apex:column value="{!con.Title}"/>
+          <apex:column value="{!con.Account.TimeZone__c}"/>
+                                                       
+</apex:pageBlockTable>
+</apex:pageblocksection>
+</apex:pageblock>
+ 
+  
+
+</apex:page>

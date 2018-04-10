@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>P4t_to_SF_I9n_S4e_Connected_App_oauth</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <modules>
+        <module>
+            <label>P4t_to_SF_I9n_S4e_Connected_App_oauth</label>
+            <moduleType>connected</moduleType>
+            <name>P4t_to_SF_I9n_S4e_Connected_App_oauth</name>
+            <types>
+                <members>P4t_to_SF_I9n_S4e_Connected_App_oauth_devConfig</members>
+                <name>ConnectivityDevConfigMetadata</name>
+            </types>
+            <types>
+                <members>b2bma__P4t_to_SF_I9n_S4e_Connected_App_oauth</members>
+                <name>Module</name>
+            </types>
+            <version>7.0</version>
+        </module>
+    </modules>
+    <namespacePrefix>b2bma</namespacePrefix>
+    <version>36.0</version>
+</Package>

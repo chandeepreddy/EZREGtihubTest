@@ -1,0 +1,7 @@
+<apex:page Controller="EZRE_CandidateResumeReports" contentType="text/csv#CandidatesWithoutResume.csv">
+"Id","Name","Email"
+ <apex:repeat value="{!lstCand}" var="Candt">
+ {!Candt.Id},{!Candt.Candidate_Full_Name__c},{!Candt.Email__c}
+ </apex:repeat>
+
+ </apex:page>

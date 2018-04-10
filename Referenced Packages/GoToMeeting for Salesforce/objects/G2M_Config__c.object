@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>Hierarchy</customSettingsType>
+    <description>Object to store the configuration/settings associated with the GoToMeeting Integration</description>
+    <enableEnhancedLookup>false</enableEnhancedLookup>
+    <enableFeeds>false</enableFeeds>
+    <fields>
+        <fullName>Exception_Recipient__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This is the email address of a group/single user responsible for exceptions in the package</description>
+        <externalId>false</externalId>
+        <label>Exception Recipient</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Email</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Fetch_Interval_Minutes__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Describes the fetch interval in minutes</description>
+        <externalId>false</externalId>
+        <label>Fetch Interval (Minutes)</label>
+        <precision>8</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Install_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This stores the install date the user installed the application</description>
+        <externalId>false</externalId>
+        <inlineHelpText>This stores the install date the user installed the application</inlineHelpText>
+        <label>Install Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <label>G2M Config</label>
+    <visibility>Public</visibility>
+</CustomObject>

@@ -1,0 +1,16 @@
+<apex:page controller="EZRE_InsideSalesDailyWorkAllocationExcel" sidebar="false" readOnly="true" contentType="application/vnd.ms-excel#Inside Sales Rep Daily Call List.xls">
+<apex:pageblock >
+ <apex:pageBlockTable value="{!acctsLst}" var="WrkAllct" title="Call List" id="pbtable" >
+ <apex:column headerValue="Account Name" >
+ <apex:outputLink value="/{!WrkAllct.Account_Name__c}">{!WrkAllct.account_Name__r.name}</apex:outputLink>
+ </apex:column>
+ <apex:column headerValue="Contact Name" >
+ <apex:outputLink value="/{!WrkAllct.Contact__c}">{!WrkAllct.Contact__r.Name}</apex:outputLink>
+ </apex:column>
+ <apex:column headerValue="Email" value="{!WrkAllct.Email__c}" />
+ <apex:column headerValue="Phone" value="{!WrkAllct.Phone__c}" />
+ <apex:column headerValue="Rep Name" value="{!WrkAllct.Name}" />
+ <apex:column headerValue="Time Zone" value="{!WrkAllct.TimeZone__c}" style="{!IF(WrkAllct.TimeZone__c ='CST','background-color:#5FE85A;',IF(WrkAllct.TimeZone__c ='EST','background-color:yellow;',IF(WrkAllct.TimeZone__c ='MST','background-color:#5AE8DA;',IF(WrkAllct.TimeZone__c ='PST','background-color:#F5BCF3;',IF(WrkAllct.TimeZone__c ='None','background-color:red;','background-color:orange;')))))}"/>
+ </apex:pageBlockTable>
+ </apex:pageblock>
+</apex:page>

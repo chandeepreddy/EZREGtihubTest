@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
+    <description>This custom object holds details for a G2M meeting.</description>
+    <enableActivities>true</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <fields>
+        <fullName>Attendance_Fetch_Status__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Attendance Fetch Status</label>
+        <summarizedField>G2M_Attendee__c.Attendance_Data_Fetched__c</summarizedField>
+        <summaryForeignKey>G2M_Attendee__c.Meeting__c</summaryForeignKey>
+        <summaryOperation>min</summaryOperation>
+        <trackTrending>false</trackTrending>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Attendee_Count__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Unique Attendees</label>
+        <summaryForeignKey>G2M_Attendee__c.Meeting__c</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <trackTrending>false</trackTrending>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>End_Time__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This is the end time stored as a hidden field for batch jobs only. Not displayed to the user.</description>
+        <externalId>false</externalId>
+        <label>End Time</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Formatted_Meeting_ID__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>IF(LEN(Meeting_ID__c) = 9, LEFT(Meeting_ID__c,3) + &apos;-&apos; + RIGHT(LEFT(Meeting_ID__c, 6), 3) + &apos;-&apos; + RIGHT(Meeting_ID__c, 3) , Meeting_ID__c)</formula>
+        <label>Meeting ID</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>IsOnDemand__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>On Demand</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>JoinUrl__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Join Url(Old)</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Url</type>
+    </fields>
+    <fields>
+        <fullName>Join_Url__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>&quot;https://www.gotomeeting.com/join/&quot;+Meeting_ID__c</formula>
+        <label>Join Url</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Meeting_ID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The meeting ID used to dial-in.</description>
+        <externalId>false</externalId>
+        <label>Meeting ID</label>
+        <length>9</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Meeting_Instance_Key__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>true</externalId>
+        <label>Meeting Instance Key</label>
+        <length>18</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Meeting_OrganizerUserName__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;../&apos; + OwnerId, Meeting_Organizer_UserName__c , &apos;_self&apos;)</formula>
+        <label>Meeting Organizer UserName</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Meeting_Organizer_UserName__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Meeting Organizer UserName</label>
+        <length>80</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Min_Fetch_Time__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>End_Time__c + ( $Setup.G2M_Config__c.Fetch_Interval_Minutes__c /1440)</formula>
+        <inlineHelpText>G2M takes some time to prepare the information for transmission to salesforce. This is the time that the information is available on G2M servers.</inlineHelpText>
+        <label>Info available after</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Related_Event_Id__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Related Event Id</label>
+        <length>18</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Start_Time__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Start Time</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Status__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Stores the status of the meeting record.</description>
+        <externalId>false</externalId>
+        <label>Status</label>
+        <length>64</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Unique_Meeting_ID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The unique meeting ID to identify the meeting.</description>
+        <externalId>false</externalId>
+        <label>Unique Meeting ID</label>
+        <length>18</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <label>GoToMeeting Session</label>
+    <listViews>
+        <fullName>All_Session</fullName>
+        <columns>Start_Time__c</columns>
+        <columns>NAME</columns>
+        <columns>Formatted_Meeting_ID__c</columns>
+        <columns>Attendee_Count__c</columns>
+        <columns>Meeting_Organizer_UserName__c</columns>
+        <columns>LAST_UPDATE</columns>
+        <filterScope>Everything</filterScope>
+        <label>All Session</label>
+    </listViews>
+    <nameField>
+        <label>GoToMeeting Session</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>GoToMeeting Sessions</pluralLabel>
+    <searchLayouts>
+        <customTabListAdditionalFields>Start_Time__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>Formatted_Meeting_ID__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>Attendee_Count__c</customTabListAdditionalFields>
+        <lookupDialogsAdditionalFields>Meeting_ID__c</lookupDialogsAdditionalFields>
+        <lookupDialogsAdditionalFields>Unique_Meeting_ID__c</lookupDialogsAdditionalFields>
+        <lookupDialogsAdditionalFields>OWNER.FIRST_NAME</lookupDialogsAdditionalFields>
+        <lookupDialogsAdditionalFields>OWNER.LAST_NAME</lookupDialogsAdditionalFields>
+        <searchFilterFields>Meeting_ID__c</searchFilterFields>
+        <searchFilterFields>Formatted_Meeting_ID__c</searchFilterFields>
+        <searchFilterFields>Meeting_Instance_Key__c</searchFilterFields>
+        <searchFilterFields>Unique_Meeting_ID__c</searchFilterFields>
+    </searchLayouts>
+    <sharingModel>ReadWrite</sharingModel>
+    <webLinks>
+        <fullName>Join_GoToMeeting</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>Join GoToMeeting</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <url>var genericURL = &apos;http://www.joingotomeeting.com/fec/&apos;; 
+var meetingURL = &apos;{!G2M_Meeting__c.JoinUrl__c}&apos;; 
+var MergeURL; 
+
+if(&apos;{!G2M_Meeting__c.JoinUrl__c}&apos; != &apos;&apos;){ 
+MergeURL = meetingURL; 
+} else { 
+MergeURL = genericURL; 
+} 
+
+window.open(MergeURL);</url>
+    </webLinks>
+    <webLinks>
+        <fullName>Related_Event</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <encodingKey>UTF-8</encodingKey>
+        <height>600</height>
+        <linkType>url</linkType>
+        <masterLabel>Related Event</masterLabel>
+        <openType>noSidebar</openType>
+        <protected>false</protected>
+        <url>&quot;/&quot;{!G2M_Meeting__c.Related_Event_Id__c}</url>
+    </webLinks>
+</CustomObject>

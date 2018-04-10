@@ -1,0 +1,1320 @@
+<!--
+ * @author           Manojkumar S, Krishnakumari  Y, Nandhini A
+ * @version          1.0 
+ * @date             22-May-2017
+ -->
+<apex:page controller="ODS_DocumentUploadController" sidebar="false" showHeader="false" standardStylesheets="false" id="pg" docType="html-5.0">
+
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+        
+        <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+
+        <!-------- Bootstrap ----->
+        <link href="{!URLFOR($Resource.ODS_Assets,'css/bootstrap.css')}" rel="stylesheet" type="text/css" />
+        <script src="{!URLFOR($Resource.ODS_Assets,'js/bootstrap.js')}" type="text/javascript"></script>
+
+    
+    
+        <link href="{!URLFOR($Resource.ODS_Assets,'css/style.css')}" rel="stylesheet" type="text/css"  />
+    
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/jquery-ui.css')}"/>   
+        <script src="{!URLFOR($Resource.ODS_Assets,'js/bootstrap.js')}" type="text/javascript"></script>
+        
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/jquery-ui.css')}"/>
+        
+        <!-------- Fonts Awesome ----->
+        <link href="{!URLFOR($Resource.ODS_NewAssets,'font-awesome/css/font-awesome.css')}" rel="stylesheet" type="text/css"  />
+        <script type="text/javascript">
+        var currentView = 'L';
+            $(document).ready(function(){
+                debugger;
+            
+            
+             var IsCustomer = {!isCustomer};            
+            if(IsCustomer){
+                $("#trashButton").hide();              
+            }
+            else{
+               $("#trashButton").show();   
+            }
+            document.getElementById('{!$Component.documentForm.uploadSprintNumber}').maxLength = "4";
+            $(".secondaryPalette").css('visibility','hidden');
+            document.getElementById('pg:formId:folderLink').style.display = 'none';
+            document.getElementById('pg:formId:folderPanel').style.display = 'block';
+            $("#documents").addClass("active");
+            var AccountID = $(".ddlstAccount").val();            
+            var ServiceID = $(".ddlstService").val();  
+            ApplySearchAction(AccountID,ServiceID);
+            checkView();
+            var AccountID = $(".ddlstAccount").val();
+            var ServiceID = $(".ddlstService").val();
+            if(AccountID =="All" || ServiceID=="All"){
+                document.getElementById('pg:formId:componentPanel').style.display = 'none';
+                 $('#btnUpload').attr("disabled", true);
+                 $('#newFolderButton').attr("disabled", true);  
+                 //$('#EditButton').attr("disabled", true); 
+                 //document.getElementById('EditButton').style.display = 'block';
+
+                 //$("#EditButton").hide();               
+            }     
+            else
+            {
+                 $('#btnUpload').attr("disabled", false);
+                 $('#newFolderButton').attr("disabled", false);    
+                 //$("#EditButton").hide();                  
+            
+            }
+               
+           
+        $("#grid").addClass('ListView');
+               
+         $("#grid").click(function()
+         {
+                if($(this).hasClass('ListView'))              
+                  {
+                    $(this).removeClass('ListView');
+                    $(this).addClass('GridView');
+                    $(this).find('i').attr('class','fa fa-th');
+                    $(".list-view thead").hide();
+                    $(".acc").hide();
+                    $(".spno").hide();
+                    $(".crt-by").hide();
+                    $(".list-view tbody tr").addClass("search_box");
+                    $(".name").addClass("srh_content");
+                    $(".date").addClass("dt");
+                    $(".action").addClass("srh_overlay");
+            
+                    $(".list-view1 thead").hide();
+                    $(".list-view1 tbody tr").addClass("con-search_box");
+                    $(".con-name").addClass("con-srh_content");
+                    $(".con-folder").show();
+    
+                    $(".con-acc").addClass("con-ac");
+                    $(".con-date").addClass("con-dt");
+                    
+                    
+                }
+                
+                else
+                {
+                    $(this).removeClass('GridView');
+                    $(this).addClass('ListView');
+                    $(this).find('i').attr('class','fa fa-list');
+                    $(".list-view thead").hide();
+                    $(".acc").show();
+                    $(".spno").show();
+                    $(".crt-by").show();
+                    $(".list-view tbody tr").removeClass("search_box");
+                    $(".name").removeClass("srh_content");
+                    $(".date").removeClass("dt");
+                    $(".action").removeClass("srh_overlay");
+            
+                    $(".list-view1 thead").show();
+                    $(".list-view1 tbody tr").removeClass("con-search_box");
+                    $(".con-name").removeClass("con-srh_content");
+                    $(".con-folder").hide();
+    
+                    $(".con-acc").removeClass("con-ac");
+                    $(".con-date").removeClass("con-dt");
+                       
+                }
+           
+         });
+         
+         $( "#grid" ).mouseover(function() {
+                 
+
+         var className = $( "#grid i" )[0].className
+         if(className == 'fa fa-list')
+         {
+         $("#grid").attr("title","List View");
+             //document.getElementById('#grid').title = 'List View';
+         }
+         else
+         {   
+                  $("#grid").attr("title","Grid View");
+
+             // document.getElementById('#grid').title = 'Grid View';
+         }
+        });
+                  
+                    
+          $("#uploadFolderName").change(function () {
+            debugger;
+            var selectedValue = $(this).val();
+           // $('{!$Component.documentForm.hiddenFolderId}').val($(this).find("option:selected").attr("value"))
+            
+            document.getElementById('{!$Component.documentForm.hiddenFolderId}').value = $(this).find("option:selected").attr("value");  
+            
+        });        
+                    
+         // ON CLICK OF NEW FOLDER    
+            $("#newFolderButton").click(function() {
+               document.getElementById('{!$Component.modalForm.folderName}').value = '';
+               $("#divErrorMessageFolderName").text(''); 
+               document.getElementById('{!$Component.modalForm.folderName}').className = " "; 
+               var AccountID = $(".ddlstAccount").val();            
+               var ServiceID = $(".ddlstService").val();            
+               //ApplySearchAction(AccountID,ServiceID); 
+               $('#myModal').modal('show');
+                 HomePage();                                  
+            });
+                    
+                      // ON CLICK OF UPLOAD DOCUMENT
+           $("#btnUpload").click(function(){ 
+            $('#myDocument').modal('show');
+               $('#uploadFolderName').empty();
+              var foldername = document.getElementById('pg:formId:folderLink').innerHTML;
+               //var foldervalue = {!folder.Name};
+               //alert('Id---'+foldervalue);
+              
+               document.getElementById('{!$Component.documentForm.hiddenFolderId}').value = "";
+               document.getElementById('{!$Component.documentForm.documentId}').value = "";    
+               document.getElementById('{!$Component.documentForm.uploadDocument}').value = "ADD";
+               document.getElementById('{!$Component.documentForm.uploadDocumentName}').value = '';
+               document.getElementById('{!$Component.documentForm.uploadDocumentName}').className = " ";
+               document.getElementById('{!$Component.documentForm.uploadProjectName}').value = '';
+               document.getElementById('{!$Component.documentForm.uploadSprintNumber}').value='';
+               document.getElementById('{!$Component.documentForm.uploadDocumentType}').value = "Document Type";
+               $("#divErrorMessageFileType").text(''); 
+               $("#divErrorMessageDocumentName").text('');
+               $("#divErrorMessageFileName").text('');
+               document.getElementById('{!$Component.documentForm.uploadFile}').value = '';
+               document.getElementById('{!$Component.documentForm:editedFileName}').setAttribute("style", "display: none;");
+               document.getElementById('{!$Component.documentForm.uploadFile}').className = " ";
+               
+               var AccountID = $(".ddlstAccount").val();            
+               var ServiceID = $(".ddlstService").val();
+               var SltdFolderName = $('#FldrName').val();  
+               ApplySearchAction(AccountID,ServiceID);
+               Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.ODS_DocumentUploadController.GetFolders}',
+                             AccountID,ServiceID,
+                             function(result, event)
+                             {
+                                 var jsonResult = result;
+                                 var documentJson = jsonResult.replace(/(&quot\;)/g,"\"");
+                                 documentJson  = $.parseJSON(documentJson);
+                                 debugger;
+                                var option;
+                                 if(foldername == ''){
+                                    option = '<option value="">' + 'Root Folder' + '</option>';
+                                    for(var i=0;i<documentJson.length;i++)
+                                    {
+                                        option += '<option value="'+ documentJson[i].Id + '">' + documentJson[i].Name + '</option>';
+                                    }
+                                 }
+                                 else{
+                                    for(var i=0;i<documentJson.length;i++)
+                                    {
+                                        if(documentJson[i].Name == foldername){
+                                            option = '<option value="'+ documentJson[i].Id + '">' + documentJson[i].Name + '</option>';    
+                                            document.getElementById('{!$Component.documentForm.hiddenFolderId}').value = documentJson[i].Id;
+                                        }
+                                    }
+                                 }
+                                $('#uploadFolderName').append(option); 
+                                jsonResult = '';
+                             },
+                             {escpae:true});
+                 return false;
+              
+               });
+                        
+                //To get the Accout ID and Service ID    
+                ApplySearch();
+                
+                if(document.getElementById('filereader').className != 'hidden'){
+                    $('#dragDropId').addClass('hidden');
+                }
+           
+             });   
+             
+        // Folder Name Validation        
+        function validateFolderName()
+        {
+           var folderName = '';
+           var errorMessage= '';
+           var isValidfolder= '';
+           errorMessage ='';
+           folderName = document.getElementById('{!$Component.modalForm.folderName}').value;
+          
+           if(isInputEmpty('{!$Component.modalForm.folderName}'))
+            {
+                isValidfolder = false;
+               
+            }
+            else if(folderName != '')
+            {     
+                validateUploadFolder();
+            }
+          }
+           
+             // To Validate the Folder Name            
+            function validateUploadFolder() 
+            {
+                //debugger;
+                var folderName = document.getElementById('{!$Component.modalForm.folderName}').value;
+                var accountId = $(".ddlstAccount").val();
+                var serviceId = $(".ddlstService").val();
+                
+                $("#divErrorMessageFolderName").text('');
+                Visualforce.remoting.Manager.invokeAction(
+
+                '{!$RemoteAction.ODS_DocumentUploadController.ValidateFolderName}',
+                folderName,accountId,serviceId,
+                
+                function(result, event)
+                {
+                  if(result != '')
+                  {
+                  document.getElementById('{!$Component.modalForm.folderName}').className = "mandatoryClass"; 
+                           $("#divErrorMessageFolderName").text('{!$Label.ODS_DocumentUpload}');
+                  }
+                  else
+                  {
+                    $("#divErrorMessageFolderName").text('');                      
+                    $('#myModal').modal('hide');
+                    
+                     document.getElementById('{!$Component.modalForm.btnCreateFolderDisabled}').click();
+                  }
+               });
+      }
+      
+        var errorMessage = '';
+        var isValidFileType = true;
+        var isValidDocument = true;
+      
+       function UploadDocument()
+        {
+           document.getElementById('{!$Component.documentForm.uploadDocument}').value = "ADD";
+           document.getElementById('{!$Component.documentForm:editedFileName}').setAttribute("style", "display: none;");
+           document.getElementById('{!$Component.documentForm:editedFileName}').disabled = true;
+           document.getElementById('{!$Component.documentForm.documentId}').value = "";
+
+           resetFields();
+           return false;
+        }
+       
+      // Validate Document Details
+       function ValidateDocumentDetails()
+        {            document.getElementById('{!$Component.documentForm.uploadDocument}').disabled = true; 
+            isValidDocument = true;
+            errorMessage ='';
+            var documentName = document.getElementById('{!$Component.documentForm.uploadDocumentName}').value;
+            var documentType = document.getElementById('{!$Component.documentForm.uploadDocumentType}').value;
+            var projectName = document.getElementById('{!$Component.documentForm.uploadProjectName}').value;
+            var sprintNumber = document.getElementById('{!$Component.documentForm.uploadSprintNumber}').value;
+            var uploadFile = document.getElementById('{!$Component.documentForm.uploadFile}').value;
+            var documentId = document.getElementById('{!$Component.documentForm.documentId}').value;
+           // debugger;
+            
+            if(isInputEmpty('{!$Component.documentForm.uploadDocumentName}'))
+            {
+                isValidDocument = false;
+            }
+            if(documentId == '')
+            {
+                if(isInputEmpty('{!$Component.documentForm.uploadFile}'))
+                {
+                    isValidDocument = false;
+                }
+            }
+                if(uploadFile != '')
+                {
+                    $("#divErrorMessageFileType").text("");
+                        var validFiles = '{!$Label.ODS_DocumentExtenstion}';
+                        var splitFileExtensions = validFiles.split(',');
+                        var fileExtension = uploadFile.substr(uploadFile.lastIndexOf('.') + 1);
+                        
+                       document.getElementById('{!$Component.documentForm.fileExtension}').value = fileExtension;
+                        
+                       for(var i = 0; i < splitFileExtensions .length; i++) {
+                         
+                         if(fileExtension == splitFileExtensions[i])
+                         {
+                             isValidFileType = true;
+                             break;
+                         }
+                         else
+                         {
+                             isValidFileType = false;
+                         }
+                      }
+                     // debugger;
+                      if(isValidFileType ==false)
+                      {
+                        isValidDocument = false;
+                        document.getElementById('{!$Component.documentForm.uploadFile}').className = "mandatoryClass";                            
+                        $("#divErrorMessageFileType").text("Invalid File Type");
+                           
+                      }
+                      else
+                      {                          
+                          var fileUpload = document.getElementById('{!$Component.documentForm.uploadFile}');
+                          if (typeof (fileUpload.files) != "undefined") {
+                              if(parseFloat(fileUpload.files[0].size / 1024).toFixed(2) > 5000){
+                                  isValidDocument = false;
+                                  document.getElementById('{!$Component.documentForm.uploadFile}').className = "mandatoryClass";                            
+                                  $("#divErrorMessageFileType").text("File size greater than 5MB");
+                                  return false;
+                              }
+                              else{
+                                   $("#divErrorMessageFileType").text("");
+                              }
+                          }
+                      }
+                }
+                
+            
+           // debugger;
+           
+           if(documentName != '' || uploadFile != '')
+           {     
+                validateUploadDocument();
+           }
+           else
+           {
+                document.getElementById('{!$Component.documentForm.uploadDocument}').disabled = false;
+           }
+           return false;
+        }
+        
+        //Validate Document Name Existence
+        function validateUploadDocument() {
+           
+          var documentName = document.getElementById('{!$Component.documentForm.uploadDocumentName}').value;
+          var documentId = document.getElementById('{!$Component.documentForm.documentId}').value;
+          var accountId = $(".ddlstAccount").val();
+          var serviceId = $(".ddlstService").val();
+          
+          var fileName = document.getElementById('{!$Component.documentForm.uploadFile}').value.replace(/^.*[\\\/]/, '');
+          
+        
+          $("#divErrorMessageDocumentName").text("");
+          $("#divErrorMessageFileName").text("");
+            Visualforce.remoting.Manager.invokeAction(
+
+           '{!$RemoteAction.ODS_DocumentUploadController.ValidateUploadDocument}',
+
+            documentName, accountId, serviceId, fileName, documentId,
+
+            function(result, event){
+              var uploadFile = document.getElementById('{!$Component.documentForm.uploadFile}').value;
+                if (event.status) {
+                
+                   if(result == "" && isValidDocument ==true )
+                   {  
+                      $("#divErrorMessage").text("");
+                      document.getElementById('{!$Component.documentForm.uploadDisableButton}').click();
+                      document.getElementById('btnUploadClose').click();
+                      $("#divLoader").css("display","block");
+                      return false;
+                   }
+                   else
+                   {
+                       document.getElementById('{!$Component.documentForm.uploadDocument}').disabled = false;
+                   }                
+
+                    
+                   if(result.indexOf("File")  > -1)
+                   {  
+                       document.getElementById('{!$Component.documentForm.uploadFile}').className = "mandatoryClass"; 
+                       $("#divErrorMessageFileName").text("File Name Already Exists!");
+                   }
+                   else
+                   {
+                       $("#divErrorMessageFileName").text("");
+                   }
+                   if(result.indexOf("Document")  > -1)
+                   {  
+                     document.getElementById('{!$Component.documentForm.uploadDocumentName}').className = "mandatoryClass";                     
+                     $("#divErrorMessageDocumentName").text("Document Name Already Exist!");
+
+                   }
+                   else
+                   {                   
+                      $("#divErrorMessageDocumentName").text("");
+                   }
+                   
+                   $("#divErrorMessage").text(errorMessage);
+
+                } else if (event.type === 'exception') {
+
+                    //alert('Exception Occured');
+
+                } else {
+
+                    //alert('Exception Occured');
+
+                }
+
+            },
+
+            {escape: true}
+
+        );
+    }
+            
+        
+        
+        // Reset fields for Document Details
+        function resetFields()
+      {
+          document.getElementById('{!$Component.documentForm.uploadDocumentName}').value = "";
+          document.getElementById('{!$Component.documentForm.uploadDocumentType}').value = "Document Type";
+          document.getElementById('{!$Component.documentForm.uploadProjectName}').value = "";
+          document.getElementById('{!$Component.documentForm.uploadSprintNumber}').value = "";
+          document.getElementById('{!$Component.documentForm.uploadFile}').value = "";
+          document.getElementById('{!$Component.documentForm.editedFileName}').value = "";
+          document.getElementById('{!$Component.documentForm.attachmentId}').value = "";
+          document.getElementById('{!$Component.documentForm.documentId}').value = "";
+          $("#divErrorMessageFileType").text("");
+          $("#divErrorMessageFileName").text("");
+          $("#divErrorMessageDocumentName").text("");          
+          document.getElementById('{!$Component.documentForm.uploadDocumentName}').className = "";
+          document.getElementById('{!$Component.documentForm.uploadFile}').className = "";
+          document.getElementById('uploadFolderName').value = "";
+        }
+        
+        //Function to make control numeric only
+        function isNumberKey(evt) {
+        
+            var charCode = (evt.which) ? evt.which : event.keyCode
+            if (charCode > 31 && (charCode < 48 || charCode > 57))
+                return false;
+        
+            return true;
+        }
+          
+      
+      // Mandtory Validation
+         function isInputEmpty(inputName) 
+            {
+                var inputControl = document.getElementById(inputName).value;
+                if ($.trim(inputControl) =="") {
+                    document.getElementById(inputName).className = "mandatoryClass";
+                    return true;
+                }
+                else {
+                    document.getElementById(inputName).className = "";
+                    return false;
+                }
+           }
+           
+            //Dont Allow Special Characters
+      function blockSpecialCharacter(event){
+      var regex = new RegExp("^[0-9a-zA-Z \b]+$");
+    var key = String.fromCharCode(!event.charCode ? event.which: event.charCode);
+    if (!regex.test(key)) 
+    {
+        event.preventDefault();
+        return false;
+    } 
+}
+         
+        //Download functionality for Document Details
+        function DownloadDocument(attachmentId)
+        {
+          //debugger;
+          var base_url = window.location.origin;
+          if (!window.location.origin) {
+             base_url  = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+            }         
+          var win = window.open(base_url +'/servlet/servlet.FileDownload?file='+attachmentId, '_blank');
+          win.focus();
+        }
+      
+      // Edit functionality for Document Details
+      
+      function EditDocumentUpload(documentId)
+      {
+        $('#myDocument').modal('show');
+        $('#uploadFolderName').empty();
+        document.getElementById('{!$Component.documentForm.hiddenFolderId}').value = "";
+
+        var AccountId = $(".ddlstAccount").val(); 
+        var ServiceID = $(".ddlstService").val();
+        
+        document.getElementById('{!$Component.documentForm.uploadDocument}').value = "UPDATE";
+        document.getElementById('{!$Component.documentForm:editedFileName}').setAttribute("style", "display: block;");
+        document.getElementById('{!$Component.documentForm:editedFileName}').disabled = true;
+
+        $("#divErrorMessageFileType").text("");
+        $("#divErrorMessageDocumentName").text("");
+        $("#divErrorMessageFileName").text("");
+        
+        
+        
+        resetFields();
+        Visualforce.remoting.Manager.invokeAction(
+
+            '{!$RemoteAction.ODS_DocumentUploadController.GetDocumentAttachment}',
+
+            documentId,AccountId,ServiceID,
+
+            function(result, event){
+            debugger;
+            var jsonResult = result.split('$$##');
+                      
+            var documentJson = jsonResult[0].replace(/(&quot\;)/g,"\"");
+            documentJson  = $.parseJSON(documentJson);  
+            
+            var attachmentJson = jsonResult[1].replace(/(&quot\;)/g,"\"");
+            attachmentJson = $.parseJSON(attachmentJson);  
+            
+            var folderNames = jsonResult[2].replace(/(&quot\;)/g,"\"");
+            folderNames = $.parseJSON(folderNames );  
+             
+            var option = '<option value="">' + 'Root Folder' + '</option>';
+            for(var i=0;i<folderNames.length;i++)
+            {
+                option += '<option value="'+ folderNames[i].Id + '">' + folderNames[i].Name + '</option>';
+            }
+            $('#uploadFolderName').append(option); 
+            
+             
+             if (event.status) 
+             {
+              
+  
+              document.getElementById('{!$Component.documentForm.uploadDocumentName}').value = documentJson.Name;
+              document.getElementById('{!$Component.documentForm.uploadDocumentType}').value = documentJson.Document_Type__c;
+              //alert(documentJson.FolderId__c);
+              //document.getElementById('uploadFolderName').value = documentJson.FolderId__c;
+              
+              if(jQuery.type(documentJson.FolderId__c) !== "undefined")
+              {
+                  document.getElementById('uploadFolderName').value = documentJson.FolderId__c;
+                  document.getElementById('{!$Component.documentForm.hiddenFolderId}').value = documentJson.FolderId__c;
+              }
+              
+              if(jQuery.type(documentJson.SprintNumber__c) !== "undefined"){
+                  document.getElementById('{!$Component.documentForm.uploadSprintNumber}').value = documentJson.SprintNumber__c;
+              }
+              
+              if(jQuery.type(documentJson.Project_Name__c) !== "undefined"){
+                  document.getElementById('{!$Component.documentForm.uploadProjectName}').value = documentJson.Project_Name__c;
+              }
+          
+          var fullFileName = attachmentJson.Name;//split('_').pop();
+          debugger;
+          
+          document.getElementById('{!$Component.documentForm.editedFileName}').value = fullFileName;
+          document.getElementById('{!$Component.documentForm.documentId}').value = documentJson.Id;
+          document.getElementById('{!$Component.documentForm:editedFileName}').setAttribute("style", "display: block;");
+          document.getElementById('{!$Component.documentForm:editedFileName}').disabled = true;
+
+                } else if (event.type === 'exception') {
+
+                    //alert('Exception Occured');
+
+                } else {
+
+                    //alert('Exception Occured');
+
+                }
+
+            },
+
+            {escape: true}
+
+        );
+      }
+       function DeleteDocumentValidate(documentId, createdById, documentName)
+      {   
+        console.log('DeleteDocumentValidate--' + documentId); 
+        //alert(documentId, createdById);      
+        debugger;
+        Visualforce.remoting.Manager.invokeAction(
+
+            '{!$RemoteAction.ODS_DocumentUploadController.CheckValidUserDocumentDelete}',
+
+            documentId, createdById,
+
+            function(result, event){
+                            debugger;
+
+                if (event.status) {
+                    
+                    if(result =="false")
+                    {
+                        alert('Sorry, you dont have permission to delete this document.');
+                    }
+                    else
+                    {
+                        var result = confirm("Are you sure want to delete this " + documentName + ' document');
+                        if (result) {
+                               console.log('confirm --' +documentId);
+                               DeleteDocumentUpload(documentId);
+                        }
+                    }
+                    
+                } else if (event.type === 'exception') {
+
+                    //alert('Exception Occured');
+
+                } else {
+
+                    //alert('Exception Occured');
+
+                }
+
+            },
+
+            {escape: true}
+
+        );
+      }
+       function DeleteDocumentUpload(documentId)
+       {       
+           var UniqueDocumentId = documentId;    
+           console.log('Action Function--' +UniqueDocumentId );
+           DeleteDocument(UniqueDocumentId);
+           //window.location.reload();
+       }
+       function DeleteDocumentCompleted()
+       {
+           //alert('DeleteDocumentCompleted');
+           ApplySearch();
+           
+       }
+       
+       function checkView()
+       {
+            if($(this).hasClass('ListView'))              
+                  {
+                    $(this).removeClass('ListView');
+                    $(this).addClass('GridView');
+                    $(this).find('i').attr('class','fa fa-th');
+                    $(".list-view thead").hide();
+                    $(".acc").hide();
+                    $(".spno").hide();
+                    $(".crt-by").hide();
+                    $(".list-view tbody tr").addClass("search_box");
+                    $(".name").addClass("srh_content");
+                    $(".date").addClass("dt");
+                    $(".action").addClass("srh_overlay");
+            
+                    $(".list-view1 thead").hide();
+                    $(".list-view1 tbody tr").addClass("con-search_box");
+                    $(".con-name").addClass("con-srh_content");
+                    $(".con-folder").show();
+    
+                    $(".con-acc").addClass("con-ac");
+                    $(".con-date").addClass("con-dt");
+                    
+                    
+                }
+                
+                else
+                {
+                    $(this).removeClass('GridView');
+                    $(this).addClass('ListView');
+                    $(this).find('i').attr('class','fa fa-list');
+                    $(".list-view thead").hide();
+                    $(".acc").show();
+                    $(".spno").show();
+                    $(".crt-by").show();
+                    $(".list-view tbody tr").removeClass("search_box");
+                    $(".name").removeClass("srh_content");
+                    $(".date").removeClass("dt");
+                    $(".action").removeClass("srh_overlay");
+            
+                    $(".list-view1 thead").show();
+                    $(".list-view1 tbody tr").removeClass("con-search_box");
+                    $(".con-name").removeClass("con-srh_content");
+                    $(".con-folder").hide();
+    
+                    $(".con-acc").removeClass("con-ac");
+                    $(".con-date").removeClass("con-dt");
+                       
+                }        
+
+       }
+       
+       
+       function updateSearchView()
+       {
+           
+            var className = $( "#grid i" )[0].className;
+            
+            if(className == 'fa fa-list')              
+              {
+                    $(this).removeClass('GridView');
+                    $(this).addClass('ListView');
+                    $(this).find('i').attr('class','fa fa-list');
+                    $(".list-view thead").hide();
+                    $(".acc").show();
+                    $(".spno").show();
+                    $(".crt-by").show();
+                    $(".list-view tbody tr").removeClass("search_box");
+                    $(".name").removeClass("srh_content");
+                    $(".date").removeClass("dt");
+                    $(".action").removeClass("srh_overlay");
+            
+                    $(".list-view1 thead").show();
+                    $(".list-view1 tbody tr").removeClass("con-search_box");
+                    $(".con-name").removeClass("con-srh_content");
+                    $(".con-folder").hide();
+    
+                    $(".con-acc").removeClass("con-ac");
+                    $(".con-date").removeClass("con-dt");                  
+                    
+                }
+                
+                else
+                {
+                    $(this).removeClass('ListView');
+                    $(this).addClass('GridView');
+                    $(this).find('i').attr('class','fa fa-th');
+                    $(".list-view thead").hide();
+                    $(".acc").hide();
+                    $(".spno").hide();
+                    $(".crt-by").hide();
+                    $(".list-view tbody tr").addClass("search_box");
+                    $(".name").addClass("srh_content");
+                    $(".date").addClass("dt");
+                    $(".action").addClass("srh_overlay");
+            
+                    $(".list-view1 thead").hide();
+                    $(".list-view1 tbody tr").addClass("con-search_box");
+                    $(".con-name").addClass("con-srh_content");
+                    $(".con-folder").show();
+    
+                    $(".con-acc").addClass("con-ac");
+                    $(".con-date").addClass("con-dt");
+
+                    
+                    
+                       
+                }        
+
+       }
+
+      
+            //To get the Accout ID and Service ID
+            function ApplySearch(){
+                var AccountID = $(".ddlstAccount").val();
+                var ServiceID = $(".ddlstService").val();   
+                if(AccountID =="All" || ServiceID=="All"){
+                debugger;
+                    document.getElementById('pg:formId:componentPanel').style.display = 'none';
+                    $('#btnUpload').attr("disabled", true);
+                    $('#newFolderButton').attr("disabled", true); 
+                    //$('#EditButton').attr("disabled", true);
+                   //document.getElementById('EditButton').style.display = 'none';
+                   //$("#EditButton").hide();  
+                                       
+                }     
+                else
+                {
+                     $('#btnUpload').attr("disabled", false);
+                     $('#newFolderButton').attr("disabled", false);                    
+
+                }
+                
+          document.getElementById('{!$Component.documentForm.txtAccountServiceId}').value = AccountID+ ',' + ServiceID;
+              
+              
+                ApplySearchAction(AccountID,ServiceID);
+                $(".secondaryPalette").css('visibility','hidden');
+                document.getElementById('pg:formId:folderLink').style.display = 'none';
+                document.getElementById('pg:formId:folderPanel').style.display = 'block';
+            
+            }
+            
+            function validateComponentPanel(){
+            
+                var AccountID = $(".ddlstAccount").val();
+                var ServiceID = $(".ddlstService").val();   
+                if(AccountID =="All" || ServiceID=="All"){
+                    document.getElementById('pg:formId:componentPanel').style.display = 'none';
+                } 
+            }
+            
+        </script>  
+    <script>
+        window.onload = function() {
+          
+            document.getElementById('pg:formId:folderLink').style.display = 'none';
+            $(".advnc_search input[type=text]").css("width","22% !important");
+        };
+    </script>
+    
+    <script>
+        function ShowRelatedDocuments(folderID,folderName){
+            $(".list-view").hide();
+            $(".page-nav-bg").hide();
+            $("[id$='folderPanel']").hide();
+             $('#newFolderButton').attr("disabled", true); 
+        
+            ShowFolderRelatedDocuments(folderID,folderName);  
+            //alert(document.getElementById('pg:formId:pb2').value)
+            //alert('hi');
+        }
+        function HomePage(){
+            
+             $(".secondaryPalette").css('visibility','hidden');
+
+            document.getElementById('pg:formId:folderLink').style.display = 'none';
+            document.getElementById('pg:formId:folderPanel').style.display = 'block';
+            $('#newFolderButton').attr("disabled", false); 
+            folderID='';
+             document.getElementById('documentName').value = '';
+                        document.getElementById('date_service').value = '';
+
+            document.getElementById('date_service1').value = '';
+            GoToHome(folderID);
+            
+             var FromDate = '';
+            var ToDate = '';
+            var FolderOrDocumentName = '';
+            var IsSearch = false;
+            
+            GetSearchResultsFromAjax(FromDate, ToDate, FolderOrDocumentName, IsSearch);
+        }
+        
+        function updateView()
+        {
+                  
+            var className = $('#grid i').attr('class');
+            
+            if(className == 'fa fa-th')
+            {    
+                    $(this).removeClass('ListView');
+                    $(this).addClass('GridView');
+                    $(this).find('i').attr('class','fa fa-th');
+                    $(".list-view thead").hide();
+                    $(".acc").hide();
+                    $(".spno").hide();
+                    $(".crt-by").hide();
+                    $(".list-view tbody tr").addClass("search_box");
+                    $(".name").addClass("srh_content");
+                    $(".date").addClass("dt");
+                    $(".action").addClass("srh_overlay");
+            
+                    $(".list-view1 thead").hide();
+                    $(".list-view1 tbody tr").addClass("con-search_box");
+                    $(".con-name").addClass("con-srh_content");
+                    $(".con-folder").show();
+    
+                    $(".con-acc").addClass("con-ac");
+                    $(".con-date").addClass("con-dt");
+                  }
+        }
+        
+        function clearEdit(){
+        debugger;
+            var AccountID = $(".ddlstAccount").val();
+            var ServiceID = $(".ddlstService").val();   
+            if(AccountID =="All" || ServiceID=="All"){
+                $('.edit').hide();
+            }
+        }
+        
+        function fnShowOrHideSearchPanel(){
+        // $('#grid i').toggleClass('fa-th fa-list');
+        $("#grid").addClass('ListView');
+          $('.advnc_search').slideToggle('fast');
+            $('#newFolderButton').attr("disabled", false); 
+            return false;
+        }
+        
+        function fnSearchDocument(){
+            var FromDate = $('.tfrom_date').val();
+            var ToDate = $('.tto_date').val();
+            var FolderOrDocumentName = $('.documentNameClass').val();
+            var IsSearch = true;
+            GetSearchResultsFromAjax(FromDate, ToDate, FolderOrDocumentName, IsSearch);
+            $("[id$='folderLink']").hide();
+        }  
+        function redirectTrashPage()
+        {
+            RedirectTrashPage();
+        
+        }
+              
+    </script>
+   
+    <style>
+    .folderNameClass{
+        cursor:pointer;
+    }
+    .mandatoryClass{
+        border-color:red !important;
+    }
+     .hideClass{
+        display:none;
+    }
+    .fontColor{
+        color: #337ab7 !important;
+    }
+    .upload {
+        width: 100% !important;
+        float: left !important;
+        padding: 50% 0 !important;
+        text-align: center !important;
+        background: #f5f5f5 !important;
+    }
+    .va-top {
+        vertical-align: top !important;
+    }
+    .btn-white {
+        background: #fff !important;
+        padding: 5px 10px !important;
+        display: inline-block !important;
+        font-size: 12px !important;
+        text-transform: uppercase !important;
+        border: 1px solid #ccc !important;
+    }
+        
+    .document-search input[type="text"]{    width: 28%;}
+    .con-srh_content{    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;}
+    .mainTitle{font-size:23px}
+    .upload{border: 1px solid #dadada;
+    box-shadow: 0px 0px 3px #dadada;}
+    .con-folder{cursor:pointer;}
+    </style>     
+    <title>ON DEMAND SERVICES </title>
+    </head>
+    
+    <apex:form id="formId">
+        <body>
+            <div class="shadow-show"></div>   
+            <c:ODS_HeaderComponent />
+         <!--   <div id="divLoader" style="display:none;">
+                <div class="popupBackground" />
+                <div class="PopupPanel">
+                    <table border="0" width="100%" height="100%">
+                        <tr>
+                            <td align="center"><b>Please Wait</b></td>
+                        </tr>
+                        <tr>
+                            <td align="center"><img src="{!$Resource.ODS_Statussign}"/></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>-->
+            
+            <apex:actionStatus id="statusSearch" stopText="">
+                <apex:facet name="start">
+                    <div>
+                        <div class="popupBackground" />
+                        <div class="PopupPanel">
+                            <table border="0" width="100%" height="100%">
+                                <tr>
+                                    <td align="center"><b>Please Wait</b></td>
+                                </tr>
+                                <tr>
+                                    <td align="center"><img src="{!$Resource.ODS_Statussign}"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </apex:facet>
+            </apex:actionStatus>
+      </body>
+        
+        <div class="mid-bg">
+            <div class="sub-warp dashboard_cus">
+                <div class="col-md-12 col-sm-12 col-xs-12 border-bottom">
+                    <div class="btn-group btn-breadcrumb mt10 hidden-xs">
+                        <apex:outputLink styleclass="btn btn-default" id="homeLink"  title="Home" onclick="HomePage(); return false;"><i class="fa fa-home" aria-hidden="true"></i></apex:outputLink>
+                        
+                        <apex:outputLink styleclass="btn btn-default" style="height: 34px;font-size: 19px;" id="folderLink" >{!SelectedFolderName}</apex:outputLink>   
+                        
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 pull-right mt10 mb10 right-align">
+                        <a href="#" class="list1 toggleButton" title="Grid View" id="grid"><i class="fa fa-th" aria-hidden="true"></i></a>
+                        <button type="submit" onClick = "redirectTrashPage(); return false;" class="btn btn-white xs-btn va-top" id="trashButton"><i class="fa fa-trash-o" aria-hidden="true"></i> <span>Trash </span></button>
+                         <!-- Search logic -->
+                        <button id="search" type="button" class="search btn btn-grey xs-btn va-top" onclick="fnShowOrHideSearchPanel(); return false;" ><i class="fa fa-search" aria-hidden="true" ></i> <span>Search</span></button>
+            
+             <a href="#" id="newFolderButton" html-data-toggle="modal" html-data-target="#myModal" class="btn btn-blue xs-btn va-top"><i class="fa fa-plus" aria-hidden="true"></i> <span>New folder</span></a>
+            <a href="javascript:void(0);" id="btnUpload" html-data-toggle="modal" html-data-target="#myDocument" class="btn btn-blue xs-btn va-top" ><span>Upload Document </span></a>
+                    <apex:actionFunction action="{!RedirectToTrash}" name="RedirectTrashPage"/>      
+                    </div><!--end col-md-6-->
+                </div>
+                <div class="clr"></div>
+                <div class="col-md-12 mt10">
+                    <div class="row">
+                        <div class="col-md-9 col-sm-8 col-xs-12 p0">
+                            <!--<apex:outputPanel id="searchPanel">-->
+                                
+                                <div class="advnc_search document-search" style="display:none;">
+                                    <div>
+                              
+                                    <input type="text" name="documentName" class="documentNameClass" placeholder="Folder/Document Name" maxlength ="80" id="documentName" autocomplete = "off" />                                
+        
+                                      <input type="text" name="txt_from" class="tfrom_date" placeholder="From Date" id="date_service" onkeypress="return isNumber(event)" autocomplete = "off"/>  
+                            
+                                      <input type="text" name="txt_to" class="tto_date" placeholder="To Date" id="date_service1" onkeypress="return isNumber(event)" autocomplete = "off" />                                
+                                                                        
+                                                                        
+                                    <input type="button" onclick="fnSearchDocument();"  value="Search" oncomplete="validateComponentPanel(); checkView();" style="background: #4bc9f4;float: left;padding: 7px 20px;color: #fff;font-weight: bold;border-radius: 5px;border: navajowhite;margin-top: 7px;margin-left: 15px;"/>
+                                    </div>  
+                                </div>  
+                           <!-- </apex:outputPanel>-->
+                            <apex:outputPanel id="folderPanel">
+                            <apex:pageBlock id="pb1" title="Folders">
+                                <apex:outputText value="No Folders Available" style="font-family: initial;font-size: x-large;color: lightcoral;margin-left: 315px;" rendered="{!(Folders.size==0)}"/>
+                                <apex:pageBlockTable value="{!Folders}" var="folder" styleclass="table list-view1" rendered="{!(Folders.size>0)}">
+                             <!--     <apex:column headerValue="name" styleclass="con-folder" >
+                                 <apex:image url="{!URLFOR($Resource.ODS_NewAssets,'images/folder.png')}" ondblclick="ShowRelatedDocuments('{!folder.ID}','{!folder.Name}'); return false;"  styleClass="" ></apex:image>
+                              </apex:column>
+                                <apex:column headerValue="Name" value="{!folder.name}" styleClass="folderNameClass con-name"  ondblclick="ShowRelatedDocuments('{!folder.ID}','{!folder.Name}'); return false;"></apex:column>
+                                <apex:column headerValue="Created By" value="{!folder.CreatedBy.name}" styleclass="con-acc"/>
+                                <apex:column headerValue="Created Date" value="{!folder.CreatedDate}" styleclass="con-date"/>
+                                -->
+                                    <apex:column headerValue="name" styleclass="con-folder" >
+                                        <apex:image url="{!URLFOR($Resource.ODS_Assets,'images/Folder.png')}" ondblclick="ShowRelatedDocuments('{!folder.ID}','{!folder.Name}'); return false;"  styleClass="" ></apex:image>
+                                    </apex:column>
+                                    <apex:column headerValue="Name" value="{!folder.name}" styleClass="folderNameClass con-name"  ondblclick="ShowRelatedDocuments('{!folder.ID}','{!folder.Name}'); return false;">
+                                        <apex:facet name="header">
+                                            <apex:commandLink action="{!FetchFolders}" reRender="pb1" value="Name{!IF(sortExpression=='Name',IF(sortDirection='ASC','▼','▲'),'')}">
+                                                <apex:param value="Name" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                            </apex:commandLink>
+                                        </apex:facet>
+                                    </apex:column>
+                                    <apex:column headerValue="Created By" value="{!folder.CreatedBy.name}" styleclass="con-acc">
+                                        <apex:facet name="header">
+                                            <apex:commandLink action="{!FetchFolders}" reRender="pb1" value="Created By{!IF(sortExpression=='CreatedBy.name',IF(sortDirection='ASC','▼','▲'),'')}">
+                                                <apex:param value="CreatedBy.name" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                            </apex:commandLink>
+                                        </apex:facet>
+                                    </apex:column>
+                                    <apex:column headerValue="Created Date" value="{!folder.CreatedDate}" styleclass="con-date">
+                                        <apex:facet name="header">
+                                            <apex:commandLink action="{!FetchFolders}" reRender="pb1" value="Created Date{!IF(sortExpression=='CreatedDate',IF(sortDirection='ASC','▼','▲'),'')}">
+                                                <apex:param value="CreatedDate" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                            </apex:commandLink>
+                                        </apex:facet>
+                                    </apex:column>
+                                </apex:pageBlockTable>   
+                            </apex:pageBlock>
+                            </apex:outputPanel>
+                            <apex:outputPanel id="documentPanel" >
+                            <apex:pageBlock id="pb2" title="Documents">
+                                <apex:outputText value="No Documents Available" style="font-family: initial;font-size: x-large;color: lightcoral;margin-left: 315px;" rendered="{!(Documents.size==0)}"/>
+                                <apex:pageBlockTable value="{!Documents}" id="documentGrid" var="doc" styleclass="table list-view fontColor" first="{!CurrentPage }" rows="{!PageSize}" rendered="{!(Documents.size>0)}">
+                           <!--     <apex:column headerValue="Name" styleclass="name" >
+                                 <apex:outputText value="{!doc.Image_URL__c}" escape="false" styleClass="icon-f" ></apex:outputText>
+                               <p>{!doc.Name}</p>
+                               
+                                </apex:column>
+                               
+                                <apex:column value="{!doc.CreatedDate}" headerValue="Date"  styleclass="date"/>
+                                <apex:column value="{!doc.account__r.name}" headerValue="Account"  styleclass="acc"/>
+                                <apex:column value="{!doc.SprintNumber__c}" headerValue="Sp.No."  styleclass="spno"/> 
+
+                                <apex:column value="{!doc.CreatedBy.name}" headerValue="Created By"  styleclass="crt-by"/> -->
+                                    <apex:column headerValue="Name" styleclass="name" >
+                                 <apex:outputText value="{!doc.Image_URL__c}" escape="false" styleClass="icon-f" ></apex:outputText>
+                               <p>{!doc.Name}</p>
+                               <apex:facet name="header">
+                                            <apex:commandLink action="{!FetchDocuments}" reRender="pb2" value="Name{!IF(sortExpression1=='Name',IF(sortDirection='ASC','▼','▲'),'')}">
+                                                <apex:param value="Name" name="column" assignTo="{!sortExpression1}" ></apex:param>
+                                            </apex:commandLink>
+                                        </apex:facet>
+                                </apex:column>
+                                    <!--  <apex:column headerValue="Name" styleclass="name" >
+<apex:outputText value="{!doc.Image_URL__c}" escape="false" styleClass="icon-f" ></apex:outputText>
+<p>{!doc.Name}</p>
+
+</apex:column> -->
+                                    
+                                    <apex:column value="{!doc.CreatedDate}" headerValue="Date"  styleclass="date">
+                                        <apex:facet name="header">
+                                            <apex:commandLink action="{!FetchDocuments}" reRender="pb2" value="Date{!IF(sortExpression1=='CreatedDate',IF(sortDirection='ASC','▼','▲'),'')}">
+                                                <apex:param value="CreatedDate" name="column" assignTo="{!sortExpression1}" ></apex:param>
+                                            </apex:commandLink>
+                                        </apex:facet>
+                                    </apex:column>
+                                    <apex:column value="{!doc.account__r.name}" headerValue="Account"  styleclass="acc">
+                                        <apex:facet name="header">
+                                            <apex:commandLink action="{!FetchDocuments}" reRender="pb2" value="Account{!IF(sortExpression1=='account__r.name',IF(sortDirection='ASC','▼','▲'),'')}">
+                                                <apex:param value="account__r.name" name="column" assignTo="{!sortExpression1}" ></apex:param>
+                                            </apex:commandLink>
+                                        </apex:facet>
+                                    </apex:column>
+                                    <apex:column value="{!doc.SprintNumber__c}" headerValue="Sp.No."  styleclass="spno">
+                                        <apex:facet name="header">
+                                            <apex:commandLink action="{!FetchDocuments}" reRender="pb2" value="Sp.No.{!IF(sortExpression1=='SprintNumber__c',IF(sortDirection='ASC','▼','▲'),'')}">
+                                                <apex:param value="SprintNumber__c" name="column" assignTo="{!sortExpression1}" ></apex:param>
+                                            </apex:commandLink>
+                                        </apex:facet>
+                                    </apex:column>
+                                    
+                                    <apex:column value="{!doc.CreatedBy.name}" headerValue="Created By"  styleclass="crt-by">
+                                        <apex:facet name="header">
+                                            <apex:commandLink action="{!FetchDocuments}" reRender="pb2" value="Created By{!IF(sortExpression=='CreatedBy.name',IF(sortDirection='ASC','▼','▲'),'')}">
+                                                <apex:param value="CreatedBy.name" name="column" assignTo="{!sortExpression1}" ></apex:param>
+                                            </apex:commandLink> 
+                                        </apex:facet>
+                                    </apex:column>
+                                    
+                                    <apex:column headervalue="Action" styleClass="action" >
+                                          <a href="#" class="download" onClick="DownloadDocument('{!doc.Attachment_Id__c}'); return false;" ><i class="fa fa-download" aria-hidden="true"></i></a>
+                                          <a href="#" id="EditButton" class="edit" html-data-toggle="modal" html-data-target="#myDocument" onClick="EditDocumentUpload('{!doc.Id}'); return false;" ><i class="fa fa-pencil-square" aria-hidden="true"></i></a>
+                                          <a href="#" class="delete"  onClick="DeleteDocumentValidate('{!doc.Id}', '{!doc.CreatedById}', '{!doc.Name}'); return false;"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                                    </apex:column>
+                                    
+                                </apex:pageBlockTable>
+                        
+                              <apex:outputPanel styleClass="page-nav-bg" id="paginationPanel" rendered="{!Documents.size>0}"> 
+                                    <apex:commandButton value="First" action="{!showFirst}" disabled="{!!ShowPrevious}" oncomplete="updateSearchView();clearEdit();" rerender="documentPanel" styleClass="save-submit page-nav-btn first-nav-btn"/>
+                                    <apex:commandButton value="Previous" action="{!showPrevious}" disabled="{!!ShowPrevious}" oncomplete="updateSearchView();clearEdit();" rerender="documentPanel" styleClass="save-submit page-nav-btn previous-nav-btn"/>
+                                    <apex:outputText value="{!CurrentPageInfo}" />
+                                    <apex:commandButton value="Next" action="{!showNext}" disabled="{!!ShowNext}" oncomplete="updateSearchView();clearEdit();" rerender="documentPanel" styleClass="save-submit page-nav-btn next-nav-btn"/>
+                                    <apex:commandButton value="Last" action="{!showLast}" disabled="{!!ShowNext}" oncomplete="updateSearchView();clearEdit();" rerender="documentPanel" styleClass="save-submit page-nav-btn last-nav-btn"/>       
+                                </apex:outputPanel> 
+                                  
+                            </apex:pageBlock>
+                            
+                            </apex:outputPanel>                                                            
+                        </div>
+                        <apex:outputPanel id="componentPanel">
+                        <div class="col-md-3 col-sm-4 col-xs-12" >
+                            <div class="upload" id="documentUploadDiv">
+                                <c:ODS_DragDropFileUploadComponent DragDropHeight="100px" AccountServiceId="{!AccountServiceID}" DocumentSuffix="{!DocumentSuffix}" FolderId="{!SelectedFolderID}" AccountID="{!AccountID}" id="comp" />
+                            </div>
+                        </div>
+                        </apex:outputPanel>
+                    </div>
+                </div>
+            </div><!--end sub-wrap-->
+        </div><!--end mid-bg-->
+         <apex:actionFunction name="RefreshTheDocuments" action="{!FetchDocuments}" reRender="documentPanel,componentPanel" oncomplete="updateSearchView();"/>
+        <apex:actionFunction name="ShowFolderRelatedDocuments" action="{!FetchDocuments}" reRender="documentPanel,componentPanel,folderLink" status="statusSaveTrip" oncomplete="validateComponentPanel(); updateView(); clearEdit(); return false;">
+            <apex:param name="folderID" value="" assignTo="{!SelectedFolderID}"/>
+            <apex:param name="folderName" value="" assignTo="{!SelectedFolderName}"/>
+            <!--<apex:param name = "" value="false" assignTo="{!ShowFolder}"/>
+            <apex:param name = "" value="true" assignTo="{!ShowDocument}"/>-->
+        </apex:actionFunction>
+        <apex:actionFunction name="GoToHome" action="{!FetchDocuments}" reRender="folderPanel,documentPanel" oncomplete="updateview();">
+            <apex:param name="folderID" value="" assignTo="{!SelectedFolderID}"/>
+        </apex:actionFunction>
+              <apex:actionFunction name="ApplySearchAction" status="statusSaveTrip" action="{!GetStatusReportByAccountServiceID}" oncomplete="validateComponentPanel(); updateView(); clearEdit();return false;" immediate="True" rerender="folderlink,searchPanel,folderPanel,documentPanel,componentPanel,pb1">
+                <apex:param name="SelectedAccountId" value="" assignTo="{!AccountId}"/>
+                <apex:param name="SelectedServiceID" value="" assignTo="{!ServiceID}"/>
+        </apex:actionFunction> 
+        <apex:actionFunction name="GetSearchResultsFromAjax" action="{!GetSearchResults}" reRender="folderPanel,documentPanel" status="statusSaveTrip" oncomplete="updateSearchView();clearEdit();">
+               <apex:param name="FromDt" value="" assignTo="{!FromDate}"/>
+                <apex:param name="ToDt" value="" assignTo="{!ToDate}"/>
+                <apex:param name="DocName" value="" assignTo="{!FolderOrDocumentName}"/>
+                <apex:param name="IsSrch" value="" assignTo="{!IsSearch}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="ShowOrHideSearch" action="{!ShowOrHideSearchPanel}" reRender="searchPanel,folderPanel,documentPanel,,folderLink" status="statusSaveTrip" oncomplete="validateComponentPanel(); return false;">
+        </apex:actionFunction>
+         <apex:actionFunction name="DeleteDocument" action="{!DeleteDocument}" oncomplete="DeleteDocumentCompleted();" reRender="CustomerPanel,listPanel,PanelId,SearchResultsPanel,searchPanelId,outPnlCustGrid" status="statusSaveTrip">
+               <apex:param name="DocumentId" value="" assignTo="{!UniqueDocumentId }"/>              
+     </apex:actionFunction>   
+        
+    </apex:form>  
+
+    <!--Pop up for New Folder-->
+    <apex:form id="modalForm" >
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+          <!-- Modal content-->
+         <div class="modal-content">
+                <h1>Create New Folder</h1>
+               <div style="text-align:center;color:red;" id="divErrorMessageFolderName"></div>
+    
+               <div class="clr"></div>
+              <div class="popup-btn">
+              <apex:actionRegion >
+            <apex:inputField value="{!Folder.Name}" styleClass="hideClass" id="folderName" onKeypress="return blockSpecialCharacter(event)" html-placeholder="Folder Name"/>   
+               
+            <div class="clr"></div>
+     <div class="popup-btn">  
+     </div>
+        <button type="button" class="btn btn-default" id="btnUploadClose" data-dismiss="modal">CLOSE</button>
+        <apex:commandbutton styleClass="popup-add" value="Create" id="createFolder"  onClick="validateFolderName(); return false;" /> 
+        <apex:commandbutton style="display:none;"  id="btnCreateFolderDisabled" action="{!CreateFolder}"  /> 
+         </apex:actionRegion> 
+        </div>  
+        </div>
+        </div>
+      </div>
+    </apex:form> 
+    
+    <!--Pop up for Document Upload-->
+<apex:form id="documentForm" >
+<div class="modal fade" id="myDocument" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+     <div class="modal-content">
+            <h1>Upload Document</h1>
+            <div style="text-align:center;color:red;" id="divErrorMessageFileType"></div>
+           <div style="text-align:center;color:red;" id="divErrorMessageDocumentName"></div>
+           <div style="text-align:center;color:red;" id="divErrorMessageFileName"></div>
+           <div style="text-align:center;color:red;" id="divErrorMessage"></div>
+
+            <apex:actionRegion >
+              <apex:inputField value="{!DocumentsUpload.Attachment_Id__c}" styleClass="hideClass" id="attachmentId" />   
+               <apex:inputField value="{!DocumentsUpload.File_Extension__c}" styleClass="hideClass" id="fileExtension" />  
+                             
+               <apex:inputField value="{!DocumentsUpload.AccountServiceId__c}" styleClass="hideClass" id="txtAccountServiceId" />      
+
+               <apex:inputField value="{!DocumentsUpload.DocumentId__c}"   styleClass="hideClass"  id="documentId" />      
+             <apex:inputfield value="{!DocumentsUpload.Name }" id="uploadDocumentName"  onKeypress="return blockSpecialCharacter(event)" html-placeholder="Document Name"/>               
+        <apex:selectList size="1" id="uploadDocumentType"  value="{!DocumentsUpload.Document_Type__c }" styleClass="drop-doc"  >
+            <apex:selectOptions value="{!DocumentTypeOptions}"></apex:selectOptions>
+        </apex:selectList>
+        
+        <select id="uploadFolderName" Class="drop-doc" html-placeholder="Folder Name">
+        <option value="">Folder Name</option>
+        </select>
+                 
+        <apex:inputField value="{!DocumentsUpload.Project_Name__c }" id="uploadProjectName" onkeypress="return blockSpecialCharacter(event)" html-placeholder="Project Name"/>
+        <apex:inputField value="{!DocumentsUpload.SprintNumber__c }"  onkeypress="return isNumberKey(event)"  id="uploadSprintNumber" html-placeholder="Sprint Number"/>           
+        <apex:inputFile value="{!blobBody}"  id="uploadFile" filename="{!filename}" title="Max file size is 5MB"/>         
+        <apex:inputField value="{!DocumentsUpload.Attachment_Id__c}"  style="disabled:true;"  id="editedFileName" /> 
+        <input type="hidden" id="FldrName" value="{!SelectedFolderName}"/>
+        <div style="display:none;">
+
+        <apex:inputText value="{!FolderId}"  id="hiddenFolderId" />
+         </div>
+
+
+             <div class="clr"></div> 
+             <div class="popup-btn">
+             <apex:commandbutton styleClass="popup-add" value="ADD" id="uploadDocument"  onClick="ValidateDocumentDetails(); return false;" />
+             <apex:commandbutton id="uploadDisableButton" style="display:none;" status="statusSearch" action="{!UploadDocument}"/>
+ 
+             <apex:commandbutton styleClass="popup-cancel" value="RESET" onClick="resetFields();return false;"/>
+             <button type="button" class="btn btn-default" id="btnUploadClose" data-dismiss="modal">CLOSE</button>
+             </div>
+             </apex:actionRegion> 
+         </div>  
+     </div>
+    </div>
+    <c:ODS_FooterComponent />
+
+  </apex:form>
+
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+ 
+    <script type="text/javascript">//<![CDATA[
+    $(function() {
+        $( "#date_service, #date_service1" ).datepicker({
+            dateFormat : 'mm/dd/yy',
+            changeMonth : true,
+            changeYear : true,
+            yearRange: '-100y:c+nn',
+            maxDate: '0d'
+        });
+        $("#date_service, #date_service1").bind('paste',function(e){
+            e.preventDefault();  //disable paste in datePicker
+        });
+    });
+    </script>
+   
+</apex:page>

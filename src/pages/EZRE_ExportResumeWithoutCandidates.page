@@ -1,0 +1,7 @@
+<apex:page Controller="EZRE_CandidateResumeReports" contentType="text/csv#ResumeWithoutCandidates.csv">
+"Id","Title","Candidate","Created Date"
+ <apex:repeat value="{!lstContent}" var="con">
+ {!con.Id},{!con.Title},{!con.Candidate_ID__c},{!con.CreatedDate}
+ </apex:repeat>
+
+ </apex:page>

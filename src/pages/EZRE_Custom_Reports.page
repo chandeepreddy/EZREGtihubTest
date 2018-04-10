@@ -1,0 +1,112 @@
+<apex:page controller="EZRE_CustomReportsTabController"  >
+    <style>
+        body{margin:0; padding:0;}
+        .sec-bg{ background:#efefef; width:90%; margin-left:30px;   float:left; margin-top:35px; border:1px solid #1797c0; border-top:None;}
+        .sec-bg h1{background:#1797c0; padding:15px 21px; font:normal 16px Arial, Helvetica, sans-serif; color:#fff; margin:0px; width: 96%; float: left; padding: 1.5% 2%; }
+        .sec-bg .sec-bg-left{ background:#fff; border:1px solid #87a7b1; width:96%; float:left;     margin: 10px 2% 10px 2%;     position: relative;}
+        .sec-bg .sec-bg-left h2{background:#256275 url("{!URLFOR($Resource.EZRE_CssImages, '/arrow.png')}") right center no-repeat; font:normal 14px Arial, Helvetica, sans-serif; color:#fff; margin:0; padding:10px; text-align:center;   height: auto;
+            bottom: 0; width:150px;
+            position: absolute;
+            top: 0;}
+        .sec-bg .sec-bg-left .right-part{       margin-left: 150px;
+            float: left;
+            margin-bottom: 20px;
+        }
+        
+        .sec-bg .sec-bg-left h2 span{     display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+            width: 150px;
+            top: 42%;
+            height: 100%;
+            position: absolute;}
+        .sec-bg .sec-bg-left a{ width:270px; margin:20px 0 0 52px; font:normal 14px Arial, Helvetica, sans-serif; color:#000; background:url("{!URLFOR($Resource.EZRE_CssImages, '/btn-bg.png')}") repeat-x bottom;  float: left; padding:5px 0 5px 5px; border:1px solid #cacaca;  border-radius:5px; }
+        .sec-bg .sec-bg-left a:hover{background:#f2f2f2;}
+        .sec-bg .sec-bg-left a img{float:left;}
+        .sec-bg .sec-bg-left a span{float:left; padding: 7px 0 0 7px;}
+        .sec-bg .sec-bg-left p{ text-align:center; margin:26px 0 27px 0; font:normal 16px Arial, Helvetica, sans-serif; color:#9a9a9a;  padding:5px 0 5px 5px; }
+    </style>
+    <script type="text/javascript">
+        function reqStatusRport(){
+            reqStatus();
+        }
+        function isrSumryRport(){
+            IsrSumy();
+        }
+        function candResumeRport(){
+            candResume();
+        }
+        function isrDailyCalLstRport(){
+            isrDailyCalLst();
+        }
+        function isrDailyCntCalLstRport(){
+            isrDailyCntCalLst();
+        }
+        
+    </script>
+    <apex:form >
+        <apex:actionFunction name="reqStatus" action="{!redirecttoReqStatusReport}"/>
+        <apex:actionFunction name="IsrSumy" action="{!redirecttoISRSummaryReport}"/>
+        <apex:actionFunction name="candResume" action="{!redirecttoCandidateResumeReport}"/>
+        <apex:actionFunction name="isrDailyCalLst" action="{!redirecttoDailyCallList}"/>
+        <apex:actionFunction name="isrDailyCntCalLst" action="{!redirecttoDailyCntCallList}"/>
+    <body>
+        <div class="sec-bg">
+           <h1>Custom Reports</h1>
+            <div class="sec-bg-left">
+                <h2>
+              <span>EZRE</span>
+                </h2>
+                <div class="right-part">
+                    <a href="#" onclick="reqStatusRport();" ><img src="{!URLFOR($Resource.EZRE_CssImages, '/icon-1.png')}" alt="image" /> 
+                    <span>Requirement Status Report</span></a>
+                    <a href="#" onclick="candResumeRport();" ><img src="{!URLFOR($Resource.EZRE_CssImages, '/icon-1.png')}" alt="image"  />
+                    <span>Candidates Resume Report</span></a>
+                </div>
+            </div>
+            <div class="sec-bg-left">
+                <h2>
+              <span>Inside Sales </span>
+                </h2>
+                <div class="right-part">
+                    <a href="#" onclick="isrSumryRport();" ><img src="{!URLFOR($Resource.EZRE_CssImages, '/icon-1.png')}" alt="image"  />
+                    <span>ISR Summary Report</span></a>
+                </div>
+            </div>
+          
+        </div>
+        <div class="sec-bg">
+            <h1>Custom Pages</h1>
+            <!-- <div class="sec-bg-left">
+                <h2>
+              <span>EZRE</span>
+                </h2>
+                <div class="right-part">
+                    <a href="#" onclick="candResumeRport();" ><img src="{!URLFOR($Resource.EZRE_CssImages, '/icon-1.png')}" alt="image"  />
+                    <span>Candidates Resume Report</span></a>
+                </div>
+            </div> -->
+            <!--<div class="sec-bg-left">
+                <h2>
+              <span>Inside Sales </span>
+                </h2>
+                <div class="right-part">
+                    <a href="#" onclick="isrDailyCalLstRport();"><img src="{!URLFOR($Resource.EZRE_CssImages, '/icon-1.png')}" alt="image"  />
+                    <span>ISR Daily Call List</span></a>
+                </div>
+            </div>-->
+            <div class="sec-bg-left">
+                <h2>
+              <span>Inside Sales </span>
+                </h2>
+                <div class="right-part">
+                    <a href="#" onclick="isrDailyCntCalLstRport();"><img src="{!URLFOR($Resource.EZRE_CssImages, '/icon-1.png')}" alt="image"  />
+                    <span>ISR Daily Call List</span></a>
+                </div>
+            </div>
+          
+        </div>
+        
+    </body>
+    </apex:form>
+</apex:page>

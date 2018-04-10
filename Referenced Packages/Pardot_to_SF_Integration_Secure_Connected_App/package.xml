@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Pardot_to_SF_Integration_Secure_Connected_App</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <namespacePrefix>b2bma</namespacePrefix>
+    <types>
+        <members>Pardot_to_SF_Integration_Secure_Connected_App</members>
+        <name>Application</name>
+    </types>
+    <version>36.0</version>
+</Package>

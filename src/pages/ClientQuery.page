@@ -1,0 +1,137 @@
+<apex:page controller="ODS_ClientQueryController" sidebar="false" showHeader="false" standardStylesheets="false">
+
+<apex:form >
+<body>
+<script>
+$(document).ready(function(){
+ $("#ClientQuery").addClass("active");
+    $("button.collapsed").click(function(){
+        $(".header").toggleClass("header-fixed");
+        $(".navbar-toggle").toggleClass("nav-btn-fixed");
+        $(".mid-bg").toggleClass("mid-bg-fixed");
+    });
+    //Search popup
+    $('.tsearch').click(function(){
+        $('.advnc_search').slideToggle('fast');
+        $('#date_service').val('');
+        $('#date_service1').val('');
+    }); 
+    ApplySearch();
+});
+function ApplySearch(){
+     var AccountID = $(".ddlstAccount").val();
+     var ServiceID = $(".ddlstService").val();
+          
+     ApplySearchAction(AccountID,ServiceID)
+ }
+ function fnSearchQuery(){
+    var FromDate = $('.tfrom_date').val();
+    var ToDate = $('.tto_date').val();
+    
+    GetSearchResultsFromAjax(FromDate,ToDate);
+ }
+//function to restrict numbers in datepicker
+function isNumber(evt) {
+    evt = (evt) ? evt : window.event;
+    var charCode = (evt.which) ? evt.which : evt.keyCode;
+    if (!(charCode > 31 && (charCode < 48 || charCode > 57) && charCode ==91 )) {
+        return false;
+    }
+    return true;
+}
+</script>
+   <c:ODS_HeaderComponent />
+ <apex:actionStatus id="statusSearch" stopText="">
+    <apex:facet name="start">
+    <div>
+        <div class="popupBackground" />
+        <div class="PopupPanel">
+            <table border="0" width="100%" height="100%">
+                <tr>
+                    <td align="center"><b>Please Wait</b></td>
+                </tr>
+                <tr>
+                    <td align="center"><img src="{!$Resource.ODS_Statussign}"/></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    </apex:facet>
+ </apex:actionStatus>  
+    <apex:actionFunction name="GetSearchResultsFromAjax" action="{!GetQueriesByUserId}" reRender="pgblckClientQueryGrid" status="statusSearch">
+       <apex:param name="FromDt" value="" assignTo="{!FromDate}"/>
+        <apex:param name="ToDt" value="" assignTo="{!ToDate}"/>
+    </apex:actionFunction>
+ 
+ <div class="mid-bg">
+    <div class="sub-warp">  
+        <div class="top_srch">
+            <h1><!-- Client Query --></h1>
+            <div class="tsearch">Search<i class="fa fa-search" aria-hidden="true"></i></div>
+            <div class="advnc_search">
+                <div>
+                    <input type="text" name="txt_from" class="tfrom_date" placeholder="From Date" id="date_service" onkeypress="return isNumber(event)" autocomplete = "off"/>
+                    <input type="text" name="txt_to" class="tto_date" placeholder="To Date" id="date_service1" onkeypress="return isNumber(event)" autocomplete = "off"/>
+                    <input type="button" onclick="return fnSearchQuery();"  value="Search" style="background: #4ECAF4;float: left;padding: 5px 20px;color: #fff;font-weight: bold;border-radius: 5px;border: navajowhite;margin-top: 10px;margin-left: 15px;"/>
+                </div>
+            </div>
+        </div>
+       <apex:outputPanel id="ClientQueryPanel" >   
+        <div class="mid-white">
+           <div class="timeline-scroll">
+              <apex:actionFunction name="ApplySearchAction" action="{!GetCustomerByAccountServiceID}" status="statusSearch" reRender="pgblckClientQueryGrid">
+                  <apex:param name="SelectedAccountId" value="" assignTo="{!AccountId}"/>
+                  <apex:param name="SelectedServiceID" value="" assignTo="{!ServiceID}"/>
+              </apex:actionFunction>
+               <apex:pageBlock id="pgblckClientQueryGrid" rendered="{!NOT(ISNULL(queryLst ))}">
+                   <apex:outputPanel id="noSearchRec" rendered="{!(queryLst.size==0 && queryLst !=null ) }">
+                        <strong><center>No Records Found.</center></strong>
+                   </apex:outputPanel>
+                   
+                   <apex:outputPanel id="searchPanelId">
+                       <apex:pageBlockTable StyleClass="timeline" Style="cellpadding:0; cellspacing:0; width:100%;"
+                               value="{!queryLst}" var="rec" first="{!CurrentPage }" rows="{!PageSize}"
+                               rendered="{!(queryLst.size !=0 && queryLst  !='' && queryLst  !=null ) }" >                                               
+                            <apex:column headerValue="CUSTOMER NAME" value="{!rec.Account_Name__r.Name}" style="text-align:left;"/>
+                            <apex:column headerValue="SERVICE OPTED" value="{!rec.Service_Name__r.Name__c}" style="text-align:left;"/>
+                            <apex:column headerValue="QUERY" value="{!rec.Queries__c}" style="text-align:left;"/>
+                            <apex:column headerValue="QUERY DATE" value="{!rec.Query_Date__c}" style="text-align:left;"/>                                        
+                       </apex:pageBlockTable>
+                   </apex:outputPanel>
+                   <apex:outputPanel styleClass="page-nav-bg" rendered="{!(queryLst.size!=0 && queryLst  !='' && queryLst  !=null)}" >
+                        <center>
+                            <apex:commandButton value="First" action="{!showFirst}" disabled="{!!ShowPrevious}" rerender="pgblckClientQueryGrid" styleClass="save-submit page-nav-btn first-nav-btn"/>
+                            <apex:commandButton value="Previous" action="{!showPrevious}" disabled="{!!ShowPrevious}" rerender="pgblckClientQueryGrid" styleClass="save-submit page-nav-btn previous-nav-btn"/>
+                            <apex:outputText value="{!CurrentPageInfo}" />
+                            <apex:commandButton value="Next" action="{!showNext}" disabled="{!!ShowNext}" rerender="pgblckClientQueryGrid" styleClass="save-submit page-nav-btn next-nav-btn"/>
+                            <apex:commandButton value="Last" action="{!showLast}" disabled="{!!ShowNext}" rerender="pgblckClientQueryGrid" styleClass="save-submit page-nav-btn last-nav-btn"/> 
+                        </center> 
+                </apex:outputPanel>
+                </apex:pageBlock>                       
+               </div>
+        </div>
+        </apex:outputPanel>
+    </div>
+</div>
+
+</body>
+</apex:form>
+<c:ODS_FooterComponent />
+<apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'js/jquery-1.4.4.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'js/jquery-ui.js')}"/>
+<script type="text/javascript">
+$(function() {
+    $( "#date_service, #date_service1" ).datepicker({
+        dateFormat : 'mm/dd/yy',
+        changeMonth : true,
+        changeYear : true,
+        yearRange: '-100y:c+nn',
+        maxDate: '0d'
+    });
+    $('#date_service, #date_service1').bind('paste',function(e) { 
+     e.preventDefault(); //disable paste in datePicker
+    });
+});
+
+</script> 
+</apex:page>

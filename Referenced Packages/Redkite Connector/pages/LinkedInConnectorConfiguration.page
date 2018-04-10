@@ -1,0 +1,102 @@
+<apex:page controller="RK_LinkedIn.LinkedInConfigurationController"
+			id="pLinkedInConfiguration"
+			title="{!$Label.rk_linkedin__Config_PageTitle}"
+			tabStyle="LinkedIn_Connector__tab">
+	<apex:form id="fLinkedInConfig">
+	
+	<style>
+	/*
+	** For faux required fields
+	*/
+	td.data2Col
+	{
+		background-image: url( {!URLFOR($Resource.RK_LinkedIn__RequiredFieldRed)} );
+		background-repeat: no-repeat;
+		background-position: 9px 4px;	
+	}
+	td.data2Col input
+	{
+		margin-left:3px;
+	}
+	</style>
+		
+	<apex:sectionHeader title="{!$Label.rk_linkedin__Config_SectionHeader_Title}"
+						subtitle="{!$Label.rk_linkedin__Config_SectionHeader_Subtitle}"
+						description="{!$Label.rk_linkedin__Config_SectionHeader_Description}"/>	
+			
+	<a href="http://www.redkitetechnologies.com" 
+		target="_blank"
+		style="float:right;width:228px;padding-right:200px;padding-top:7px;">
+			<img src="{!URLFOR($Resource.LinkedInConnectorResources,'image/poweredbyredkite001_white_228x40.png')}"/>
+	</a>
+	
+	<ul>
+		<li><a href="http://redkitetechnologies.com/products/inforce-connector" 
+				title="{!$Label.Config_Link_Overview_Title}"
+				target="_blank">{!$Label.Config_Link_Overview_Label}</a></li>
+		<li><a href="http://redkitetechnologies.com/products/inforce-connector/deployment-guide" 
+				title="{!$Label.Config_Link_DeploymentGuide_Title}"
+				target="_blank">{!$Label.Config_Link_DeploymentGuide_Label}</a></li>
+		<li><a href="http://redkitetechnologies.com/products/inforce-connector/frequently-asked-questions" 
+				title="{!$Label.Config_Link_FAQ_Title}"
+				target="_blank">{!$Label.Config_Link_FAQ_Label}</a></li>
+	</ul>
+	<apex:outputText escape="false" value="{!$Label.rk_linkedin__Config_Link_Footer}"/>
+	
+	<apex:pageMessages id="messages" />
+	
+	<apex:pageBlock id="pbLinkedInConnectorConfiguration" 
+					mode="edit"
+					title="{!$Label.rk_linkedin__Config_Settings_Title}"
+					rendered="{!isAdminUser}">
+					
+		<apex:pageBlockButtons location="top">
+			<apex:commandButton value="{!$Label.rk_linkedin__Config_Settings_Button_ReEnterApiKeys}"
+								rendered="{!NOT(showApiKeyFields)}"
+								action="{!reenterApiKeys}" 
+						 		reRender="pbLinkedInConnectorConfiguration,messages"
+						 		immediate="true"/>
+
+			<apex:commandButton value="{!$Label.rk_linkedin__Config_Settings_Button_Save}" rendered="{!showApiKeyFields}" action="{!save}" />
+			<apex:commandButton value="{!$Label.rk_linkedin__Config_Settings_Button_Cancel}" rendered="{!showApiKeyFields}" action="{!cancel}" /> 
+		</apex:pageBlockButtons>
+		
+		
+		<apex:outputPanel id="configFields" layout="none" rendered="{!showApiKeyFields}">
+			<apex:outputPanel id="apiKeyFields" layout="none" >
+				
+				<apex:pageBlockSection id="pbsLinkedInConnectorApiKeys"
+								columns="1"
+								title="{!$Label.rk_linkedin__Config_Settings_APIKeys_Title}"
+								collapsible="false">
+				
+					<apex:pageBlockSectionItem id="pbsiApiKey"
+							helpText="{!$Label.rk_linkedin__Config_Settings_APIKeys_PubKey_Helptext}">
+						<apex:outputLabel value="{!$Label.rk_linkedin__Config_Settings_APIKeys_PubKey_Label}" for="itLinkedInApiKeyInput" />
+						<apex:inputText id="itLinkedInApiKeyInput" 
+										value="{!linkedInApiKeyInput}"/>  
+					</apex:pageBlockSectionItem>
+					
+					<apex:pageBlockSectionItem id="pbsiSecretKey"
+							helpText="{!$Label.rk_linkedin__Config_Settings_APIKeys_SecretKey_Helptext}">
+						<apex:outputLabel value="{!$Label.rk_linkedin__Config_Settings_APIKeys_SecretKey_Label}" for="itLinkedInSecretKeyInput" />
+						<apex:inputText id="itLinkedInSecretKeyInput" 
+										value="{!linkedInSecretKeyInput}"/>  
+					</apex:pageBlockSectionItem>
+				</apex:pageBlockSection>
+			</apex:outputPanel>
+		</apex:outputPanel>
+	</apex:pageBlock>
+	
+	<apex:outputPanel id="nonAdminMessage" rendered="{!NOT(isAdminUser)}">
+		<apex:outputPanel id="nonAdminMessageKeysSet" rendered="{!areApiKeysSet}">
+			<p>{!$Label.rk_linkedin__Config_Nonadmin_ChangeConfig}</p>
+		</apex:outputPanel>
+		<apex:outputPanel id="nonAdminMessageKeysNotSet" rendered="{!NOT(areApiKeysSet)}">
+			<p>{!$Label.rk_linkedin__Config_Nonadmin_InitialConfig}</p>
+		</apex:outputPanel>
+	</apex:outputPanel>
+	
+	</apex:form>		
+
+</apex:page>

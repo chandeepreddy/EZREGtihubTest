@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML><HEAD>
+
+
+
+<TITLE>Jigsaw Basic Search</TITLE>
+
+
+<script language="javascript" src="https://www.salesforce.com/services/lib/ajax/beta3.3/sforceclient.js?browser=true" type="text/javascript"></script>
+		<script id="clientEventHandlersJS" language="javascript">
+<!-- 
+function initPage() {
+	sforceClient.registerInitCallback(setup);
+	sforceClient.setLoginUrl("https://www.salesforce.com/services/Soap/u/6.0");
+	sforceClient.init("{!API.Session_ID}", "{!API.Partner_Server_URL_60}", true);
+}
+
+//Use this function as the entry point for your DHTML and JAVASCRIPT processing
+function setup() {
+}
+
+//-->
+</script>
+<STYLE type=text/css media=all>
+body#splashBody {
+  font-family: arial, helvetica, verdana, sans-serif;
+  font-size: 80%;
+  margin: 0;
+  padding: 0;
+  width: 97%;
+}
+img {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+p {
+  margin: 0;
+  padding: 0;
+}
+h1.appName {
+  font-weight: bold;
+  font-size: 100%;
+  color: #FFF;
+  background-color: #006699;
+  padding: 10px 0 10px 8px;
+  margin: 0 0 15px 0;
+}
+h2 {
+  color: #FFF;
+  padding: 2px 0 2px 8px;
+  margin-top: 0;
+  background-color: #006699;
+  font-size: 90%;
+}
+h2.exchangeTitle {
+  background-color: #006699;
+}
+#splash {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+#splash td {
+  margin: 0;
+  padding: 0;
+}
+#splash #splashLeft {
+  vertical-align: top;
+  background-color: #E8E8E8;
+  border-bottom: 2px solid #999;
+}
+#splash #splashCenter {
+  display:block;
+  width: 15px;
+  background-color: #FFF;
+}
+#splash #splashRight {
+  vertical-align: top;
+  background-color: #E8E8E8;
+  border-bottom: 2px solid #999;
+}
+#splash #splashLeft .about, #splash #splashLeft .exchange {
+  width: 100%;
+}
+#splash #splashRight .exchange p {
+  font-size: 90%;
+  color: #333;
+  margin: 0 10px 12px 10px;
+  line-height: 1.4em;
+}
+#splash #splashLeft .about p {
+  font-size: 90%;
+  color: #333;
+  margin: 0 10px 12px 15px;
+  line-height: 1.4em;
+}
+#splash #splashLeft .about fieldset {
+  color: #333;
+  margin: 0 15px 10px 15px;
+  padding: 2px;
+}
+#splash #splashLeft .about fieldset ul {
+  padding: 0;
+  margin: .3em 0 .3em 2em;
+}
+#splash #splashLeft .about fieldset li {
+  padding: 0;
+  margin: 0;
+}
+#splash #splashLeft .about legend {
+  font-size: 90%;
+  color: #333;
+  font-weight: bold;
+}
+.imgDiv {
+  text-align: center;
+  padding: 0 0 10px 0; 
+}
+
+span.page-textChar
+	{}
+</STYLE>
+<!--  Do not edit this section above -->
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY id=splashBody>
+<H1 class=appName>Jigsaw Search</H1>
+<BR/>
+<table>
+
+<tr>
+
+<td>&nbsp;&nbsp;&nbsp;&nbsp;
+</td>
+
+<td>
+
+<table border=1 width="70%" bordercolor="#006699" cellpadding="0" cellspacing="0" bgcolor="E8E8E8">
+  		<tr>
+  		<td><form onsubmit="return validateForm(this)" name="BasicSearchForm" action="https://www.jigsaw.com/SFL.xhtml" target="jswin" >
+                            		    <input type="hidden" name="sfsession" value="{!API.Session_ID}"/>
+					          		    <input type="hidden" name="sfserver" value="{!API.Partner_Server_URL_60}"/>
+					          		    <input type="hidden" name="sfuserid" value="{!User.Id}"/>
+					          		    <input type="hidden" name="sfusername" value="{!User.Username}"/>
+					<input type="hidden" name="sfOpCode" value=""/>
+           		    <input type="hidden" name="opCode" value="search"/>
+        		    <input type="hidden" name="name" value=""/>
+					<input type="hidden" name="country" value=""/>
+
+        		    <input type="hidden" name="cnName" value=""/>
+        		    <input type="hidden" name="cnTitle" value=""/>
+					<input type="hidden" name="cnCountry" value=""/>
+
+        			<div style="margin:14px;margin-bottom:12px;">
+        			<span style="font-weight:bold;font-size:15px;">Search Jigsaw</span>
+        			&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+        			<a href="https://www.jigsaw.com/SFL.xhtml?opCode=searchAdv&sfsession={!API.Session_ID}&sfserver={!API.Partner_Server_URL_60}&sfuserid={!User.Id}&sfusername={!User.Username}" target="jswin">Advanced Search</a>
+        			  
+        			<table border=0 cellpadding=0 cellspacing=0 width="500" style="backgrround-color:#ffffff;margin-bottom:4px;margin-top:2px;">
+        			   
+        			    <tr valign="middle">
+        			    <td width="220">
+        			        <input type="text" name="searchValue" style="font-size:15px;width:230px;" maxlength=128/>
+        			    </td><td width="250">&nbsp;&nbsp;<select style="font-size:15px;width:210px;" name="searchType">
+        			            <option value="name">by Company Name / Ticker
+        			            <option value="cnTitle">Contact Title
+        			            <option value="cnName">Contact Last Name
+        			        </select>
+        			    </td>
+        			    <td width="220" halign="left">
+        			        &nbsp;&nbsp;<input align="top" type="submit"/>
+        			    </td>
+        			</tr>
+        			
+        			
+        			</table>
+        			</div>
+        			
+        			</form></td>
+  		</tr>
+  		
+  		
+  		</table>
+</td>
+</tr>
+</table>  		
+  		<BR/><br/>
+
+     
+     <script>
+     
+    function trimJ(str)
+	{
+   return str.replace(/^\s*|\s*$/g,"");
+	}
+     
+     
+     function validateForm (form) {
+  		var typeJ = form.searchType.value;
+    	var valJ = form.searchValue.value;
+    	if ((valJ == null) )
+        return false;
+       if ((trimJ(valJ) == ""))
+       return false;
+    
+    form.name.value = "";
+    form.cnName.value = "";
+    form.cnTitle.value = "";
+    form.sfOpCode.value = "";
+    	
+    	if (typeJ == "name") {
+        	form.name.value = valJ;
+        	form.sfOpCode.value = "name";
+    	} else if (typeJ == "cnTitle") {
+            form.cnTitle.value = valJ;
+            form.sfOpCode.value = "title";
+    	} else {
+        	form.cnName.value = valJ;
+        	form.sfOpCode.value = "cnName";
+   		} 
+    	return true;
+	}
+     </script>
+     </BODY></HTML>

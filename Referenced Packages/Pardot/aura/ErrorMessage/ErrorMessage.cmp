@@ -1,0 +1,39 @@
+<aura:component description="ErrorMessage" access="public">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="title" type="String" access="public"/>
+    <aura:attribute name="severity" type="String" access="public" default="error"/>
+    <aura:attribute name="message" type="String" access="public"/>
+    <aura:attribute name="icon" type="Aura.Component" access="public"/>
+    <aura:attribute name="showUnlinkedAccountMessage" type="Boolean" access="public"/>
+    <aura:attribute name="showPardotApiTimeoutMessage" type="Boolean" access="public"/>
+    
+    <ui:message aura:id="messageContainer" title="{!v.title}" severity="{!v.severity}">
+        <div class="slds-grid">
+            <div class="slds-col">{!v.icon}</div>
+            <div class="slds-col">
+                <aura:if isTrue="{!v.showUnlinkedAccountMessage}">
+                    <div class="slds-m-bottom--x-small">
+                        <b>Unlinked Account</b><br />
+                        You must link your Pardot and Salesforce account to view this content.
+                    </div>
+                    <div>
+                        <b>Error Details</b><br />
+                        Pardot login failed. Make sure your Salesforce user is <a href="http://help.pardot.com/customer/portal/articles/2127367-mapping-salesforce-and-pardot-usernames-and-single-sign-on#Setting+your+salesforce.com+Pardot+Single+Sign-on" target="_blank">mapped to a user in your Pardot account</a>. Contact your Pardot admin or <a href="http://help.pardot.com/customer/portal/articles/2133457" target="_blank">Pardot Support</a> for more help.
+                    </div>
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{!v.showPardotApiTimeoutMessage}">
+                            <div>
+                                We're having trouble connecting. Please check your connection and try refreshing the page.
+                            </div>
+                            <aura:set attribute="else">
+                                <ui:outputText value="{!v.message}" />
+                            </aura:set>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+            </div>
+        </div>
+
+    </ui:message>
+</aura:component>

@@ -1,0 +1,75 @@
+<apex:page standardController="Account" extensions="pi.MicroCampaignStdCtrl,pi.AccessPardotController" sidebar="false" action="{!init}">
+
+<apex:slds ></apex:slds>
+<apex:stylesheet value="{!URLFOR($Resource.pi__MicroCampaign, 'css/main.css')}"></apex:stylesheet>
+<div class="slds-scope slds-text-body--regular">
+  <div id="modal_container"></div>
+  <div id="toast_message_container" class="toast-message-container"></div>
+  <div id="engage_email_container"></div>
+</div>
+<apex:includeLightning ></apex:includeLightning>
+<apex:includeScript value="{!URLFOR($Resource.pi__MarketingActions, 'js/jquery-2.1.1.min.js')}"></apex:includeScript>
+<apex:includeScript value="{!URLFOR($Resource.pi__jquery_ui_1_11_1_custom_has_dialog, 'jquery-ui.min.js')}"></apex:includeScript>
+<apex:includeScript value="{!URLFOR($Resource.pi__ckeditorSalesReach, 'ckeditor/ckeditor.js')}"></apex:includeScript>
+<script type="text/javascript">
+  window.SLDS_assetsPath = '{!URLFOR($Asset.SLDS, "assets")}';
+  window.NamespacePrefix = '{!JSENCODE(namespace)}';
+  window.SyncedProspectType = '{!JSENCODE(standardControllerType)}';
+  window.userFullName = '{!JSENCODE($User.FirstName)} {!JSENCODE($User.LastName)}';
+  window.userId = '{!JSENCODE($User.Id)}';
+  window.userEmail = '{!JSENCODE($User.Email)}';
+  window.recipients = [];
+  window.emailTemplates = [];
+  window.returnUrl = '{!JSENCODE(returnUrl)}';
+  window.invalidObjectType = '{!IF(invalidObjectTypeError, "true", "false")}';
+  window.userHasInsufficientAccess = '{!IF(userHasInsufficientAccess, "true", "false")}';
+  window.TemplateLockingEnabled = {!IF(hasTemplateLockingEnabled, "true", "false")};
+  window.soboEnabled = {!IF(soboEnabled, "true", "false")};
+  window.UiUpdatesPdfUrl = '{!URLFOR($Resource.MicroCampaign, 'pdf/Engage_Editor_Updates.pdf')}';
+  window.unsubscribeFooterThreshold = '{!JSENCODE(unsubscribeFooterThreshold)}';
+  window.sendOnBehalfOf = {
+  	leadOwner: false,
+  	contactOwner: false,
+  	accountOwner: false
+  }
+  
+  <apex:repeat value="{!chunksOfEmailTemplates}" var="chunkOfEmailTemplates">
+  	<apex:repeat value="{!chunkOfEmailTemplates.templates}" var="emailTemplate">
+  		emailTemplates.push({
+  			id: '{!emailTemplate.id}',
+  			name: "{!JSENCODE(HTMLENCODE(emailTemplate.name))}"
+  		});
+  	</apex:repeat>
+  </apex:repeat>
+  
+  <apex:repeat value="{!recipients}" var="recipient">
+  	recipients.push({
+  		id: '{!JSENCODE(recipient.id)}',
+  		name: "{!JSENCODE(recipient.name)}",
+  		email: "{!JSENCODE(recipient.email)}",
+  		canReceiveEmails: {!IF(recipient.canReceiveEmails, "true", "false")},
+  		isDuplicateEmail: {!IF(recipient.isDuplicateEmail, "true", "false")},
+  		accountHasEmailBlocked: {!IF(recipient.accountHasEmailBlocked, "true", "false")},
+  		isPersonAccount: {!IF(recipient.isPersonAccount, "true", "false")}
+  	});
+  </apex:repeat>
+  
+</script>
+<apex:includeScript value="{!URLFOR($Resource.pi__MicroCampaign, 'js/micro_campaign_main.js')}"></apex:includeScript>
+<script type="text/javascript">
+	window.PardotBaseUrl = '{!pardotBaseUrl}';
+	window.SendEmailActionLocation = '{!$RemoteAction.MicroCampaignStdCtrl.sendMicrocampaignV2}';
+	window.GetRemainingPardotEmailSendsActionLocation = '{!$RemoteAction.MicroCampaignStdCtrl.getRemainingPardotEmailSends}';
+	window.GetPardotVariableTags = '{!$RemoteAction.MicroCampaignStdCtrl.getPardotVariableTags}';
+	window.PopulatePardotMergeTags = '{!$RemoteAction.MicroCampaignStdCtrl.populatePardotMergeTagsV3}';
+	window.TemplateHtmlActionLocation = '{!$RemoteAction.MicroCampaignStdCtrl.getEmailTemplate}';
+	window.determineIfRecipientsCanSoboActionLocation = '{!$RemoteAction.MicroCampaignStdCtrl.determineIfRecipientsCanSobo}';
+    window.determineIfOwnersExistsInPardotLocation = '{!$RemoteAction.MicroCampaignStdCtrl.determineIfOwnersExistsInPardotV2}';
+	window.getUsersActionLocation = '{!$RemoteAction.MicroCampaignStdCtrl.getUsers}';
+	window.sendOnBehalfOfAbilities = {
+		contactOwner: {!IF(userCanSoboByEdit, "true", "false")} || {!IF(userCanSoboByAccountTeam, "true", "false")},
+		accountOwner: {!IF(userCanSoboByEdit, "true", "false")} || {!IF(userCanSoboByAccountTeam, "true", "false")},
+		leadOwner: false
+	}
+</script>
+</apex:page>

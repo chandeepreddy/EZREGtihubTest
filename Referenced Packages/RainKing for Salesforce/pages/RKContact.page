@@ -1,0 +1,309 @@
+<apex:page standardController="Contact" extensions="rkpi2.ContactControllerExtension">
+	<head>
+		<c:rkPluginStyles />
+	</head>
+
+<!-- 	<apex:pageMessages /> -->
+
+	<apex:outputPanel id="refresh" rendered="true">
+	 <apex:outputPanel id="refresh1" rendered="{!refreshPage}">
+	  <script>
+		window.top.location='/{!contactId}';
+ 	  </script> 
+	 </apex:outputPanel>
+	</apex:outputPanel>
+	
+	<apex:form >
+	<br />
+	
+	<apex:actionFunction name="doToggleVisibilityFlag" action="{!toggleRkDisplayFlag}" rerender="refresh" status="myStatus"/>
+	<apex:actionFunction name="doToggleRetrievalFlag" action="{!resetRetrievalFlag}" rerender="refresh" status="myStatus"/>
+	<apex:actionFunction name="doUnlinkContact" action="{!performUnlinkContact}" rerender="refresh" status="myStatus"/>
+	<apex:actionFunction name="doUnlinkCompany" action="{!performUnlinkCompany}" rerender="refresh" status="myStatus"/>
+	<apex:actionFunction name="doResearchNow" action="{!performResearchNow}" rerender="rnStatusBox" status="rnStatusBox"/>
+	
+	<input type="hidden" name="researchNowTextMain" id="researchNowTextMain" />
+	
+	<div class="main">
+	<apex:pageBlock title="">
+			<apex:tabPanel rendered="{!NOT(ISNULL(rk)) && status['id'] == '1'}" switchType="client" selectedTab="tabdetails" id="myTabPanel" inactiveTabClass="inactiveTab">
+				<apex:tab label="RainKing Contact" name="RkContact" id="RkContact" onTabEnter="hideActionPanels()">
+					<apex:outputPanel rendered="{!status['showContactlist'] == '0'}">
+						<c:tabContactContent rk="{!rk}" 
+							renderTechs="{!techs.size}" 
+							teks="{!techs}" 
+							renderRanks="{!ranks.size}"
+							ranks="{!ranks}"
+							renderGroups="{!contactGroups.size}"
+							contactGroups="{!contactGroups}"
+							renderDirectReports="{!directReports.size}"
+							directReports="{!directReports}"
+							renderWorkhistory="{!workhistory.size}"
+							workhistory="{!workhistory}"
+							renderEducation="{!education.size}"
+							education="{!education}"
+							teaser="{!status['description']=='Teaser'}"
+							user="{!sfUser}" />  
+					</apex:outputPanel>	
+					
+					<apex:outputPanel id="lookupContact" styleClass="lookupContact" layout="block" rendered="{!status['showContactlist'] == '1'}">
+
+							<div class="content">
+								<b>RainKing Contact's for {!rk['companyName']}</b>
+								<br />
+								The following Contacts are available in RainKing.  To link one to your Contact, just click on it.
+								<br /><br />
+								<apex:actionStatus id="linkStatus2"  startText=" (updating...)"  stopText=""/>
+								<br />
+								<div class="tblHeader">
+									<div class="tblHeaderCell" style="width:30%;">&nbsp;Contact</div>
+									<div class="tblHeaderCell" style="width:49%;">Title</div>
+									<div class="tblHeaderCell" style="width:10%;">Location</div>
+								</div>
+								<div class="contentScrolling" style="background-color:#ffffff;border:1px solid #c0c0c0;height:400px;padding-left:0px;padding-right:0px;width:95%;">
+									<apex:dataTable value="{!contactList}" var="t" style="width:100%;background-color:#ffde48">
+										<apex:column style="padding:5px 5px 5px 5px;width:30%" rendered="{!t['lastName']==Contact.LastName}">
+											<apex:outputText value="{!t['lastName']+', '+t['firstName']}" style="text-decoration:underline;color:blue;cursor:pointer;cursor:hand;"/>
+						       				<apex:actionSupport onsubmit="showSpinner()" event="onclick"  action="{!linkContact}" rerender="refresh" status="linkStatus2">
+								         		<apex:param name="contactIdToLink" value="{!t['contactId']}"/>
+								         	</apex:actionSupport>				
+									    </apex:column>
+									    <apex:column style="padding:5px 5px 5px 5px;width:50%" rendered="{!t['lastName']==Contact.LastName}">{!t['title']}</apex:column>
+									    <apex:column style="padding:5px 5px 5px 5px;width:20%" rendered="{!t['lastName']==Contact.LastName}">{!IF(ISBLANK(t['state']),t['city'],t['city']+', '+t['state'])}</apex:column>
+									</apex:dataTable>
+									<apex:dataTable value="{!contactList}" var="t" rowClasses="even,odd" style="width:100%;">
+										<apex:column style="padding:5px 5px 5px 5px;width:30%" rendered="{!t['lastName']!=Contact.LastName}">
+											<apex:outputText value="{!t['lastName']+', '+t['firstName']}" style="text-decoration:underline;color:blue;cursor:pointer;cursor:hand;"/>
+						       				<apex:actionSupport onsubmit="showSpinner()" event="onclick"  action="{!linkContact}" rerender="refresh" status="linkStatus2">
+								         		<apex:param name="contactIdToLink" value="{!t['contactId']}"/>
+								         	</apex:actionSupport>				
+									    </apex:column>
+									    <apex:column style="padding:5px 5px 5px 5px;width:50%" rendered="{!t['lastName']!=Contact.LastName}">{!t['title']}</apex:column>
+									    <apex:column style="padding:5px 5px 5px 5px;width:20%" rendered="{!t['lastName']!=Contact.LastName}">{!IF(ISBLANK(t['state']),t['city'],t['city']+', '+t['state'])}</apex:column>
+									</apex:dataTable>
+								</div>	
+
+						</div>
+					</apex:outputPanel>
+				</apex:tab>
+				<apex:tab label="RainKing Company" name="RkCompany" id="RkCompany" onTabEnter="hideActionPanels()">
+					<c:tabCompanyContent rk="{!rk}"
+						lv="{!lastVerified}"
+						researcher="{!researcher[0]}"
+						companyIntel="{!companyIntel}"
+						fye="{!fye}"
+						renderScoops="{!myScoops.size}"
+						myScoops="{!myScoops}"
+						renderCompanyTechs="{!companyTechs.size}"
+						companyTechs="{!companyTechs}"
+						renderLocations="{!locations.size}"
+						locations="{!locations}"
+						teaser="{!status['description']=='Teaser'}"
+						user="{!sfUser}" />
+				</apex:tab>
+				<apex:tab label="Merge Data" name="Merge " id="tabMerge" rendered="{!NOT(ISNULL(rk)) && status['showContactlist'] == '0' && status['description']!='Teaser'}" onTabEnter="hideActionPanels()">
+					<c:contactHeader rk="{!rk}" showWrongBtn="false" teaser="{!status['description']=='Teaser'}" />
+
+						<div class="researchNow">
+							<c:researchNow company="{!rk['companyName']}" contact="" user="{!sfUser}" />
+						</div>
+						<div class="content">
+							<div style="color:#696969">
+							Use the tool below to copy RainKing data into your Salesforce record.
+							</div>
+							<table width="100%" cellpadding="4" cellspacing="1" bgcolor="#dcdcdc">
+								<tr class="contentHeader">
+									<td width="30" align="center"></td>
+									<td width="20%"><b style="color:#ffffff">Field</b></td>
+									<td width="40%"><b style="color:#ffffff">RainKing Value</b></td>
+									<td width="40%"><b style="color:#ffffff">SalesForce Value</b></td>
+								</tr>
+								<tr bgcolor="#DBECF7" class="{!mergeStyleControl['styleFirstName']}">
+									<td width="30" align="center" class="myCheckbox">
+										<apex:inputCheckbox value="{!mfFirstName}" id="mfFirstName" disabled="{!mergeEnabledControl['selectedFirstName']==0}" onclick="toggleRowColor()" /> 
+									</td>
+									<td class="{!mergeStyleControl['styleFirstName2']}">First Name</td>
+									<td class="{!mergeStyleControl['styleFirstName2']}">{!rk['firstName']}</td>
+									<td class="{!mergeStyleControl['styleFirstName2']}">{!Contact.firstName}</td>
+								</tr>
+								<tr bgcolor="#ffffff" class="{!mergeStyleControl['styleLastName']}">
+									<td width="30" align="center" class="myCheckbox">
+										<apex:inputCheckbox value="{!mfLastName}" id="mfLastName" disabled="{!mergeEnabledControl['selectedLastName']==0}" onclick="toggleRowColor()" /> 
+									</td>
+									<td class="{!mergeStyleControl['styleLastName2']}">Last Name</td>
+									<td class="{!mergeStyleControl['styleLastName2']}">{!rk['lastName']}</td>
+									<td class="{!mergeStyleControl['styleLastName2']}">{!Contact.lastName}</td>
+								</tr>
+								<tr bgcolor="#DBECF7" class="{!mergeStyleControl['styleSalutation']}">
+									<td width="30" align="center" class="myCheckbox">
+										<apex:inputCheckbox value="{!mfSalutation}" id="mfSalutation" disabled="{!mergeEnabledControl['selectedSalutation']==0}" onclick="toggleRowColor()" /> 
+									</td>
+									<td class="{!mergeStyleControl['styleSalutation2']}">Salutation</td>
+									<td class="{!mergeStyleControl['styleSalutation2']}">{!rk['salutation']}</td>
+									<td class="{!mergeStyleControl['styleSalutation2']}">{!Contact.salutation}</td>
+								</tr>
+								<tr bgcolor="#ffffff" class="{!mergeStyleControl['styleTitle']}">
+									<td width="30" align="center" class="myCheckbox">
+										<apex:inputCheckbox value="{!mfTitle}" id="mfTitle" disabled="{!mergeEnabledControl['selectedTitle']==0}" onclick="toggleRowColor()" /> 
+									</td>
+									<td class="{!mergeStyleControl['styleTitle2']}">Title</td>
+									<td class="{!mergeStyleControl['styleTitle2']}">{!rk['title']}</td>
+									<td class="{!mergeStyleControl['styleTitle2']}">{!Contact.title}</td>
+								</tr>
+								<tr bgcolor="#DBECF7" class="{!mergeStyleControl['stylePhone']}">
+									<td width="30" align="center" class="myCheckbox">
+										<apex:inputCheckbox value="{!mfPhone}" id="mfPhone" disabled="{!mergeEnabledControl['selectedPhone']==0}" onclick="toggleRowColor()" /> 
+									</td>
+									<td class="{!mergeStyleControl['stylePhone2']}">Phone</td>
+									<td class="{!mergeStyleControl['stylePhone2']}">{!rk['phone']}</td>
+									<td class="{!mergeStyleControl['stylePhone2']}">{!Contact.phone}</td>
+								</tr>
+								<tr bgcolor="#ffffff" class="{!mergeStyleControl['styleFax']}">
+									<td width="30" align="center" class="myCheckbox">
+										<apex:inputCheckbox value="{!mfFax}" id="mfFax" disabled="{!mergeEnabledControl['selectedFax']==0}" onclick="toggleRowColor()" /> 
+									</td>
+									<td class="{!mergeStyleControl['styleFax2']}">Fax</td>
+									<td class="{!mergeStyleControl['styleFax2']}">{!rk['fax']}</td>
+									<td class="{!mergeStyleControl['styleFax2']}">{!Contact.fax}</td>
+								</tr>
+								<tr bgcolor="#DBECF7" class="{!mergeStyleControl['styleEmail']}">
+									<td width="30" align="center" class="myCheckbox">
+										<apex:inputCheckbox value="{!mfEmail}" id="mfEmail" disabled="{!mergeEnabledControl['selectedEmail']==0}" onclick="toggleRowColor()" /> 
+									</td>
+									<td class="{!mergeStyleControl['styleEmail2']}">Email</td>
+									<td class="{!mergeStyleControl['styleEmail2']}">{!rk['email']}</td>
+									<td class="{!mergeStyleControl['styleEmail2']}">{!Contact.email}</td>
+								</tr>
+								<tr bgcolor="#ffffff" class="{!mergeStyleControl['styleMailingStreet']}">
+									<td width="30" align="center" class="myCheckbox">
+										<apex:inputCheckbox value="{!mfMailingStreet}" id="mfMailingStreet" disabled="{!mergeEnabledControl['selectedMailingStreet']==0}" onclick="toggleRowColor()" /> 
+									</td>
+									<td class="{!mergeStyleControl['styleMailingStreet2']}">Mailing Street</td>
+									<td class="{!mergeStyleControl['styleMailingStreet2']}">{!rk['address']} <apex:outputText escape="false" value="{!rk['address2']}" rendered="rk['address2'] != null" /></td>
+									<td class="{!mergeStyleControl['styleMailingStreet2']}">{!Contact.MailingStreet}</td>
+								</tr>
+								<tr bgcolor="#DBECF7" class="{!mergeStyleControl['styleMailingCity']}">
+									<td width="30" align="center" class="myCheckbox">
+										<apex:inputCheckbox value="{!mfMailingCity}" id="mfMailingCity" disabled="{!mergeEnabledControl['selectedMailingCity']==0}" onclick="toggleRowColor()" /> 
+									</td>
+									<td class="{!mergeStyleControl['styleMailingCity2']}">Mailing City</td>
+									<td class="{!mergeStyleControl['styleMailingCity2']}">{!rk['city']}</td>
+									<td class="{!mergeStyleControl['styleMailingCity2']}">{!Contact.MailingCity}</td>
+								</tr>
+								<tr bgcolor="#ffffff" class="{!mergeStyleControl['styleMailingState']}">
+									<td width="30" align="center" class="myCheckbox">
+										<apex:inputCheckbox value="{!mfMailingState}" id="mfMailingState" disabled="{!mergeEnabledControl['selectedMailingState']==0}" onclick="toggleRowColor()" /> 
+									</td>
+									<td class="{!mergeStyleControl['styleMailingState2']}">Mailing State</td>
+									<td class="{!mergeStyleControl['styleMailingState2']}">{!rk['state']} <apex:outputText escape="false" value="{!rk['address2']}" rendered="rk['address2'] != null" /></td>
+									<td class="{!mergeStyleControl['styleMailingState2']}">{!Contact.MailingState}</td>
+								</tr>
+								<tr bgcolor="#DBECF7" class="{!mergeStyleControl['styleMailingPostalCode']}">
+									<td width="30" align="center" class="myCheckbox">
+										<apex:inputCheckbox value="{!mfMailingPostalCode}" id="mfMailingPostalCode" disabled="{!mergeEnabledControl['selectedMailingPostalCode']==0}" onclick="toggleRowColor()" /> 
+									</td>
+									<td class="{!mergeStyleControl['styleMailingPostalCode2']}">Mailing Postal Code</td>
+									<td class="{!mergeStyleControl['styleMailingPostalCode2']}">{!rk['zip']}</td>
+									<td class="{!mergeStyleControl['styleMailingPostalCode2']}">{!Contact.MailingPostalCode}</td>
+								</tr>
+							</table>
+							<br />
+							<div class="submitBtnCt">
+								<apex:commandButton value="Merge Selected Fields" onclick="showSpinner()" action="{!mergeRecords}" disabled="{!mergeEnabledControl['submitBtnEnabled']==0}" />
+							</div>
+							<br/><br/>
+						</div>
+ 
+				</apex:tab>
+			</apex:tabPanel>
+			
+			<apex:outputPanel id="lookupCompany" styleClass="lookupContact" layout="block" rendered="{!status['id']=='3'}">
+			 	<br />
+
+					<div>
+						<b>Contact not Found in RainKing</b>
+						<br />
+						Sorry, we tried to use the email address from SalesForce to look up this person.  It’s possible your SalesForce Contact has a different or out-dated email address.  Confirm the company below, then you can choose from a list of possible alternatives.
+						<br /><br />
+						<apex:actionStatus id="linkStatus"  startText=" (updating...)"  stopText=""/>
+						<br />
+						<apex:dataTable value="{!companyList}" var="t" rowClasses="even,odd" style="width:100%;border:solid 1px #c0c0c0;">
+							<apex:column style="padding:5px 5px 5px 5px;">
+								<apex:outputText value="{!t['companyName']}" style="text-decoration:underline;color:blue;cursor:pointer;cursor:hand;"/>
+			       				<apex:actionSupport onsubmit="showSpinner()" event="onclick"  action="{!linkCompany}" rerender="refresh" status="linkStatus">
+					         		<apex:param name="companyIdToLink" value="{!t['companyId']}"/>
+					         	</apex:actionSupport>				
+						    </apex:column>
+						</apex:dataTable>
+						<br /><br />
+					<div align="center">
+						<div style="text-align:left;height:55px;background-color:#dcdcdc;border:#c0c0c0 solid 1px;padding:10px;width:75%;border-radius: 5px;-moz-border-radius: 5px;-webkit-border-radius: 5px;">
+							<apex:commandButton value="Company Not in List" action="{!companyNotInList}" rerender="refresh" onclick="showSpinner()" />
+							<div style="width:100%;height:7px;" />
+							<span style="font-size:11px;">If the company is not in the list above, you can choose for the RainKing plugin not to show for this record by clicking this button.</span>
+						</div>
+					</div>
+					<br /><br />		
+					</div>
+
+			</apex:outputPanel>
+		
+	 	    <apex:outputPanel id="companyNotFound" styleClass="lookupContact" layout="block" rendered="{!status['id']=='2'}">
+
+					<div class="content">
+						<c:errorBox rkDisplayFlag="{!Contact.rkpi2__rk_DefaultVisibility__c}" error="companyNotFound" />
+					</div>
+
+	 		</apex:outputPanel>
+			
+
+			<apex:outputPanel id="error" styleClass="lookupContact" layout="block" rendered="{!status['id']=='4'}">
+
+					<div class="content">
+						<c:errorBox rkDisplayFlag="{!Contact.rkpi2__rk_DefaultVisibility__c}" error="{!rk['errMsg']}" />
+					</div>
+
+	 		</apex:outputPanel>
+
+ 		
+	 		<apex:outputPanel id="cfgError" styleClass="lookupContact" layout="block" rendered="{!status['id']=='5'}">
+
+					<div class="content">
+						<c:errorBox rkDisplayFlag="{!Contact.rkpi2__rk_DefaultVisibility__c}" error="Either the RainKing Plugin is not configured correctly or there is a communication issue between Salesforce and RainKing." />
+					</div>
+
+	 		</apex:outputPanel>
+			 	
+			 <c:js />
+
+		</apex:pageBlock>
+       </div>
+       <div class="spinner2" title="" style="height:400px;width:100%;padding-left:40%;padding-top:100px;">
+       		
+       		<br/><br/>
+       		<apex:actionStatus id="rnStatusBox" >
+       			 <apex:facet name="start"> 
+	       			<apex:outputPanel >
+		       			<apex:image value="{!$Resource.rkpi2__spinner}"  />
+    				</apex:outputPanel>
+    			</apex:facet>
+       			 <apex:facet name="stop"> 
+	       			<div class="researchNowSuccess" style="position:absolute;left:250px;">
+	       			<b style="font-size:12px;">Research Now</b>
+	       			<hr size="1" />
+	       			{!researchNowReturnStatus} 
+	       			<br/>
+	       			<input type="button" value=" OK " onclick="hideSpinner();" style="margin-left:32px;margin-top:10px;" />
+    				</div>
+    			</apex:facet>
+       		</apex:actionStatus>
+       </div>
+       <div class="spinner" title="" style="height:100%;width:100%;padding-left:40%;padding-top:100px;">
+       		<apex:image value="{!$Resource.rkpi2__spinner}"/>
+       </div>
+	</apex:form>
+	
+	
+	
+	
+</apex:page>

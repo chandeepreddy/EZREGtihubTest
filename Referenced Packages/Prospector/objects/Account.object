@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <webLinks>
+        <fullName>Add_Contacts_from_Jigsaw</fullName>
+        <availability>online</availability>
+        <displayType>link</displayType>
+        <encodingKey>UTF-8</encodingKey>
+        <hasMenubar>false</hasMenubar>
+        <hasScrollbars>true</hasScrollbars>
+        <hasToolbar>false</hasToolbar>
+        <height>600</height>
+        <isResizable>true</isResizable>
+        <linkType>url</linkType>
+        <masterLabel>Add Contacts from Jigsaw</masterLabel>
+        <openType>newWindow</openType>
+        <position>none</position>
+        <protected>false</protected>
+        <showsLocation>false</showsLocation>
+        <showsStatus>false</showsStatus>
+        <url>https://www.jigsaw.com/SFL.xhtml?opCode=search&amp;sfOpCode=name&amp;sfacctid={!Account.Id}&amp;name={!Account.Name}&amp;sfsession={!API.Session_ID}&amp;sfserver={!API.Partner_Server_URL_60}&amp;sfuserid={!User.Id}&amp;sfusername={!User.Username}</url>
+    </webLinks>
+    <webLinks>
+        <fullName>Send_to_Jigsaw</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <encodingKey>UTF-8</encodingKey>
+        <hasMenubar>false</hasMenubar>
+        <hasScrollbars>true</hasScrollbars>
+        <hasToolbar>false</hasToolbar>
+        <height>600</height>
+        <isResizable>true</isResizable>
+        <linkType>url</linkType>
+        <masterLabel>Submit to Jigsaw</masterLabel>
+        <openType>newWindow</openType>
+        <position>none</position>
+        <protected>false</protected>
+        <showsLocation>false</showsLocation>
+        <showsStatus>false</showsStatus>
+        <url>https://crm01.jigsaw.com/SendJigsawCompanyLogin.xhtml?crm=salesforce&amp;crmAccountId={!Account.Id}&amp;cmName={!Account.Name}&amp;cmAddress={!Account.BillingStreet}&amp;cmCity={!Account.BillingCity}&amp;cmState={!Account.BillingState}&amp;cmZip={!Account.BillingPostalCode}&amp;cmCountry={!Account.BillingCountry}&amp;cmMainphone={!Account.Phone}&amp;cmWebsite={!Account.Website}&amp;cmEmployee={!Account.NumberOfEmployees}&amp;cmRevenue={!Account.AnnualRevenue}&amp;cmOwnership={!Account.Ownership}&amp; cmTickerSymbo={!Account.TickerSymbol}&amp;session={!User.Session_ID}&amp;server={!API.Partner_Server_URL_60}&amp;crmUserId={!$User.Id}&amp;username={!$User.Username}</url>
+    </webLinks>
+    <webLinks>
+        <fullName>Update_from_Jigsaw</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <encodingKey>UTF-8</encodingKey>
+        <height>600</height>
+        <linkType>url</linkType>
+        <masterLabel>Update from Jigsaw</masterLabel>
+        <openType>sidebar</openType>
+        <protected>false</protected>
+        <url>https://crm01.jigsaw.com/UpdateCRMAccountLogin.xhtml?crm=salesforce&amp;crmAccountId={!Account.Id}&amp;cmName={!Account.Name}&amp;cmAddress={!Account.BillingStreet}&amp;cmCity={!Account.BillingCity}&amp;cmState={!Account.BillingState}&amp;cmZip={!Account.BillingPostalCode}&amp;cmCountry={!Account.BillingCountry}&amp;cmMainphone={!Account.Phone}&amp;cmWebsite={!Account.Website}&amp;cmEmployee={!Account.NumberOfEmployees}&amp;cmRevenue={!Account.AnnualRevenue}&amp;cmOwnership={!Account.Ownership}&amp;cmTickerSymbo={!Account.TickerSymbol}&amp;session={!User.Session_ID}&amp;server={!API.Partner_Server_URL_60}&amp;crmUserId={!$User.Id}&amp;username={!$User.Username}</url>
+    </webLinks>
+</CustomObject>

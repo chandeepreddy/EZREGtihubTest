@@ -1,0 +1,27 @@
+<apex:page controller="EZRE_OppAndActivities_Report" > 
+    <apex:form >
+        <apex:pageBlock title="Opportunity-Activity Report">           
+            <apex:pageBlockTable title="Opportunity-Activity Report" value="{!lstOppWthoutActvts}" var="objOpp">
+                <apex:column headerValue="Account Name">
+                    <apex:outputLink value="/{!objOpp.AccountId}">{!objOpp.Account.Name}</apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="Opportunity Name">                
+                  <apex:outputLink value="/{!objOpp.Id}">{!objOpp.Name}</apex:outputLink>
+                </apex:column>                
+                <apex:column value="{!objOpp.Follow_up_Date__c }"/>
+                <apex:column value="{!objOpp.OwnerId}"/>
+                <apex:pageBlock >                
+            </apex:pageBlock>
+                              
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+        <apex:pageBlock Title="Opportunity Activity Report Summary">      
+        <apex:pageBlockTable value="{!lstWrapperAggregateResult}" var="OwnerCount">      
+        <apex:column headerValue="Owner Name" value="{!OwnerCount.strOwnerName}"/>     
+         <apex:column headerValue="Opportunity Count" value="{!OwnerCount.intOwnerCount}"/>
+        </apex:pageBlockTable>
+      </apex:pageblock>
+       
+        
+    </apex:form>
+</apex:page>

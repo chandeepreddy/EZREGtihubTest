@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>S91_for_Windows_oauth_windows</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <modules>
+        <module>
+            <label>S91_for_Windows_oauth_windows</label>
+            <moduleType>WindowsPushApplicationSetup</moduleType>
+            <name>S91_for_Windows_oauth_windows</name>
+            <types>
+                <members>sf_chttr_apps__S91_for_Windows_oauth_windows</members>
+                <name>Module</name>
+            </types>
+            <version>4.0</version>
+        </module>
+    </modules>
+    <namespacePrefix>sf_chttr_apps</namespacePrefix>
+    <version>36.0</version>
+</Package>

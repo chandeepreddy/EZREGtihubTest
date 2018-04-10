@@ -1,0 +1,70 @@
+<aura:component controller="pi.EngagementHistoryControllerV2" access="public">
+	<ltng:require scripts="{!$Resource.pi__Promise + '/js/promise.js'}" />
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+	<aura:handler name="EngagementHistoryPageChange" event="pi:EngagementHistoryPageChange" action="{!c.pageChange}" includeFacets="true"/>
+
+	<aura:dependency resource="pi:EngagementHistoryListItem" type="COMPONENT"/>
+	<aura:dependency resource="pi:EngagementHistoryPaginator" type="COMPONENT"/>
+	<aura:dependency resource="pi:ErrorMessage" type="COMPONENT"/>
+
+	<aura:attribute name="recordId" type="String" access="public"/>
+	<aura:attribute name="recordType" type="String" access="public"/>
+	<aura:attribute name="sObjectName" type="String" access="public"/>
+	<aura:attribute name="messageText" type="String" access="public"/>
+	<aura:attribute name="componentMode" type="String" access="public"/>
+	<aura:attribute name="logo" type="String" access="public" default="EngagementHistory.svg"/>
+
+	<aura:attribute name="limit" type="Integer" default="5" access="public"/>
+	<aura:attribute name="page" type="Integer" default="1" access="public"/>
+	<aura:attribute name="totalPages" type="Integer" default="0" access="public"/>
+
+	<aura:attribute name="data" type="Object[]" default="[]" access="public"/>
+
+	<aura:attribute name="historyComponents" type="Aura.Component[]" access="public"/>
+	<aura:attribute name="messageComponent" type="Aura.Component" access="public"/>
+	<aura:attribute name="selectComponent" type="Aura.Component" access="public"/>
+
+	<aura:method name="setRecord" action="{!c.handleRecordChange}">
+		<aura:attribute name="id" type="String" />
+		<aura:attribute name="type" type="String" />
+	</aura:method>
+
+	<div class="slds">
+		<div class="slds-card slds-card--narrow">
+
+			<div class="slds-card__header slds-truncate">
+				<img src="{!$Resource.pi__EngagementHistory+'/'+v.logo}" class="slds-icon slds-icon--small slds-media__figure "/>
+				<span class="slds-text-heading--small">Engagement History</span>
+				<aura:if isTrue="{!v.data.length > 0}">
+					<span class="activity-count">{!' ('+v.data.length+') '}</span>
+				</aura:if>
+			</div>
+
+			{!v.selectComponent}
+
+			<div aura:id="spinner" class="slds-hidden slds__spinner">
+				<img src="{!$Resource.pi__PardotLightningDesignSystem_unversioned + '/images/spinners/slds_spinner.gif'}" class="slds-icon--small slds-icon__spinner"/>
+				<span class="slds-text-body--small">Loading activities...</span>
+			</div>
+
+			<div aura:id="lcbody" class="slds-card__body">
+				<div class="slds-card__body--inner slds-m-bottom--large">
+					{!v.messageComponent || v.messageText}
+				</div>
+				<div class="slds-card__body--inner">
+					<ul>
+						<aura:iteration items="{!v.historyComponents}" var="historyComponent">
+							<li>
+								{!historyComponent}
+							</li>
+						</aura:iteration>
+					</ul>
+					<pi:EngagementHistoryPaginator aura:id="engHistPaginator"/>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+</aura:component>

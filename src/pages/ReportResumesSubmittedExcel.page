@@ -1,0 +1,51 @@
+<apex:page contentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet#ResumesSubmittedReport.xls" showHeader="false" standardStylesheets="false">
+<!--<style>
+    .tableclass{
+        background-color:#84C6F8;
+    }
+    
+    .oddrow{background-color: #6699FF; } 
+    .evenrow{background-color: #C2D6FF; } 
+    .textalign{text-align:center; } 
+</style>
+    <apex:pageBlock title="Submission Report">
+        <apex:dataTable value="{!LstReqmtAssignClass}" var="proj" rowClasses="oddrow,evenrow">
+            <apex:column style="border: 1px solid; font-weight:{!IF(proj.strUser = 'Date','bold', IF(proj.strUser = 'Day','bold',IF(proj.strUser = 'Total','bold','semi-bold')))}; text-align:{!IF(proj.strUser = 'Date','Center', IF(proj.strUser = 'Day','Center', IF(proj.strUser = 'Total','Center', 'left')))};">
+            <apex:facet name="header">No.Of Submissions</apex:facet>            
+            {!proj.strUser}
+            </apex:column>
+            <apex:column value="{!proj.strDate1}" style="border: 1px solid"></apex:column>         
+            <apex:column value="{!proj.strDate2}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate3}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate4}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate5}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate6}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate7}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate8}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate9}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate10}" style="border: 1px solid" ></apex:column>
+            <apex:column value="{!proj.strDate11}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate12}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate13}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate14}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate15}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate16}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate17}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate18}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate19}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate20}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate21}" style="border: 1px solid"></apex:column>  
+            <apex:column value="{!proj.strDate22}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate23}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate24}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate25}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate26}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate27}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate28}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate29}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate30}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strDate31}" style="border: 1px solid"></apex:column>
+            <apex:column value="{!proj.strTotal}" style="border: 1px solid"></apex:column>
+        </apex:dataTable>
+    </apex:pageBlock>-->
+</apex:page>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
+    <description>A Component of the in|force Connector. Stores the cross reference between SFDC Contact ID&apos;s and LinkedIn Profile IDs.</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>false</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <fields>
+        <fullName>API_Std_Profile_Headers__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>API Std Profile Headers</label>
+        <length>32000</length>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>API_Std_Profile_Url__c</fullName>
+        <deprecated>false</deprecated>
+        <description>API Url to retrieve person&apos;s LinkedIn Profile
+Note: 2083 is max IE7 url size</description>
+        <externalId>false</externalId>
+        <label>API Std Profile Url</label>
+        <length>2083</length>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>LinkedIn_ID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>LinkedIn Profile IDs</description>
+        <externalId>true</externalId>
+        <label>LinkedIn ID</label>
+        <length>20</length>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ProfileErrorOccurred__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Will be checked if the last LinkedIn Profile API request was an error.</description>
+        <externalId>false</externalId>
+        <label>ProfileErrorOccurred</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>ProfileLastRequestDT__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Last Date/Time that the profile was refreshed from LinkedIn</description>
+        <externalId>false</externalId>
+        <label>ProfileLastRequest</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>ProfileRequestResponse__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>ProfileRequestResponse</label>
+        <length>32000</length>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>25</visibleLines>
+    </fields>
+    <fields>
+        <fullName>SFDC_Contact_ID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>SFDC Contact</description>
+        <externalId>false</externalId>
+        <label>SFDC Contact ID</label>
+        <referenceTo>Contact</referenceTo>
+        <relationshipName>Contact_xRefs</relationshipName>
+        <relationshipOrder>0</relationshipOrder>
+        <reparentableMasterDetail>false</reparentableMasterDetail>
+        <trackTrending>false</trackTrending>
+        <type>MasterDetail</type>
+        <writeRequiresMasterRead>true</writeRequiresMasterRead>
+    </fields>
+    <label>LinkedIn Contact xRef</label>
+    <nameField>
+        <displayFormat>xRef-{0000000000}</displayFormat>
+        <label>xRef Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>LinkedIn Contact xRefs</pluralLabel>
+    <searchLayouts/>
+    <sharingModel>ControlledByParent</sharingModel>
+</CustomObject>

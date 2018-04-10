@@ -1,0 +1,45 @@
+<aura:component controller="pi.EngagementHistoryControllerV2" access="public">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="pageViews" type="Object" access="public"/>
+    <aura:attribute name="visitId" type="String" default="" access="public"/>
+    <aura:attribute name="pageViewCount" type="Integer" access="public"/>
+    <aura:attribute name="since" type="String" access="public"/>
+    <aura:attribute name="loadState" type="String" default="pending" access="public"/>
+    <aura:attribute name="errorComponent" type="Aura.Component" access="public"/>
+    <div class="slds-text-body--small">
+        <div>
+            <span>Page Views:&nbsp;</span>
+            <ui:button aura:id="showHidePageViews" class="slds-button slds-button--neutral link-button" press="{!c.toggle}"/>
+            <div aura:id="spinner" class="pv-spinner slds-hide">
+                <img src="{!$Resource.pi__PardotLightningDesignSystem_unversioned + '/images/spinners/slds_spinner.gif'}" class="slds-icon--small pv-loading-icon"/>
+                <span class="slds-text-body--small">Loading...</span>
+            </div>
+        </div>
+        <div aura:id="pageViewListErrorMessage" class="slds-card__body--inner">
+            {!v.errorComponent}
+        </div>
+        <table aura:id="pageViews" class="slds-table slds-table--bordered slds-table--cell-buffer tableSection hide slds-no-row-hover">
+            <thead>
+                <tr class="slds-text-heading--label">
+                    <th scope="col" class="first-cell"><span class="slds-truncate">Page</span></th>
+                    <th scope="col"><span class="slds-truncate">Time</span></th>
+                </tr>
+            </thead>
+            <tbody class="slds-scrollable--y">
+
+                <aura:iteration items="{!v.pageViews}" var="pageView">
+                    <tr>
+                        <td scope="row" class="first-cell">
+                            <div class="wrap">
+                                <a title="{!pageView.page}" href="{!pageView.url}" class="elliptic" target="_blank">{!pageView.page}</a>
+                            </div>
+                        </td>
+                        <td>{!pageView.time}</td>
+                    </tr>
+                </aura:iteration>
+
+            </tbody>
+        </table>
+        <div aura:id="noData" class="slds-text-body--medium hide">No page views found.</div>
+    </div>
+</aura:component>

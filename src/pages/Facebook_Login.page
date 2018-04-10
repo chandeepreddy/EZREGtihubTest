@@ -1,0 +1,13 @@
+<!--
+@Page Name      : Facebook_Login
+@Author         : Indumathi
+@Date           : July-2014
+@Description    : This page is used for Facebook Auhtorization, which invokes the Authorize method of the 
+                    controller class: PostOnFacebookWall
+-->
+
+<apex:page controller="PostOnFacebookWall" action="{!Authorize}">
+<apex:form >
+Authorization is complete!!!!!!!!!!!!!! 
+</apex:form>
+</apex:page>

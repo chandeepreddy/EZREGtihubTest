@@ -1,0 +1,8 @@
+<apex:page standardController="Event" extensions="G2M4Force.G2M_StartFutureMeetings" action="{!startMeeting}">
+ <apex:form target="_blank">
+  <apex:inputHidden value="{!Event.G2M4Force__G2M_Meeting_ID__c}"/>
+  <apex:inputHidden value="{!Event.OwnerId}"/>
+  <apex:inputHidden value="{!Event.G2M4Force__G2M_On_Demand_Event__c}"/>
+  <apex:inputHidden value="{!Event.Type}"/>
+  </apex:form>
+</apex:page>

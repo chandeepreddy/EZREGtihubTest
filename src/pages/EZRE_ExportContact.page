@@ -1,0 +1,9 @@
+<apex:page Controller="EZRE_ExportContactController" readOnly="true" >
+<apex:form >
+
+ <apex:outputLabel style="font-weight:bold" >Please click the button to export contacts</apex:outputLabel>&nbsp;&nbsp;&nbsp;
+
+ <apex:commandButton value="ExportContacts" action="{!getContacts}"/>
+
+</apex:form>
+</apex:page>

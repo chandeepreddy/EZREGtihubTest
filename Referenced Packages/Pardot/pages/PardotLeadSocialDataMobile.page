@@ -1,0 +1,6 @@
+<apex:page standardcontroller="Lead" extensions="pi.PardotResourceBaseByUserExtension" showHeader="false" sidebar="false" standardStylesheets="false">
+  <style>
+     Body { Background: transparent; }
+  </style>
+  <apex:iframe src="{!pardotBaseUrl}/socialData/socialData/email/{!URLENCODE(Lead.Email)}{!authenticatedQueryString}&serverurl={!$Api.Partner_Server_URL_90}&source=salesforce1&tab=lead&style={!$User.UIThemeDisplayed}&fid={!Lead.ID}" height="390" scrolling="false" id="prospect_insight"/>
+</apex:page>

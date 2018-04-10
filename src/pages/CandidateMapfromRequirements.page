@@ -1,0 +1,142 @@
+<apex:page controller="CandidateMapfromRequirements" id="Page" sidebar="true" >
+<style type="text/css" >
+.pbSubheader{
+    background-color: #8370C2 !important;
+}
+</style>
+  <script type="text/javascript"> 
+  function openLookup(baseURL, width, modified, searchParam){
+    var originalbaseURL = baseURL;
+    var originalwidth = width;
+    var originalmodified = modified;
+    var originalsearchParam = searchParam;
+ 
+    var lookupType = baseURL.substr(baseURL.length-3, 3);
+    //alert('lookuptype:' +baseURL);
+    if (modified == '1') baseURL = baseURL + searchParam;
+ 
+    var isCustomLookup = false;
+ 
+    // Following "001" is the lookup type for Account object so change this as per your standard or custom object a09
+        
+    if(lookupType == "001" || lookupType=="a0k"){ 
+      var urlArr = baseURL.split("&");
+      var txtId = '';
+      if(urlArr.length > 2) {
+        urlArr = urlArr[1].split('=');
+        txtId = urlArr[1];
+        //alert('TxtId' + txtId);
+      }
+     
+
+      // Following is the url of Custom Lookup page. You need to change that accordingly
+         baseURL = "/apex/CustomAccountLookup?txt=" + txtId;
+   
+        //baseURL ="https://cs1.salesforce.com/_ui/common/search/client/ui/UnifiedSearchResults?";
+
+
+            // Following is the id of apex:form control "myForm". You need to change that accordingly
+      baseURL = baseURL + "&frm=" + escapeUTF("{!$Component.myForm}");
+      if (modified == '1') {
+        baseURL = baseURL + "&lksearch=" + searchParam;
+        //alert('modified'+ baseURL );
+      }
+ 
+      // Following is the ID of inputField that is the lookup to be customized as custom lookup
+      if(txtId.indexOf('Account') > -1 ){
+        isCustomLookup = true;
+      }
+      if(txtId.indexOf('Candidate') > -1 ){
+        isCustomLookup = true;
+      }
+     
+   }
+ 
+    //alert('baseURL1' + baseURL);
+    if(isCustomLookup == true){
+      openPopup(baseURL, "lookup", 300, 480, "width="+width+",height=480,toolbar=no,status=no,directories=no,menubar=no,resizable=yes,scrollable=no", true);
+    }
+    else {
+      if (modified == '1') originalbaseURL = originalbaseURL + originalsearchParam;
+      openPopup(originalbaseURL, "lookup", 350, 480, "width="+originalwidth+",height=480,toolbar=no,status=no,directories=no,menubar=no,resizable=yes,scrollable=no", true);
+    } 
+  }
+  
+  function test()
+    {
+    
+    var message=document.getElementById("{!$Component.myForm.PageBlock.errMsg}").innerText;
+    alert(message);
+    
+    }
+  
+    function MailDisplay() 
+    {
+        var pa = document.getElementById("Page:myForm:PageBlock:j_id33:InterviewScheduled");                      
+     
+        if(pa.value == "Yes")  
+        {    
+   
+            var Emails ="";  
+            var body = escape(window.document.title); 
+            var subject = "Sub:";
+            var EmailsTo= "{JSENCODE(!uEmail)}";  
+            window.location.href =  "mailto:"+EmailsTo+"?bcc="+Emails   
+            return false;        
+        }        
+               
+        var currentLocation=window.location;var ur=currentLocation+"";
+        var recordId=ur.split(".com/")[1].split("/")[0];
+       }
+       
+    function test1()
+    {
+    
+        var test12 = document.getElementById("Page:myForm:PageBlock:j_id32:MRStatus");
+        
+        if(test12.value == "Approved")
+        {
+           
+            addinfo.style.display = "block";
+        }
+        
+        else
+        {
+            addinfo.style.display = "none";
+        }
+    }
+    
+    function DynamicDatePicker(d_id)
+    {
+        DatePicker.pickDate(false,d_id.id,true);
+    }
+   
+</script>
+ 
+<apex:sectionHeader title="CandidateMappings Edit"  subtitle="New Candidate Mappings" />
+ 
+  <apex:form id="myForm">  
+    <apex:PageBlock id="PageBlock">
+    <apex:pagemessages id="errMsg" />  
+    <apex:pageBlockButtons >
+            <apex:commandButton value="Save" action="{!save}"/>
+            <apex:commandButton value="Save & New" action="{!saveNew}"/>
+            <apex:commandButton value="Cancel" action="{!cancel}" immediate="true"/>
+    </apex:pageBlockButtons>
+    <apex:pageBlockSection columns="1" title="Candidate Assignments Edit">
+       <!--  <apex:inputField id="Account" value="{!contact.AccountID}" /> -->
+        <apex:inputField id="Candidate"  value="{!coa.Candidate__c}"   />
+        <apex:inputField id="Requirement" value="{!coa.Requirement__c}"  />
+        <!--<apex:inputField id="Status" value="{!coa.Status__c}" required="true" />-->
+        <apex:inputField id="RComments" value="{!coa.R_Comments__c}"/>
+        <apex:inputField id="LRStatus" value="{!coa.LR_Status__c}" required="true" />
+        <apex:inputField id="LRComments" value="{!coa.LR_Comments__c}"/>
+        <apex:inputField id="MRStatus" value="{!coa.MR_Status__c}" required="true" onchange="test1();" />
+        <apex:inputField id="MRComments" value="{!coa.MR_Comments__c}"/>
+        <apex:inputField id="EmployerAuthorization" value="{!coa.Employer_s_Authorization__c}" required="true"/>
+        <!--<apex:inputField id="ManagerEmailID" value="{!coa.Manager_Email_ID__c}"/> -->
+      </apex:pageBlockSection>
+
+            </apex:PageBlock>
+  </apex:form>
+</apex:page>

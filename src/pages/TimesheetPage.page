@@ -1,0 +1,1389 @@
+<apex:page showHeader="false" sidebar="false" controller="ODS_TimesheetController">
+    <apex:form >
+
+        <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE; IE=10; IE=11; " />
+
+            <apex:includeScript value="https://code.jquery.com/jquery-latest.min.js" />
+            <!-------- Bootstrap ----->
+            <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/bootstrap.css')}" />
+            <apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'js/bootstrap.js')}" />
+            <apex:stylesheet value="https://fonts.googleapis.com/css?family=Open+Sans:400,700" />
+            <apex:includeScript value="https://www.google.com/recaptcha/api.js" />
+            <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/style.css')}" />
+            <link href="{!URLFOR($Resource.ODS_Assets,'css/style_dev.css')}" rel="stylesheet" type="text/css" />
+            <style>
+                .popupBackground {
+                    /* Background color */
+                    background-color: black;
+                    opacity: 0.20;
+                    filter: alpha(opacity=20);
+
+                    /* Dimensions */
+                    width: 100%;
+                    height: 500%;
+                    top: 0;
+                    left: 0;
+                    z-index: 998;
+                    position: absolute;
+                    font-family: sans-serif;
+                    /* Mouse */
+                    cursor: wait;
+                }
+                /* This is for the message DIV */
+
+                .PopupPanel {
+                    /* Background color */
+                    border: solid 2px skyblue;
+                    background-color: white;
+                    font-family: sans-serif;
+                    /* Dimensions */
+                    left: 50%;
+                    width: 100px;
+                    margin-left: -100px;
+                    top: 50%;
+                    height: 100px;
+                    margin-top: -25px;
+                    z-index: 999;
+                    position: fixed;
+
+                    /* Mouse */
+                    cursor: pointer;
+                }
+            </style>
+            <script>
+                var StartDateOfWeek = new Date('{!CurrentDate}');
+                var EndDateOfWeek = new Date('{!CurrentDate}');
+                TuesdayDate = new Date('{!CurrentDate}');
+                WednesdayDate = new Date('{!CurrentDate}');
+                ThursdayDate = new Date('{!CurrentDate}');
+                FridayDate = new Date('{!CurrentDate}');
+                SaturdayDate = new Date('{!CurrentDate}');
+                SundayDate = new Date('{!CurrentDate}');
+                var PortalUserRole = '{!PortalUserRole}';
+                var IsDisableFields = false;
+                var timesheetstatus = '';
+                //alert('{!CurrentDate}');
+
+                function getstartAndEndOfWeek(date) {
+
+                    //If no date object supplied, use current date
+                    // Copy date so dont modify supplied date
+                    var now = date ? new Date(date) : new Date('{!CurrentDate}');
+
+                    // set time to some convenient value
+                    now.setHours(0, 0, 0, 0);
+
+                    // Get the previous Monday
+                    var monday = new Date(now);
+                    monday.setDate(monday.getDate() - monday.getDay() + 1);
+
+                    // Get next Sunday
+                    var sunday = new Date(now);
+                    sunday.setDate(sunday.getDate() - sunday.getDay() + 7);
+
+                    // Return array of date objects
+                    return [monday, sunday];
+                }
+
+
+                $(document).ready(function() {
+                    $(".ddlstAccount").hide();
+                    $(".ddlstService").hide();
+                    $(".ApplyBtn").hide();
+
+
+                    $("#timesheet").addClass("active");
+
+                    $(".hrs").attr('maxlength', '3');
+
+
+                    var IsCustomer = {!isCustomer
+                    };
+
+                    if (IsCustomer) {
+                        $("#mnuMyAccount").css("display", "block");
+
+                    } else {
+
+                        $("#mnuCustomer").css("display", "block");
+                    }
+                    $("#txtComments").prop('disabled', true);
+                    var portalRole = '{!PortalUserRole}';
+                    var portalApprover = '{!IsPortalApprover}';
+                    var timeshetStats = '{!CurrentTimeSheetStatus}';
+                    var passdFromDate = '{!PassedWeekFromDate}';
+
+                    if (timeshetStats == '') {
+
+                        $("divStatus").hide();
+
+                    }
+                    PortalUserRole = '{!PortalUserRole}';
+                    IsPortalApprover = '{!IsPortalApprover}';
+
+
+                    //  BindJSONDataToPage();
+                    // CustomizePageByTimesheetStatus(timeshetStats,PortalUserRole );
+
+
+                    $("button.collapsed").click(function() {
+
+                        $(".header").toggleClass("header-fixed");
+                        $(".navbar-toggle").toggleClass("nav-btn-fixed");
+                        $(".mid-bg").toggleClass("mid-bg-fixed");
+                    });
+
+                    if (passdFromDate == '') {
+                        PopulateWeekDays(new Date('{!CurrentDate}'));
+                    } else {
+                        PopulateWeekDays(new Date(passdFromDate));
+                    }
+
+                    $(".hrs").each(function() {
+
+                        var that = this;
+                        $(this).keyup(function() {
+
+                            this.value = this.value.replace(/[^0-9\.]/g, '');
+
+                            newSum.call(that);
+                            totalSum.call(that);
+
+                        });
+                    });
+
+                    $(".hrs").blur(function() {
+                        this.value = this.value.replace(/[^0-9\.]/g, '');
+
+                        if (this.value != '') {
+
+                            //if((this.value > 24)||(this.value == 0))
+                            if (this.value > 24) {
+                                alert("Invalid Hours. It cannot be more than 24");
+                                //alert("Invalid Hours. It cannot be Zero or more than 24");
+                                this.value = "";
+
+                            }
+                        }
+                    });
+
+                    $("#Tbltimesheet").on("click", "a.delete-icon", function() {
+                        $(this).closest("tr").remove();
+                        totalSum();
+                        CalculateColumnTotal();
+                        
+                    });
+                    $(".add-row").click(function() {
+                        var rowCount = $(".timesheet > tbody >tr").length;
+                        var RowNo = rowCount;
+
+                        AddRowToAdditionalTable(RowNo);
+                        var elementid = '#ddlResName_' + RowNo;
+                        var initiativeElementid = '#ddlInitiative_' + RowNo;
+                        populateDynamicResoureNameByRow(elementid);
+                        populateDynamicInitiativeNameByRow(initiativeElementid);
+                        DisableFields(timesheetstatus);
+                    });
+
+                    $("#btnApprove").on("click", function(e) {
+                        e.preventDefault();
+                    });
+
+                    /*$("#btnReject").on("click", function(e){
+                         e.preventDefault();
+                    });*/
+                    passWeekDateToController(FormatDate(new Date($("#weekStDate").html())), FormatDate(new Date($("#weekEndDate").html())))
+
+                });
+                
+                //// Bind Resource Name dropdown
+                function populateDynamicResoureName() {
+                debugger;
+                    var jsonResourceName = $('#hdnResourceName').val();
+                    resourceNameArray = $.parseJSON(jsonResourceName);
+                    $(".ddlResource").append($("<option></option>").val('--Select--').html('--Select--'));
+                    $.each(resourceNameArray, function(key, value) {
+                        $(".ddlResource").append($("<option></option>").val(value.ResourceId).html(value.ResourceName));
+                    });
+                }
+
+                function populateDynamicResoureNameByRow(elementid) {
+                debugger;
+                    var jsonResourceName = $('#hdnResourceName').val();
+                    resourceNameArray = $.parseJSON(jsonResourceName);
+                    $(elementid).append($("<option></option>").val('--Select--').html('--Select--'));
+                    $.each(resourceNameArray, function(key, value) {
+                        $(elementid).append($("<option></option>").val(value.ResourceId).html(value.ResourceName));
+                    });
+                }                
+                
+                //// Bind Initiative Name dropdown
+                function populateDynamicInitiativeName() {
+                debugger;
+                    var jsonInitiativeName = $('#hdnInitiativeName').val();
+                    initiativeNameArray = $.parseJSON(jsonInitiativeName);
+                    $(".ddlInitiative").append($("<option></option>").val('--Select--').html('--Select--'));
+                    $.each(initiativeNameArray, function(key, value) {
+                        $(".ddlInitiative").append($("<option></option>").val(value.InitiativeId).html(value.InitiativeName));
+                    });
+                }
+
+                function populateDynamicInitiativeNameByRow(elementid) {
+                debugger;
+                    var jsonInitiativeName = $('#hdnInitiativeName').val();
+                    initiativeNameArray = $.parseJSON(jsonInitiativeName);
+                    $(elementid).append($("<option></option>").val('--Select--').html('--Select--'));
+                    $.each(initiativeNameArray, function(key, value) {
+                            $(elementid).append($("<option></option>").val(value.InitiativeId).html(value.InitiativeName));
+                    });
+                }
+
+                function CommentValidation() {
+                    var cmnts = $('.Comments').val();
+                    if (cmnts.trim() == '')
+
+                    {
+                        alert('Please enter comments');
+                        return false;
+                    } else {
+                        HidePopup();
+                        RejectAction(cmnts);
+                        return true;
+                    }
+
+                }
+
+                function reloadpage() {
+                    window.location.reload(false);
+                }
+
+                function fnUpdateStatus(Statustype) {
+                    //alert(Statustype);
+                    if (Statustype == 'Approve') {
+                        HidePopup();
+                        ApproveAction();
+                    } else {
+
+                        var cmnts = $('.Comments').val();
+                        if (cmnts.trim() == '') {
+                            alert('Please enter comments');
+                            return false;
+                        } else {
+                            HidePopup();
+                            RejectAction(cmnts);
+                            return true;
+                        }
+                    }
+                }
+
+                function ClearTimeSheetComments(actiontype) {
+                
+                    if (actiontype == 'Approve') {
+                        $('.btnApprove').show();
+                        $('.btnReject').hide();
+                        $('#lblHeading').html("Approve");
+
+                    } else {
+                        $('.btnReject').show();
+                        $('.btnApprove').hide();
+                        $('#lblHeading').html("Reject");
+                    }
+                    $("#myModal").find("textarea").val('').end();
+                    HidePopup();
+                }
+
+                function CustomizePageByTimesheetStatus(status, PortalUserRole, IsPortalApprover) {                                                                                
+                    if (PortalUserRole == 'Customer') {
+                        $(".timesheet").find("input").prop('disabled', true);
+                        $("#txtComments").hide();
+
+                        if (status == 'Approved') {
+                            $(".actiontd").hide();
+                            $("#addRowTd").attr("colspan", "2");
+                            $(".ddlInitiative").show();
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+                            $(".timesheet").find("input").prop('disabled', true);
+                            $(".ddlInitiative").prop('disabled', true);
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").show();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'inline-block';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'inline-block';
+
+                        }
+                        if (status == 'Rejected') {
+                            $(".actiontd").hide();
+                            $("#addRowTd").attr("colspan", "2");
+
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+                            $(".timesheet").find("input").prop('disabled', true);
+                            $(".ddlInitiative").prop('disabled', true);
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").show();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'none';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'none';
+
+                        }
+                        if (status == 'Submitted') {
+                            $(".actiontd").hide();
+                            $("#addRowTd").attr("colspan", "2");
+
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+                            $(".timesheet").find("input").prop('disabled', true);
+                            $(".ddlInitiative").prop('disabled', true);
+
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+
+                            if (IsPortalApprover == "true") {
+                                $("#btnApprove").show();
+                                $("#btnReject").show();
+                            } else {
+                                $("#btnApprove").hide();
+                                $("#btnReject").hide();
+                            }
+                            $("#txtComments").hide();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'none';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'none';
+
+                        }
+                        if (status == 'Saved') {
+                            $(".actiontd").hide();
+                            $("#divStatus").hide();
+                            $("#addRowTd").attr("colspan", "2");
+
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+                            $(".timesheet").find("input").prop('disabled', true);
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").hide();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'none';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'none';
+                        }
+                        if (status == '') {
+                        debugger;
+                            $(".actiontd").hide();
+                            $("#divStatus").hide();
+                            $("#addRowTd").attr("colspan", "2");
+
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+                            $(".timesheet").find("input").prop('disabled', true);
+                            $(".ddlInitiative").prop('disabled', true);
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").hide();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'none';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'none';
+                            $("#btnReject").hide();
+                            $("#txtComments").hide();
+
+                        }
+                        $(".Rescol").hide();
+                        $("#tdColTotal").hide();
+                    }                    
+                    else {
+                        $("#txtComments").hide();
+                        if (status == 'Approved') {
+                            $(".actiontd").hide();
+                            $("#addRowTd").attr("colspan", "1");
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+                            $(".timesheet").find("input").prop('disabled', true);
+                            $(".ddlResource").prop('disabled', true);
+                            $(".ddlInitiative").prop('disabled', true);
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").show();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'inline-block';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'inline-block';
+                        }
+                        if (status == 'Rejected') {
+                            $(".actiontd").show();
+                            $("#addRowTd").attr("colspan", "2");
+
+                            $(".add-row").show();
+                            $(".delete-icon").show();
+
+                            $(".timesheet").find("input").prop('disabled', false);
+                            $(".ddlResource").prop('disabled', false);
+                            $(".ddlInitiative").prop('disabled', false);
+                            $("#btnSave").show();
+                            $("#btnSubmit").show();
+                            $("#btnCancel").show();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").show();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'none';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'none';
+
+                        }
+                        if (status == 'Submitted' && (PortalUserRole == 'Technical Account Manager' || PortalUserRole == 'Practice Head')) {
+                            $(".actiontd").hide();
+                            $("#addRowTd").attr("colspan", "1");
+
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+
+
+                            $(".timesheet").find("input").prop('disabled', true);
+                            $(".ddlResource").prop('disabled', true);
+                            $(".ddlInitiative").prop('disabled', true);
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").show();
+                            $("#btnReject").show();
+                            $("#txtComments").hide();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'inline-block';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'inline-block';
+
+                        }
+
+                        if (status == 'Submitted' && (PortalUserRole != 'Technical Account Manager' && PortalUserRole != 'Practice Head')){
+                            $(".actiontd").hide();
+                            $("#addRowTd").attr("colspan", "1");
+
+                            $(".add-row").hide();
+                            $(".delete-icon").hide();
+
+
+                            $(".timesheet").find("input").prop('disabled', true);
+                            $(".ddlResource").prop('disabled', true);
+                            $(".ddlInitiative").prop('disabled', true);
+                            //alert('1');
+                            $("#btnSave").hide();
+                            $("#btnSubmit").hide();
+                            $("#btnCancel").hide();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").hide();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'inline-block';
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'inline-block';
+
+                        }
+                        if (status == 'Saved' || status == '') {
+                            $(".actiontd").show();
+                            $("#addRowTd").attr("colspan", "2");
+                            $(".add-row").show();
+                            $(".delete-icon").show();
+                            $(".timesheet").find("input").prop('disabled', false);
+                            $("#btnSave").show();
+                            $("#btnSubmit").show();
+                            $("#btnCancel").show();
+                            $("#btnApprove").hide();
+                            $("#btnReject").hide();
+                            $("#txtComments").hide();
+                            document.getElementById("j_id0:j_id1:exportaspdf").style.display = 'none'; 
+                            document.getElementById("j_id0:j_id1:exportasexcel").style.display = 'none';                                                        
+                        }  
+                                              
+                    }
+
+                }
+
+                function validateNewRows(element) {
+                    var elementvalue = $(element).val();
+              //      var newelementvalue = elementvalue.replace(/[^0-9\.]/g, '');
+                    $(element).val(elementvalue);
+                    if ($(element).val() > 24) {
+                        alert("Hours cannot be more than 24");
+                        $(element).val("");
+                    }
+                }
+
+                function newSum() {
+                    var sum = 0;
+                    var thisRow = $(this).closest("tr");
+                    thisRow.find("td .hrs").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            sum += parseFloat($(this).val());
+                        }
+                    });
+                    thisRow.find("td.total").html(sum); // It is an <input>, right?
+                }
+
+                function newSumInAddRow(element) {
+                    var sum = 0;
+                    var thisRow = $(element).closest("tr");
+                    thisRow.find("td .hrs").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            sum += parseFloat($(this).val());
+
+                        }
+                    });
+                    thisRow.find("td.total").html(sum); // It is an <input>, right?
+                }
+
+                function totalSum() {
+                    var sum = 0;
+                    var table = $(".timesheet");
+                    table.find("td.total").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).html()))) {
+                            sum += parseFloat($(this).html());
+                        }
+                    });
+                    $("#tdTotalSum").html(sum.toFixed(2));
+                }
+
+                function CalculateColumnTotal() {
+                    var MonSum = 0;
+                    var TueSum = 0;
+                    var WedSum = 0;
+                    var ThuSum = 0;
+                    var FriSum = 0;
+                    var SatSum = 0;
+                    var SunSum = 0;
+
+                    var table = $(".timesheet");
+
+                    table.find("td .mondate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            MonSum += parseFloat($(this).val());
+                        }
+                    });
+                    table.find("td .tuedate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            TueSum += parseFloat($(this).val());
+                        }
+                    });
+                    table.find("td .weddate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            WedSum += parseFloat($(this).val());
+                        }
+                    });
+                    table.find("td .thudate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            ThuSum += parseFloat($(this).val());
+                        }
+                    });
+                    table.find("td .fridate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            FriSum += parseFloat($(this).val());
+                        }
+                    });
+                    table.find("td .satdate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            SatSum += parseFloat($(this).val());
+                        }
+                    });
+                    table.find("td .sundate").each(function(i, el) {
+                        if (!isNaN(parseFloat($(this).val()))) {
+                            SunSum += parseFloat($(this).val());
+                        }
+                    });
+                    
+                    $("#tdMonSum").html(MonSum.toFixed(2));
+                    $("#tdTueSum").html(TueSum.toFixed(2));
+                    $("#tdWedSum").html(WedSum.toFixed(2));
+                    $("#tdThuSum").html(ThuSum.toFixed(2));
+                    $("#tdFriSum").html(FriSum.toFixed(2));
+                    $("#tdSatSum").html(SatSum.toFixed(2));
+                    $("#tdSunSum").html(SunSum.toFixed(2)); 
+                    
+                }
+
+                function PopulateWeekDays(DateValue) {
+                    var shortMonth = new Array();
+                    shortMonth[0] = "JAN";
+                    shortMonth[1] = "FEB";
+                    shortMonth[2] = "MAR";
+                    shortMonth[3] = "APR";
+                    shortMonth[4] = "MAY";
+                    shortMonth[5] = "JUN";
+                    shortMonth[6] = "JUL";
+                    shortMonth[7] = "AUG";
+                    shortMonth[8] = "SEP";
+                    shortMonth[9] = "OCT";
+                    shortMonth[10] = "NOV";
+                    shortMonth[11] = "DEC";
+                    var startEndDateofWeek = [];
+
+
+                    startEndDateofWeek = getstartAndEndOfWeek(new Date(DateValue));
+                    WeekDay1 = "";
+                    WeekDay2 = "";
+                    WeekDay3 = "";
+                    WeekDay4 = "";
+                    WeekDay5 = "";
+                    WeekDay6 = "";
+                    WeekDay7 = "";
+                    WeekStartDayYear = "";
+                    WeekEndDayYear = "";
+                    locale = "en-us"
+                    $.each(startEndDateofWeek, function(index, value) {
+                        eachDate = new Date(value);
+                        if (index == 0) {
+                            StartDateOfWeek = eachDate;
+                            //WeekDay1 = eachDate.toLocaleString(locale, { month: "short" }) +" " +eachDate.getDate();   
+                            WeekDay1 = shortMonth[eachDate.getMonth()] + " " + eachDate.getDate();
+                            //alert(shortMonth[eachDate.getMonth()]);                   
+                            WeekStartDayYear = shortMonth[eachDate.getMonth()] + " " + eachDate.getDate() + " " + eachDate.getFullYear();
+                        } else if (index == 1) {
+                            EndDateOfWeek = eachDate;
+                            WeekDay7 = shortMonth[eachDate.getMonth()] + " " + eachDate.getDate();
+                            WeekEndDayYear = shortMonth[eachDate.getMonth()] + " " + eachDate.getDate() + " " + eachDate.getFullYear();
+                        }
+                    });
+                    TuesdayDate = new Date(StartDateOfWeek);
+                    WednesdayDate = new Date(StartDateOfWeek);
+                    ThursdayDate = new Date(StartDateOfWeek);
+                    FridayDate = new Date(StartDateOfWeek);
+                    SaturdayDate = new Date(StartDateOfWeek);
+                    SundayDate = new Date(StartDateOfWeek);
+
+                    TuesdayDate.setDate(StartDateOfWeek.getDate() + 1);
+                    WednesdayDate.setDate(StartDateOfWeek.getDate() + 2);
+                    ThursdayDate.setDate(StartDateOfWeek.getDate() + 3);
+                    FridayDate.setDate(StartDateOfWeek.getDate() + 4);
+                    SaturdayDate.setDate(StartDateOfWeek.getDate() + 5);
+                    SundayDate.setDate(StartDateOfWeek.getDate() + 6);
+
+
+
+                    WeekDay2 = shortMonth[TuesdayDate.getMonth()] + " " + TuesdayDate.getDate(); // AssignWeekValueToSet(StartDateOfWeek.getDate()+ 1,StartDateOfWeek,EndDateOfWeek); 
+                    WeekDay3 = shortMonth[WednesdayDate.getMonth()] + " " + WednesdayDate.getDate(); //  AssignWeekValueToSet(StartDateOfWeek.getDate()+ 2,StartDateOfWeek,EndDateOfWeek);
+                    WeekDay4 = shortMonth[ThursdayDate.getMonth()] + " " + ThursdayDate.getDate(); //  AssignWeekValueToSet(StartDateOfWeek.getDate()+ 3,StartDateOfWeek,EndDateOfWeek);
+                    WeekDay5 = shortMonth[FridayDate.getMonth()] + " " + FridayDate.getDate(); //  AssignWeekValueToSet(StartDateOfWeek.getDate()+ 4,StartDateOfWeek,EndDateOfWeek);
+                    WeekDay6 = shortMonth[SaturdayDate.getMonth()] + " " + SaturdayDate.getDate(); // AssignWeekValueToSet(StartDateOfWeek.getDate()+ 5,StartDateOfWeek,EndDateOfWeek);
+                    //alert(WeekDay2)
+
+                    $("#HdrDay1").html(WeekDay1 + "<br/> MON");
+                    $("#weekStDate").html(WeekStartDayYear);
+                    $("#HdrDay2").html(WeekDay2 + "<br/> TUE");
+                    $("#HdrDay3").html(WeekDay3 + "<br/> WED");
+                    $("#HdrDay4").html(WeekDay4 + "<br/> THU");
+                    $("#HdrDay5").html(WeekDay5 + "<br/> FRI");
+                    $("#HdrDay6").html(WeekDay6 + "<br/> SAT");
+                    $("#HdrDay7").html(WeekDay7 + "<br/> SUN");
+
+                    $("#weekEndDate").html(WeekEndDayYear);
+                    $(".mondate").attr("DateValue", FormatDate(StartDateOfWeek));
+                    $(".tuedate").attr("DateValue", FormatDate(TuesdayDate));
+                    $(".weddate").attr("DateValue", FormatDate(WednesdayDate));
+                    $(".thudate").attr("DateValue", FormatDate(ThursdayDate));
+                    $(".fridate").attr("DateValue", FormatDate(FridayDate));
+                    $(".satdate").attr("DateValue", FormatDate(SaturdayDate));
+                    $(".sundate").attr("DateValue", FormatDate(SundayDate));
+                }
+
+                function AssignMonthValueToSet(valToSet, dateVal) {
+                    var days = getDaysInMonth(dateVal.getMonth() + 1, dateVal.getFullYear());
+                    if (valToSet > days) {
+                        return dateVal.getMonth() + 2;
+                    } else {
+                        return dateVal.getMonth() + 1;
+                    }
+                }
+
+                function AssignWeekValueToSet(valToSet, dateVal, dateSetVal) {
+                    var shortMonth = new Array();
+                    shortMonth[0] = "JAN";
+                    shortMonth[1] = "FEB";
+                    shortMonth[2] = "MAR";
+                    shortMonth[3] = "APR";
+                    shortMonth[4] = "MAY";
+                    shortMonth[5] = "JUN";
+                    shortMonth[6] = "JUL";
+                    shortMonth[7] = "AUG";
+                    shortMonth[8] = "SEP";
+                    shortMonth[9] = "OCT";
+                    shortMonth[10] = "NOV";
+                    shortMonth[11] = "DEC";
+
+                    var days = getDaysInMonth(dateVal.getMonth() + 1, dateVal.getFullYear());
+                    if (valToSet <= days) {
+                        //return (new Date(dateVal) ).toLocaleString(locale, { month: "short" }) +" " +valToSet;
+                        return shortMonth[dateVal.getMonth()] + " " + valToSet;
+                    } else {
+                        //return (new Date(dateSetVal)).toLocaleString(locale, { month: "short" }) +" " +(valToSet - days);
+                        return shortMonth[dateSetVal.getMonth()] + " " + (valToSet - days);
+                    }
+                }
+
+                var getDaysInMonth = function(month, year) {
+                    return new Date(year, month, 0).getDate();
+                }
+
+                function FormatDate(datevalue) {
+                    var dd = datevalue.getDate();
+                    var mm = datevalue.getMonth() + 1;
+                    var y = datevalue.getFullYear();
+                    var FormattedDate = mm + "/" + dd + "/" + y;
+                    return FormattedDate;
+                }
+
+                function FetchTimesheetValues(stats) {
+                    var TimesheetJson = {};
+                    $("#hdnAction").val(stats);
+                    var currStartDate = $("#weekStDate").html();
+                    var currEndDate = $("#weekEndDate").html();
+                    TimesheetJson.WeekStartDate = FormatDate(new Date(currStartDate)); //"9/1/2016";
+                    TimesheetJson.WeekEndDate = FormatDate(new Date(currEndDate)); //"9/7/2016";
+                    TimesheetJson.Status = stats;
+                    TimesheetJson.Comments = $("txtComments").val();
+                    TimesheetJson.TimesheetDtls = [];
+
+                    var validation = ValidateTimesheetRows();
+                    var confirmresult = false;
+                    if (validation) {
+
+                        if (stats == "Submitted") {
+
+                            confirmresult = confirm("Are you sure want to submit the timesheet");
+
+                        } else {
+                            confirmresult = true;
+                        }
+                        if (confirmresult) {
+                        debugger;
+                            var table = $(".timesheet");
+                            TotalHrs = 0;
+                            table.find("tr").each(function(i, el) {
+                                var RowNo = $(this).attr("RowNo");
+                                if (RowNo > 0) {
+                                    var TaskName = $("#txtTask_" + RowNo).val();
+                                    var ResourceId = $("#ddlResName_" + RowNo).find('option:selected').val();
+                                    var ResourceName = $("#ddlResName_" + RowNo).find('option:selected').text();
+                                    var IntiativeId = $("#ddlInitiative_" + RowNo).find('option:selected').val();
+                                    var IntiativeName = $("#ddlInitiative_" + RowNo).find('option:selected').text();
+
+                                    var eachRowNo = i;
+                                    if (TaskName != "" && ResourceName != "--Select--") {
+                                        $(this).find("td .hrs").each(function(i, el) {
+
+                                            var EachTimsheetDtlJson = {}
+                                            var DateValue = $(this).attr("DateValue");
+                                            var HoursSpent = $(this).val();
+                                            if (HoursSpent != "") {
+                                                TotalHrs = parseInt(TotalHrs) + parseInt(HoursSpent);
+                                                EachTimsheetDtlJson.RowNo = eachRowNo;
+                                                EachTimsheetDtlJson.TaskName = TaskName;
+                                                EachTimsheetDtlJson.ResourceId = ResourceId;
+                                                EachTimsheetDtlJson.ResourceName = ResourceName;
+                                                EachTimsheetDtlJson.IntiativeId = IntiativeId;
+                                                EachTimsheetDtlJson.IntiativeName = IntiativeName;
+                                                EachTimsheetDtlJson.TDate = DateValue;
+                                                EachTimsheetDtlJson.Hrs = HoursSpent;
+                                                TimesheetJson.TimesheetDtls.push(EachTimsheetDtlJson);
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                            TimesheetJson.TotalHours = TotalHrs;
+                            var strUpdatedList = JSON.stringify(TimesheetJson);
+                            //alert(strUpdatedList);
+                            passJSONToController(strUpdatedList, stats);
+
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                };
+
+                function ValidateTimesheetRows() {
+                    var table = $(".timesheet");
+                    var IsMandatoryMissing = false;
+
+                    var TotalHrs = 0;
+                    var TotalSum = $("#tdTotalSum").html();
+                    table.find("tr").each(function(i, el) {
+
+                        var RowNo = $(this).attr("RowNo");
+                        if (RowNo > 0) {
+                            var TaskName = $("#txtTask_" + RowNo).val().trim();
+                            var ResourceName = $("#ddlResName_" + RowNo).val().trim();
+                            var EachRowTotalHrs = $("#tdTotal_" + RowNo).html();
+                            var TotalSum = $("#tdTotalSum").html();
+
+                            if ((TaskName == "" || ResourceName == "--Select--") && ((EachRowTotalHrs != "0"))) {
+                                IsMandatoryMissing = true;
+                                return false;
+                            }
+                            if ((TaskName != "") && ((EachRowTotalHrs == "0"))) {
+                                IsMandatoryMissing = true;
+                                return false;
+                            }
+                            if ((ResourceName != "--Select--") && ((EachRowTotalHrs == "0"))) {
+                                IsMandatoryMissing = true;
+                                return false;
+                            }
+                        }
+                    });
+                    if ((TotalSum == "") || ((TotalSum == 0))) {
+                        alert("Hours cannot be blank or zero, Please enter hours")
+                        return false;
+
+                    }
+
+                    if (IsMandatoryMissing) {
+                        alert("Please fill in all the mandatory fields before Save/Submit the timesheet.")
+                        return false;
+                    }
+                    return true;
+                }
+
+                function populatePreviousWeekDates() {
+                    $(".total").html('');
+                    $(".ColTotal").html('');
+                    $(".spanTotal").html('');
+                    $("#tdTotalSum").html('');
+                    var currDate = $("#weekStDate").html();
+                    var currDateSplit = currDate.split(" ");
+                    var shortMonth = currDateSplit[0];
+                    var monthstring = getMonthFromString(shortMonth) + 1;
+                    var dayString = parseFloat(currDateSplit[1]) - 7;
+                    var yearString = currDateSplit[2];
+                    if (dayString <= 0) {
+                        monthstring = monthstring - 1;
+                        //var days = Math.round(((new Date(yearString, monthstring))-(new Date(yearString, monthstring-1)))/86400000);
+                        var days = new Date(yearString, monthstring, 0).getDate();
+                        dayString = dayString + days;
+                        if (monthstring == 0) {
+                            monthstring = 12;
+                            yearString = yearString - 1;
+                        }
+                    }
+                    var currWeekDate = monthstring + '/' + dayString + '/' + yearString;
+                    var datecurr = new Date(currWeekDate);
+                    var WeekDate = FormatDate(datecurr);
+
+                    PopulateWeekDays(WeekDate);
+                    $("#Tbltimesheet").find("input").val('');
+                    //DisableFields();
+                    passWeekDateToController(FormatDate(new Date($("#weekStDate").html())), FormatDate(new Date($("#weekEndDate").html())))
+                }
+
+                //To Disable the Previous Month Fields
+                function DisableFields(tstatus) {
+
+                    //To get the Current and Previous Month
+                                               
+
+                    var currentMonthdate = new Date('{!CurrentDate}');
+
+
+                    var previousMonth = new String(currentMonthdate.getMonth());
+                    var currentMonth = new String(currentMonthdate.getMonth() + 1);
+                    var currentYear = new String(currentMonthdate.getFullYear());
+                    if (previousMonth == "0") {
+                        previousMonth = 12;
+                    }
+
+                    $(".timesheet").children("tr").each(function() {
+
+                        $('td', this).each(function() {
+                            var timeValue = $(this).find(":input").attr("Datevalue");
+                            var currentRowDate = new Date(timeValue);
+                            // alert(currentRowDate);             
+                            //$(this).find(":input").prop('disabled', true);
+                            if (typeof timeValue !== "undefined") {
+                                var splitTimeValue = timeValue.split("/");
+
+                                if (currentRowDate > currentMonthdate) {
+                                    if (tstatus == '' || tstatus == 'Saved') {
+                                        $(this).find(":input").prop('disabled', true);
+                                        $(this).find(":input").parent().prop('disabled', true);
+                                    }
+
+                                }
+                                if (previousMonth == 12) {
+                                    if ((splitTimeValue[0] != previousMonth.valueOf() && splitTimeValue[0] != currentMonth.valueOf())) {
+                                        if (tstatus == '' || tstatus == 'Saved') {
+                                            $(this).find(":input").prop('disabled', true);
+                                            $(this).find(":input").parent().prop('disabled', true);
+                                        }
+                                    }
+
+                                } else if ((splitTimeValue[0] != previousMonth.valueOf() && splitTimeValue[0] != currentMonth.valueOf()) || (splitTimeValue[2] != currentYear.valueOf())) {
+                                    if (tstatus == '' || tstatus == 'Saved') {
+                                        $(this).find(":input").prop('disabled', true);
+                                        $(this).find(":input").parent().prop('disabled', true);
+                                    }
+                                } else {
+                                    if (tstatus == '' || tstatus == 'Saved') {
+                                        $(this).find(":input").prop('disabled', false);
+                                        $(this).find(":input").parent().prop('disabled', false);
+                                    }
+                                }
+
+                            }
+
+                        })
+
+                        //TO Check whether all the hours entry fields are disabled. If disabled then we are disabling the task and resource fields  
+                        if ($(".mondate").prop("disabled") == true && $(".tuedate").prop("disabled") == true && $(".weddate").prop("disabled") == true && $(".thudate").prop("disabled") == true && $(".fridate").prop("disabled") == true && $(".satdate").prop("disabled") == true && $(".sundate").prop("disabled") == true) {
+                            if (tstatus == '' || tstatus == 'Saved') {
+                                $(".txtTask").prop('disabled', true);
+                                $(".ddlResource").prop('disabled', true);
+                                $(".ddlInitiative").prop('disabled', true);
+                            }
+
+                        } else {
+                            if (tstatus == '' || tstatus == 'Saved') {
+                                $(".txtTask").prop('disabled', false);
+                                $(".ddlResource").prop('disabled', false);
+                                $(".ddlInitiative").prop('disabled', false);
+                            }
+                        }
+                    })
+                }
+
+                function populateNextWeekDates() {
+                    var currDate = $("#weekEndDate").html();
+                    var currDateSplit = currDate.split(" ");
+                    var shortMonth = currDateSplit[0];
+                    var monthstring = getMonthFromString(shortMonth) + 1;
+                    var dayString = parseFloat(currDateSplit[1]) + 1;
+                    var yearString = currDateSplit[2];
+                    var days = new Date(yearString, monthstring, 0).getDate();
+                    if (dayString > days) {
+                        dayString = dayString - days;
+                        monthstring = monthstring + 1;
+                        if (monthstring == 13) {
+                            yearString = yearString + 1;
+                        }
+                    }
+                    var currWeekDate = monthstring + '/' + dayString + '/' + yearString;
+                    var datecurr = new Date(currWeekDate);
+                    var TodayDate = new Date('{!CurrentDate}');
+                    if (datecurr > TodayDate) {
+
+                        return false;
+                    }
+
+                    $(".total").html('');
+                    $(".ColTotal").html('');
+                    $("#tdTotalSum").html('');
+                    var WeekDate = FormatDate(datecurr);
+                    //alert(WeekDate);
+                    PopulateWeekDays(WeekDate);
+                    $("#Tbltimesheet").find("input").val('');
+                    passWeekDateToController(FormatDate(new Date($("#weekStDate").html())), FormatDate(new Date($("#weekEndDate").html())));
+                }
+
+                //To Get the Month Value from Short Month Name
+                function getMonthFromString(mon) {
+                    var months = new Array("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC");
+                    var result = getPosition(mon.toUpperCase(), months);
+                    return result;
+                }
+
+                //To get the Position of the Month
+                function getPosition(elementToFind, arrayElements) {
+                    var i;
+                    for (i = 0; i < arrayElements.length; i += 1) {
+
+                        var strarrayElements = arrayElements[i];
+                        var strelementToFind = elementToFind;
+
+                        if (strarrayElements.localeCompare(strelementToFind) == 0) {
+                            return i;
+                        }
+                    }
+                    return null; //not found
+                }
+
+
+                function CancelTimesheet() {
+                    location.reload();
+                }
+
+                function HidePopup() {
+                    $("#myModal").hide();
+                    $(".modal-backdrop").removeClass("modal-backdrop");
+                }
+
+                function ApplySearch() {
+                    var AccountID = $(".ddlstAccount").val();
+                    var ServiceID = $(".ddlstService").val();
+
+                    ApplySearchAction(AccountID, ServiceID)
+                }          
+                                
+                
+                function SetVisiblityForNextWeek(CurrentWeekEndDate) {
+                    var nextWeekEndDate = new Date('{!CurrentDate}');
+                    var TodayDate = new Date('{!CurrentDate}');
+                    nextWeekEndDate.setDate(CurrentWeekEndDate.getDate() + 6);
+                    if (TodayDate < nextWeekEndDate) {
+                        $("#nextWeekID").hide();
+                    } else {
+                        $("#nextWeekID").show();
+                    }
+                }
+            </script>
+
+            <apex:outputPanel id="jsPanel">
+                <script>
+                    function BindJSONDataToPage() {
+
+                        timesheetstatus = '';
+                        var jResponse = '{!TimeshtJSONtoBind}';
+                        jResponse = jResponse.replace(/'/g, "\\'");
+
+                        var jsonFromCtrl = '';
+                        var Comments = '';
+
+                        if (jResponse != '') {
+                            jsonFromCtrl = jResponse.split('~')[0];
+
+                            timesheetstatus = jResponse.split('~')[1];
+                            Comments = jResponse.split('~')[2];
+
+                        }
+                        $("#txtComments").val(Comments);
+                        if (!timesheetstatus) {
+                            $("#divStatus").hide();
+                        } else {
+                            $("#divStatus").show();
+                            $("#lblStatus").html(timesheetstatus);
+                        }
+                        $(".staticRows").remove();
+                        if (jsonFromCtrl != '') {
+
+                            var timeshtArray = $.parseJSON(jsonFromCtrl);
+
+                            $.each(timeshtArray, function(key, value) {
+                                var rowno = timeshtArray[key].Row_No__c;
+
+                                if (rowno > 0) {
+                                    if ($('#txtTask_' + rowno).length == 0) {
+                                        AddRowToAdditionalTable(rowno);
+                                        var elementid = '#ddlResName_' + rowno;
+                                        var initiativeElementid = '#ddlInitiative_' + rowno;
+                                        populateDynamicResoureNameByRow(elementid);
+                                        populateDynamicInitiativeNameByRow(initiativeElementid);
+                                    }
+                                }
+                                var TaskName = timeshtArray[key].Task_Name__c;
+                                TaskName = TaskName.replace('$#$', "'");
+
+                                $('#txtTask_' + rowno).val(TaskName);
+                                $('#ddlResName_' + rowno).val(timeshtArray[key].Resource_Id__c);
+                                $('#ddlInitiative_' + rowno).val(timeshtArray[key].Intiative__c);                                
+                                var timeshtDate = timeshtArray[key].Timesheet_Date__c;
+
+                                var timeDate = new Date(toMmDdYy(timeshtDate));
+                                var dayName = timeDate.getDay();
+                                switch (dayName) {
+                                    case 1:
+                                        $('#txtMonHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtMonHrs_' + rowno).keyup();
+                                        break;
+                                    case 2:
+                                        $('#txtTueHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtTueHrs_' + rowno).keyup();
+                                        break;
+                                    case 3:
+                                        $('#txtWedHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtWedHrs_' + rowno).keyup();
+                                        break;
+                                    case 4:
+                                        $('#txtThuHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtThuHrs_' + rowno).keyup();
+                                        break;
+                                    case 5:
+                                        $('#txtFriHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtFriHrs_' + rowno).keyup();
+                                        break;
+                                    case 6:
+                                        $('#txtSatHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtSatHrs_' + rowno).keyup();
+                                        break;
+                                    default:
+                                        $('#txtSunHrs_' + rowno).val(timeshtArray[key].Hours_Worked__c);
+                                        $('#txtSunHrs_' + rowno).keyup();
+                                        break;
+                                }
+                            });
+                        } else {
+                            AddRowToAdditionalTable(1);
+                            AddRowToAdditionalTable(2);
+                            AddRowToAdditionalTable(3);
+                            AddRowToAdditionalTable(4);
+                            AddRowToAdditionalTable(5);
+                            populateDynamicResoureName();
+                            populateDynamicInitiativeName();
+                            $("#Tbltimesheet").find("input").val('');
+                        }
+
+                        CustomizePageByTimesheetStatus(timesheetstatus, PortalUserRole, IsPortalApprover);
+                        if (PortalUserRole != 'Customer') {
+                             DisableFields(timesheetstatus);
+                        }
+                    }
+
+                    function PostSaveTimesheet() {
+
+                        //var accid = '{!AccountId}';
+                        //alert(BindJSONDataToPage);
+                        //alert(FetchTimesheetValues);
+                        //alert(   $("#hdnAction").val());
+                        debugger;
+                        if ($("#hdnAction").val() == 'Saved') {
+                            alert("Timesheet has been saved successfully");
+                        } else if($("#hdnAction").val() == 'ValidateFailed'){
+                            var invalidInitiativeName = $("#hdnInitateName").val();
+                            var invalidInitiateEstmtdHrs = $("#hdnEstmtHrs").val();
+                            var invalidInitiateRemHrs = $("#hdnRemngHrs").val();
+                            alert("Total added hours is higher than the estimated hours of " + invalidInitiateEstmtdHrs +" for Initiative: "+ invalidInitiativeName + ". Remaining Hours: " +invalidInitiateRemHrs);
+                        } else if($("#hdnAction").val() == 'Submitted'){
+                            window.location.href = "ViewTimesheet";
+
+                        }
+                        //accntId ='+AccountId+'&srvcId='+'serviceId
+
+                    }
+
+                    var toMmDdYy = function(input) {
+                        var ptrn = /(\d{4})\-(\d{2})\-(\d{2})/;
+                        if (!input || !input.match(ptrn)) {
+                            return null;
+                        }
+                        return input.replace(ptrn, '$2/$3/$1');
+                    };
+
+                    function AddRowToAdditionalTable(RowNo) {
+                        $("#addtionalTable").append("<tr class='staticRows'    RowNo=" + RowNo + "> <td class='actiontd'> <a href='#' class='delete-icon'><i class='fa fa-trash-o' aria-hidden='true'></i></a> </td> <td ><select id='ddlInitiative_" + RowNo + "' class='width3 ddlInitiative' style='width:165px' /></td> <td><input type='text' maxlength = '150' title = 'Max chars 150' id='txtTask_" + RowNo + "' class='width1 txtTask' /></td> <td class = 'Rescol'><select id='ddlResName_" + RowNo + "' class='width2 ddlResource' style='width:165px' /></td>  <td><input type='text' id='txtMonHrs_" + RowNo + "'  class='width3 hrs mondate' onkeyup='validateNewRows(this);newSumInAddRow(this);totalSum(this);CalculateColumnTotal(this)' autocomplete = 'off'/></td> <td><input type='text' id='txtTueHrs_" + RowNo + "' onkeyup='validateNewRows(this);newSumInAddRow(this);totalSum(this);CalculateColumnTotal(this)' class='width3 hrs tuedate' autocomplete = 'off' /></td> <td><input type='text' id='txtWedHrs_" + RowNo + "' onkeyup='validateNewRows(this);newSumInAddRow(this);totalSum(this);CalculateColumnTotal(this)'  class='width3 hrs weddate' autocomplete = 'off' /> </td> <td><input type='text' id='txtThuHrs_" + RowNo + "'  onkeyup='validateNewRows(this);newSumInAddRow(this);totalSum(this);CalculateColumnTotal(this)' class='width3 hrs thudate' autocomplete = 'off' /></td> <td><input type='text' id='txtFriHrs_" + RowNo + "' onkeyup='validateNewRows(this);newSumInAddRow(this);totalSum(this);CalculateColumnTotal(this)' class='width3 hrs fridate' autocomplete = 'off' /></td> <td><input type='text' id='txtSatHrs_" + RowNo + "' onkeyup='validateNewRows(this);newSumInAddRow(this);totalSum(this);CalculateColumnTotal(this)'  class='width3 hrs satdate' autocomplete = 'off' /> </td><td><input type='text' id='txtSunHrs_" + RowNo + "' onkeyup='validateNewRows(this);newSumInAddRow(this);totalSum(this);CalculateColumnTotal(this)'  class='width3 hrs sundate' autocomplete = 'off' /> </td> <td id='tdTotal_" + RowNo + "' class='total'>0</td></tr>");
+                        $(".mondate").attr("DateValue", FormatDate(StartDateOfWeek));
+                        $(".tuedate").attr("DateValue", FormatDate(TuesdayDate));
+                        $(".weddate").attr("DateValue", FormatDate(WednesdayDate));
+                        $(".thudate").attr("DateValue", FormatDate(ThursdayDate));
+                        $(".fridate").attr("DateValue", FormatDate(FridayDate));
+                        $(".satdate").attr("DateValue", FormatDate(SaturdayDate));
+                        $(".sundate").attr("DateValue", FormatDate(SundayDate));
+                        $(".hrs").attr('maxlength', '5');
+                    }
+
+                    function logout() {
+                        window.location.replace("{!$Site.Prefix}/secur/logout.jsp");
+                    }
+
+                    function Redirect() {
+                        window.location.href = "ViewTimesheet";
+                    }
+                </script>
+            </apex:outputPanel>
+
+
+            <!-------- Fonts Awesome ----->
+            <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'font-awesome/css/font-awesome.css')}" />
+            <title>ON DEMAND SERVICES </title>
+        </head>
+
+        <body>
+
+            <apex:actionFunction name="passJSONToController" action="{!SaveTimesheet}" status="statusSaveTrip" rerender="jsPanel,hdnActionPanel" immediate="false" oncomplete="PostSaveTimesheet();">
+                <apex:param name="PassedTimesheetJSON" assignTo="{!PassedTimesheetJSON}" value="" id="TimesheetJSONId" />
+                <apex:param name="hdnActionValue" assignTo="{!hdnActionValue}" value="" id="hdnActionValueId"/>
+            </apex:actionFunction>
+            <apex:actionFunction name="passWeekDateToController" action="{!GetWeeklyTimesheet}" status="statusSaveTrip" rerender="jsPanel" oncomplete="BindJSONDataToPage();">
+                <apex:param name="PassedWeekFromDate" assignTo="{!PassedWeekFromDate}" value="" id="PassedWeekFromDateId" />
+                <apex:param name="PassedWeekToDate" assignTo="{!PassedWeekToDate}" value="" id="PassedWeekToDateId" />
+            </apex:actionFunction>
+            <apex:actionFunction name="ApplySearchAction" action="{!GetTimesheetByAccountServiceID}" status="statusSaveTrip" rerender="listPanel,jsPanel,SearchResultsPanel,CustomerPanel" oncomplete="BindJSONDataToPage();" immediate="true">
+                <apex:param name="SelectedAccountId" value="" assignTo="{!AccountId}" />
+                <apex:param name="SelectedServiceID" value="" assignTo="{!ServiceID}" />
+            </apex:actionFunction>
+
+            <apex:actionFunction name="ApproveRejectAction" action="{!GetTimeSheetIdFromAction}" rerender="SearchResultsPanel, myModal" immediate="true">
+                <apex:param name="CurrentTimesheetId" value="" assignTo="{!CurrenTimesheetId}" />
+            </apex:actionFunction>
+
+            <apex:actionFunction name="RejectAction" action="{!RejectTimesheet}" reRender="SearchResultsPanel" status="statusSaveTrip" oncomplete="reloadpage();">
+                <apex:param name="timeshtCmnts" value="" assignTo="{!TimesheetComments}" />
+            </apex:actionFunction>
+            <apex:actionFunction name="ApproveAction" action="{!ApproveTimesheet}" reRender="SearchResultsPanel" status="statusSaveTrip" oncomplete="reloadpage();" />
+
+            <div class="shadow-show"></div>
+            <c:ODS_HeaderComponent />
+            <apex:actionStatus id="statusSaveTrip" stopText="">
+                <apex:facet name="start">
+                    <div>
+                        <div class="popupBackground" />
+                        <div class="PopupPanel">
+                            <table border="0" width="100%" height="100%">
+                                <tr>
+                                    <td align="center"><b>Please Wait</b></td>
+                                </tr>
+                                <tr>
+                                    <td align="center"><img src="{!$Resource.ODS_Statussign}" /></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </apex:facet>
+            </apex:actionStatus>
+            <div class="clr"></div>
+
+            <div class="clr"></div>
+
+            <div class="mid-bg">
+                <div class="sub-warp">
+                    <h1 style="float:left;">Add Timesheet <span>( Weekly Log Time )</span></h1>
+                    <div class="mid-white">
+                        <div class="mid-user-sec">
+                            <apex:outputPanel id="CustomerPanel">
+                                <div class="mid-usertxt">
+                                    <div><strong>Customer:</strong> <label style="font-weight:normal;">{!AccountName}</label></div>
+                                    <div class="clr"></div>
+                                    <div><strong>Service:</strong><label style="font-weight:normal;">{!ServiceName}</label> </div>
+
+                                </div>
+                            </apex:outputPanel>
+                            <input type='hidden' id='hdnResourceName' value='{!resourceNameJSONtoBind}' />
+                            <input type='hidden' id='hdnInitiativeName' value='{!initiativeJSONtoBind}' />
+                            <div class="mid-dateroll">
+                                <div id="divStatus"><strong>Status:&nbsp;</strong><label style="font-weight:normal;" id="lblStatus">{!CurrentTimesheetStatus}</label> </div>
+                                <div class="clr"></div>
+                                <div><strong>Log hours on:</strong> <span id="weekStDate">Sep 4</span> - <span id="weekEndDate">Sep 10</span>
+                                    <a href="#" onclick="populatePreviousWeekDates();"><i class="fa fa-caret-left" aria-hidden="true"></i></a>
+                                    <a href="#" id="nextWeekID" onclick="return populateNextWeekDates();"><i class="fa fa-caret-right" aria-hidden="true"></i></a>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="timeline-scroll">
+
+                            <table class="timeline timesheet" id="Tbltimesheet" cellpadding="0" cellspacing="0" width="100%">
+                                <tr RowNo="0">
+                                    <th class="actiontd"><strong>ACTION</strong>
+                                    
+                                    </th>
+                                    <th><strong>Initiative Name <span style="color:#ff9797; font-size:15px;"></span> </strong>
+                                    
+                                    </th>
+                                    <th><strong>User Stories / Task <span style="color:#ff9797; font-size:15px; cursor:default;" title="Mandatory">*</span></strong>
+
+                                    </th>
+                                    <th Class="Rescol"><strong>Resource Name <span style="color:#ff9797; font-size:15px;" title="Mandatory">*</span> </strong>
+                                    </th>
+                                    <th id="HdrDay1">Sep 04<br />Sun
+                                    </th>
+                                    <th id="HdrDay2">Sep 05<br />Mon
+                                    </th>
+                                    <th id="HdrDay3">Sep 06<br />Tue
+                                    </th>
+                                    <th id="HdrDay4"> Sep 07<br />Wed
+                                    </th>
+                                    <th id="HdrDay5"> Sep 08<br />Thu
+                                    </th>
+                                    <th id="HdrDay6">Sep 09<br />Fri
+                                    </th>
+                                    <th id="HdrDay7">Sep 10<br />Sat
+                                    </th>
+                                    <th DayNo="0" style="width:300px;"><strong>Total</strong>
+                                    </th>
+                                </tr>
+                                
+                                <tbody id="addtionalTable" class="timesheet"> </tbody>
+                                <tr class="total-bg">
+                                    <td colspan="2" style="text-align:left" id="addRowTd">
+                                        <a href="#" class="add-row"><i class="fa fa-plus" aria-hidden="true"></i> Add Row</a>
+                                        <span style="text-align: right"> TOTAL </span>
+                                    </td>
+                                    <td  colspan="2" id="tdColTotal"></td>
+                                    <td id="tdMonSum" style="font-weight: normal;font-size: 12px; text-align:left;" class ="ColTotal"></td>
+                                    <td id="tdTueSum" style="font-weight: normal;font-size: 12px; text-align:left;" class ="ColTotal"></td>
+                                    <td id="tdWedSum" style="font-weight: normal;font-size: 12px; text-align:left;" class ="ColTotal"></td>
+                                    <td id="tdThuSum" style="font-weight: normal;font-size: 12px; text-align:left;" class ="ColTotal"></td>
+                                    <td id="tdFriSum" style="font-weight: normal;font-size: 12px; text-align:left;" class ="ColTotal"></td>
+                                    <td id="tdSatSum" style="font-weight: normal;font-size: 12px; text-align:left;" class ="ColTotal"></td>
+                                    <td id="tdSunSum" style="font-weight: normal;font-size: 12px; text-align:left;" class ="ColTotal"></td>
+                                    <td id="tdTotalSum"></td>
+                                    
+                                </tr>
+                                
+                            </table>
+                            <textarea id="txtComments" style="display:none" class="edit-timesheet-com" placeholder="Comments"></textarea>
+                        </div>
+                        <div class="time-submit">
+                            <!--<a href="viewTimesheet"></a> -->
+                            <apex:commandLink action="{!redirectToTimeSheet}">
+                                <input type="button" id="btnBack" class="cancel" value="Back" style="margin-right: 10px;" />
+                            </apex:commandLink>
+                            
+                            <apex:commandButton id="exportaspdf" value="Export TO PDF" styleclass="save-submit"   action="{!exportAsPDF}"  immediate="True" reRender="redirectToTimeSheet"  /> 
+                            <apex:commandButton id="exportasexcel" value="Export TO Excel" styleclass="save-submit" action="{!exportAsExcel}" immediate="True" reRender="redirectToTimeSheet" /> 
+                            
+
+                            <input type="button" id="btnSave" class="save-submit" value="Save" onclick="return FetchTimesheetValues('Saved')" />
+                            <!--   <apex:commandLink action="{!redirectToTimeSheet}">-->
+                            <input type="button" id="btnSubmit" class="save-submit" value="Submit" onclick="return FetchTimesheetValues('Submitted')" />
+                            <!--  </apex:commandLink>-->
+                            <apex:outputPanel id="hdnActionPanel">
+                                <input type="hidden" id="hdnAction" value="{!hdnActionValue}" />
+                                <input type="hidden" id="hdnInitateName" value="{!invalidInitiativeName}" />
+                                <input type="hidden" id="hdnEstmtHrs" value="{!invalidInitiateEstimtdHrs}" />
+                                <input type="hidden" id="hdnRemngHrs" value="{!inavlidInitiateRemHrs}" />
+                            </apex:outputPanel>
+
+                            <input type="button" id="btnApprove" class="save-submit" value="Approve" onclick="ClearTimeSheetComments('Approve')" data-toggle="modal" data-target="#myModal" />
+                            <input type="button" id="btnReject" class="save-submit" value="Reject" onclick="ClearTimeSheetComments('Reject')" data-toggle="modal" data-target="#myModal" style="background: #ee2c2c;" />
+                            <input type="button" id="btnCancel" class="cancel" value="Cancel" onclick="CancelTimesheet();" />
+                                                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bg">
+                <div class="copyright">COPYRIGHT © 2018 DEMANDBLUE. ALL RIGHTS RESERVED</div>
+            </div>
+
+        </body>
+
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+                <div class="modal-content">
+                    <!--<h1>Approve / Reject</h1>-->
+                    <h1><span id="lblHeading">Approve </span> </h1>
+                    <apex:inputTextarea html-placeholder="Comments" id="Comments" styleclass="Comments" value="{!TimesheetComments}" />
+                    <div class="clr"></div>
+                    <div class="popup-btn">
+
+                        <input type="button" id="btnApprove" class="popup-add btnApprove" value="Approve" onclick="return fnUpdateStatus('Approve')" />
+                        <input type="button" id="btnReject" class="popup-cancel btnReject" value="Reject" style="background:#ee2c2c;" onclick="return fnUpdateStatus('Reject')" />
+                        <!--<apex:commandlink value="Approve" styleClass="popup-add btnApprove" style="background:#ee2c2c;" onclick="HidePopup();" action="{!ApproveTimesheet}" />
+                        <apex:commandlink value="Reject" styleClass="popup-cancel btnReject" style="background:#ee2c2c;" onclick="return CommentValidation();" />-->
+
+                        <button type="button" class="btn btn-default" data-dismiss="modal">CLOSE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </apex:form>
+    </apex:page>

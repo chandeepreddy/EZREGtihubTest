@@ -1,0 +1,38 @@
+.THIS .slds-card {
+	background-color: rgb(255, 255, 255);
+	border-radius: 0em;
+	border-width: 0em;
+}
+
+.THIS .slds-card__header {
+	background-color: rgb(244, 246, 249);
+}
+
+.THIS .slds-card__header {
+	padding-bottom: 0.85em;
+}
+
+.THIS.override.two-ten-compat .slds-card__header.slds-truncate {
+	border-style: solid;
+	border-color: rgb(221,219,218);
+	border-width: 1px;
+	border-left-width: 0px;
+	margin-left: 0px;
+	background-color: rgb(255,255,255);
+}
+
+.THIS.override.two-ten-compat .slds-card__header.slds-truncate .slds-text-heading--small {
+	font-weight: 300;
+	font-size: 1.25rem;
+	line-height: 1.25;
+}
+
+.THIS.override.two-ten-compat .slds-card__header.slds-truncate .activity-count {
+	font-weight: 300;
+	font-size: 1.25rem;
+	line-height: 1.25;
+}
+
+.THIS.has-records {
+	min-height: 20em;
+}

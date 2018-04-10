@@ -1,0 +1,316 @@
+<apex:page controller="ODS_AddStatusReportController" showHeader="false" sidebar="false" standardStyleSheets="false" id="PageId" docType="html-5.0">
+    
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+
+        <title>ON DEMAND SERVICES </title>
+        <apex:includeScript value="https://code.jquery.com/jquery-latest.min.js"/>
+        <!-------- Bootstrap ----->
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/bootstrap.css')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'js/bootstrap.js')}"/>
+        <apex:stylesheet value="https://fonts.googleapis.com/css?family=Open+Sans:400,700"/>
+        <apex:includeScript value="https://www.google.com/recaptcha/api.js"/>
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/style.css')}"/>
+        <link href="{!URLFOR($Resource.ODS_Assets,'css/style_dev.css')}" rel="stylesheet" type="text/css"  />
+        <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'css/jquery-ui.css')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'ckeditor/ckeditor.js')}"/>
+
+    <script>
+    $(document).ready(function(){
+        $(".ddlstAccount").hide();
+        $(".ddlstService").hide();
+        $(".ApplyBtn").hide();
+        $("#statusreport").addClass("active");
+    
+        var IsCustomer = {!isCustomer};
+  
+  if(IsCustomer){
+  $("#mnuMyAccount").css("display","block");
+  
+  }else{
+ 
+   $("#mnuCustomer").css("display","block");
+  }
+        $("button.collapsed").click(function(){
+            $(".header").toggleClass("header-fixed");
+            $(".navbar-toggle").toggleClass("nav-btn-fixed");
+            $(".mid-bg").toggleClass("mid-bg-fixed");
+        });
+
+        
+    });
+    </script>
+    <script type="text/javascript">
+        window.onload = function()
+        {
+            CKEDITOR.replace( 'PageId:formId:editor1', { language: 'EN', toolbar: 'PageId:formId:editor1',});
+            CKEDITOR.replace( 'PageId:formId:editor2', { language: 'EN', toolbar: 'PageId:formId:editor2',});
+            CKEDITOR.replace( 'PageId:formId:editor3', { language: 'EN', toolbar: 'PageId:formId:editor3',});
+            
+            var SRStatus = '{!SRStatus}';
+            if(SRStatus === 'Submitted')
+            {
+                CKEDITOR.on("instanceReady", function (ev) 
+                {
+                var bodyelement = ev.editor.document.$.body;
+                bodyelement.setAttribute("contenteditable", false);
+                });
+            }
+            else
+            {
+                CKEDITOR.on("instanceReady", function (ev) 
+                {
+                var bodyelement = ev.editor.document.$.body;
+                bodyelement.setAttribute("contenteditable", true);
+                });
+            }
+        }
+        
+        function readonlyCkedtor()
+        {
+            var SRStatus = '{!SRStatus}';
+            alert(SRStatus)
+            if(SRStatus === 'Submitted')
+            {
+                CKEDITOR.on("instanceReady", function (ev) 
+                {
+                var bodyelement = ev.editor.document.$.body;
+                bodyelement.setAttribute("contenteditable", false);
+                });
+            }
+            else
+            {
+                CKEDITOR.on("instanceReady", function (ev) 
+                {
+                var bodyelement = ev.editor.document.$.body;
+                bodyelement.setAttribute("contenteditable", true);
+                });
+            }
+        }
+        
+       function copyPrevSR()
+          {   
+              
+              var workPrfmToday = $('.SReditor1').val();
+              var workPrfmNextDy = $('.SReditor2').val();
+              var IssuesCrn = $('.SReditor3').val();
+              
+              if($.trim(workPrfmToday).length === 0)
+              {
+                  getStatusReport(); 
+                  
+              }
+              else
+              {
+                  var strConfirm = confirm("Are you sure to copy previous status report");
+                  if(strConfirm == true)
+                  {
+                     getStatusReport();
+                     
+                  }
+              }
+               
+         }
+        
+        function isNumber(evt) {
+                evt = (evt) ? evt : window.event;
+                var charCode = (evt.which) ? evt.which : evt.keyCode;
+                if (!(charCode > 31 && (charCode < 48 || charCode > 57) && charCode ==91 )) {
+                    return false;
+                }
+                return true;
+            }
+            
+        function AssignDate()
+        {
+            var selectedDate = $('.tfrom_date').val();
+            CustomSRDate(selectedDate);
+        }
+        function RefreshCKTEditor()
+        {
+            CKEDITOR.replace( 'PageId:formId:editor1', { language: 'EN', toolbar: 'PageId:formId:editor1',});
+            CKEDITOR.replace( 'PageId:formId:editor2', { language: 'EN', toolbar: 'PageId:formId:editor2',});
+            CKEDITOR.replace( 'PageId:formId:editor3', { language: 'EN', toolbar: 'PageId:formId:editor3',});
+            
+            var SRStatus = $('.lblStatus').html();
+            if(SRStatus === 'Submitted')
+            {
+                CKEDITOR.on("instanceReady", function (ev) 
+                {
+                var bodyelement = ev.editor.document.$.body;
+                bodyelement.setAttribute("contenteditable", false);
+                });
+            }
+            else
+            {
+                CKEDITOR.on("instanceReady", function (ev) 
+                {
+                var bodyelement = ev.editor.document.$.body;
+                bodyelement.setAttribute("contenteditable", true);
+                });
+            }
+            
+         }
+        </script>
+        
+  
+
+    <apex:stylesheet value="{!URLFOR($Resource.ODS_Assets,'font-awesome/css/font-awesome.css')}"/>
+        
+    </head>
+
+    <body>
+        
+        <apex:form id="formId">
+        <!-- <apex:pageMessages id="pgMsg"/> -->
+        <apex:actionFunction id="fetchSR" name="getStatusReport" action="{!fetchStatusReportByDate}"  status="statusSaveTrip" rerender="outptPanl" oncomplete="RefreshCKTEditor()"/>
+       
+        <apex:actionFunction id="CustomSRDate" name="CustomSRDate" action="{!fetchCustomDateSR}"  status="statusSaveTrip" rerender="inputDate,outptPanl,CpyoutptPnl,sveSubPnl,SRStatus" onComplete="RefreshCKTEditor()" >
+         <apex:param id="CstmSR" assignTo="{!SRDate}" name="CustomDateSR" value="" /> 
+        </apex:actionFunction>
+        
+         <div class="shadow-show"></div>
+        <c:ODS_HeaderComponent />
+        
+         <div class="clr"></div>
+            <div class="mnu navbar-default"> 
+                <div class="collapse navbar-collapse" id="prelude_mnu">
+                    <div class="sub-warp">
+                        <ul class="nav nav-pills wow pulse nav-scroll">
+                            
+                        </ul> 
+                    </div> 
+                </div>
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#prelude_mnu"><i class="fa fa-bars" aria-hidden="true"></i></button>
+    </div>
+<div class="clr"></div>
+            
+<div class="mid-bg" >
+    <div class="sub-warp">
+        <h1>Status Report</h1>
+        <div class="mid-white">
+               <div class="mid-user-sec">
+              <!-- <apex:pageMessages /> -->
+                    <apex:outputPanel id="CustomerPanel">
+                   <!-- <div class="mid-usertxt"><strong>Customer:</strong> {!AccountName}<a href="#">{!ServiceName}</a></div> -->
+                   <div class="mid-usertxt" style="line-height: 24px;"><strong>Customer:</strong> {!AccountName} <br/> <strong>Service:</strong>  {!ServiceName} <br/> <Strong align="right">Status: </Strong>
+                    <apex:outputText id="SRStatus" styleClass="lblStatus" label="Status" value="{!SRStatus}" /></div> 
+                    <div class="mid-dateroll">
+                    
+                  
+                    &nbsp;
+                    <Strong align="right">Select Date: </strong> &nbsp;
+                    <input type="text" name="txt_from" class="tfrom_date"  id="date_service" onkeypress="return isNumber(event)" onchange="AssignDate()" onautocomplete = "off"/>
+                    &nbsp;
+                    
+                    <strong>Date: </strong> 
+                    <apex:outputText id="inputDate" styleclass="lblDate" label="date_pick" value="{0,date,MM'/'dd'/'yyyy}" >
+                        <apex:param value="{!SRDate}"/>                                                                 
+                    </apex:outputText>
+                    
+                    <br/>
+                    <div class="mid-dateroll" >
+                     <apex:outputPanel id="CpyoutptPnl" >
+                        <apex:outputPanel rendered="{!blShowCopyButton}">
+                            <input type="button" id="btnSave" class="save-submit" style="margin-right: 0;  margin-top: 5px;"  value="Copy previous status " title="Copy Previous Status Report" Onclick="copyPrevSR()" /> 
+                        </apex:outputPanel>
+                    </apex:outputPanel> 
+                    &nbsp;
+                    
+                    </div>
+                    <!--<input type="text" name="date_pick" class="datepick" value="{!SRDate}" readonly="readonly" id="inputDate" />-->
+                    </div>                     
+                    </apex:outputPanel>
+                 </div>
+            
+        <apex:outputPanel id="outptPanl">  
+        <apex:pageMessages id="pgMsg2" />        
+       <div class="status-report-sec">
+                    <h2>Work Performed Today </h2>
+                    
+                    <apex:inputTextArea id="editor1"  styleclass="SReditor1" value="{!WorkDayParam}" label="WORK PERFORMED FOR THE DAY" />                    
+               </div>
+               <div class="status-report-sec status-rep-mid">
+                    <h2>WORK TO BE PERFORMED NEXT WORKING DAY</h2>
+                    <apex:inputTextArea id="editor2" styleclass="SReditor2" value="{!WorkNextDayParam}" label="editor2" />               
+                </div>
+               <div class="status-report-sec">
+                    <h2>Issues/Concerns/Road blocks/Questions </h2>
+                    <apex:inputTextArea id="editor3" styleclass="SReditor3" value="{!IssuesConcernsParam}" label="editor3" />
+               </div>
+               </apex:outputPanel>
+               <div class="time-submit">  
+                    <apex:outputPanel id="sveSubPnl" >                 
+                    <apex:commandButton value="Save" action="{!saveStatusReport}" styleclass="save-submit" rendered="{!blShowSaveBtn}"/>
+                    <apex:commandButton value="Submit" action="{!submitStatusReport}" styleclass="btn_submit" rendered="{!blShowSubmitBtn }"/>
+                    </apex:outputPanel>
+                   <!-- <apex:actionRegion > -->
+                   <!-- <apex:commandButton value="Copy Previous Status Report" styleclass="btn_submit" onclick="getStatusReport(); return false;"/>-->
+                    <!--<apex:commandButton value="Copy" styleclass="btn_submit" > 
+                    <apex:actionsupport event="onclick" status="statusSaveTrip" action="{!fetchStatusReportByDate}" rerender="outptPanl"/>
+                    </apex:commandButton>
+                    </apex:actionRegion>   --> 
+                    
+                   <!-- <apex:commandButton value="Copy Previous Status Report" action="{!fetchStatusReportByDate}"  styleclass="btn_submit"/>  -->
+                    <apex:commandButton value="Cancel" action="{!cancelStatusReport}" styleclass="cancel" immediate="true"/>
+                </div>
+                 
+        </div>
+       
+
+    </div>
+</div>
+</apex:form>  
+   
+<div class="footer-bg"><div class="copyright">COPYRIGHT © 2018 DEMANDBLUE. ALL RIGHTS RESERVED</div></div>
+
+</body>
+    <apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'js/jquery-1.4.4.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'js/jquery-ui.js')}"/>
+   <!-- <script type="text/javascript">//<![CDATA[   
+        $(function() {
+        $( ".datepick" ).datepicker({
+            dateFormat : 'dd/mm/yy',
+            monthNames: ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", 
+                 "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
+            changeMonth : true,
+            changeYear : true,
+            yearRange: '-100y:c+nn',
+            //minDate: '0d'
+        });
+        
+    }); 
+    </script>-->
+    <apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'js/jquery-1.4.4.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'js/jquery-ui.js')}"/>
+    <script type="text/javascript">//<![CDATA[
+    var dbDate = '{!CurrentDate}';
+    var TodayDate= new Date(dbDate); 
+   
+    var dt = '{!SRDate}';
+    var SRDate = $('.lblDate').html();
+    var minDate = '{!minDate }';
+    var formattedMinDate = new Date(minDate);
+ 
+    $(function() {
+        $( "#date_service" ).datepicker({
+            dateFormat : 'mm/dd/yy',
+            changeMonth : false,
+            changeYear : false,
+            yearRange: '-100y:c+nn',
+            minDate: formattedMinDate,
+            maxDate: TodayDate
+            
+        });
+        $("#date_service, #date_service1").bind('paste',function(e){
+            e.preventDefault();  //disable paste in datePicker
+        });
+    
+    });
+    
+            
+     </script>
+     
+</apex:page>

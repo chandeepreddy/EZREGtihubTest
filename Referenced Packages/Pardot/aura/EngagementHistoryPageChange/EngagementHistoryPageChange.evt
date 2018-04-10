@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Event template" access="public">
+    <aura:attribute name="direction" type="String" access="public"/>
+</aura:event>

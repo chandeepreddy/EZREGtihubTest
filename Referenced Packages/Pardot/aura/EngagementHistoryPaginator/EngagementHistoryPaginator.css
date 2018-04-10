@@ -1,0 +1,27 @@
+.THIS {
+	margin: 0.5em;
+}
+
+.THIS.slds-align_absolute-center {
+	font-size: 0.8em;
+}
+
+.THIS .disable-click{
+	pointer-events: none;
+	color: darkgray;
+}
+
+.THIS a.disable-click:hover {
+	text-decoration: none;
+	color: darkgray;
+}
+
+.THIS a.disable-click:focus {
+	text-decoration: none;
+	color: darkgray;
+}
+
+.THIS a.disable-click:active {
+	text-decoration: none;
+	color: darkgray;
+}

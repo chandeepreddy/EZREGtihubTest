@@ -1,0 +1,1571 @@
+<!--
+* @author           Kirankumar D
+* @version          1.0 
+* @date             27-Oct-2016
+* @Status           Developed
+* @description      This is the class for the Dashboard Saving panel.
+* Dashboard
+-->
+
+<apex:page controller="ODS_DashboardController"  showHeader="false" sidebar="false" docType="html-5.0">  
+    <apex:includeScript value="{!URLFOR($Resource.ODS_Assets,'js/jquery-1.4.4.min.js')}"/> 
+    <script src="{!URLFOR($Resource.ODS_Assets,'js/amcharts.js')}"></script>
+    <script src="{!URLFOR($Resource.ODS_Assets,'js/serial.js')}"></script>
+    <!--<script src="{!URLFOR($Resource.ODS_Assets,'js/export.min.js')}"></script>-->
+<link rel="stylesheet" href="{!URLFOR($Resource.ODS_Assets,'css/export.css')}" type="text/css" media="all" />
+    <script src="{!URLFOR($Resource.ODS_Assets,'js/light.js')}">
+        <script src="https://www.amcharts.com/lib/3/gauge.js"></script>
+<script type="text/javascript">
+var timeshtArray = [];
+var completedUserStoriesArray = [];
+var InprogressUserStoriesArray = [];
+var chartData = [];
+var UserStoriesArray = [];
+var EngagementType = '';
+var AgileType = '';
+var Name = 'preludesysindia' ;
+var utilizationHurs = 0.0;  
+$(document).ready(function() {
+    $("#dashboard").addClass("active");
+    //Getting selected account value
+    var AccountID = $(".ddlstAccount").val();
+    //Getting selected service value
+    var ServiceID = $(".ddlstService").val();
+    
+    if(ServiceID == '' || ServiceID == null){
+        alert('Services has not been configured yet, please check with your Technical Manager.');
+        window.location = "/Login_Page";
+        return;
+    }
+    if(AccountID  == 'All' || ServiceID  == 'All'){
+        $('#ChartWrapper').hide();
+    }
+    
+    $("#rallydiv").hide();
+    $("#jiradiv").hide();
+    //Invoke apply search function and gets the related values of dashboard based on the selected account and service.]
+    
+    ApplySearch(); 
+    
+    //Center aligns the bulletin values
+    make_center();   
+});
+
+$(function(){
+    $("#rallydiv").hide();
+    
+});
+//Function to expand the bulletin on plus click
+function bulletin_expand(){
+    if ( $('.bulltn_list li').length > 1 ) {
+        
+        $('.bulltn_list li').addClass('blist_active');
+        $('.bexpnd').hide();
+        $('.bclose').show();
+        make_center();
+    }
+}
+
+//Function to close the bulletin on close click
+function bulletin_close(){
+    if ( $('.bulltn_list li').length > 1 ) {
+        
+        $('.bulltn_list li').removeClass('blist_active');
+        $('.bclose').hide();
+        $('.bexpnd').show();
+        make_center();}
+}
+
+if ( $('.bulltn_list li').length == 1 ) {
+    $('.bulltn_control span').css('cursor','default');
+}
+
+//Searches and retrieves the dashboard related details based on the selected account and service.
+function ApplySearch() {
+    var AccountID = $(".ddlstAccount").val();
+    var ServiceID = $(".ddlstService").val();
+    if(AccountID === 'All' || ServiceID === 'All'){
+        ApplySearchAllAction(AccountID, ServiceID);
+        $("#mnuTimeshet").css("display", "block"); 
+        $('#ChartWrapper').hide();
+    }
+    else
+    {        
+       ODS_HeaderController.RedirectDashboardPage(AccountID,ServiceID, 
+       function (result,event)
+       {
+           var jsonResult = result.split('$$##');
+           
+           var EngType = jsonResult[0];
+           
+           AgileType = jsonResult[1];
+           
+           if(EngType == 'ODS')
+           {
+               //Invokes the action function to search based on account and service
+               EngagementType = 'ODS';
+               ApplySearchAction(AccountID, ServiceID);
+               $("#mnuTimeshet").css("display", "block");
+               
+           }
+           else if (EngType == 'Other')
+           {
+               EngagementType = 'Other';
+               ApplyTMSearchAction(AccountID, ServiceID);
+               $("#mnuTimeshet").css("display", "none");
+               
+           }
+           LoadInitiativeChart();
+       },
+       {escape:true});
+       
+    }
+}
+
+//Function to retrieve the count of completed, in progress user stories, life time user stories and average sprint gaps based on the selected month and year.
+function fnGetUserStoriesByMonthYear() {
+    var AccountID = $(".ddlstAccount").val();
+    var ServiceID = $(".ddlstService").val();
+    //Gets the selected month
+    var RallyMonth = $(".ddRallyMonths").val();
+    //Gets the selected year
+    var RallyYear = $(".ddRallyYears").val();
+    
+    //Gets the server date
+    var now = new Date('{!CurrentDateTime}'); 
+    //Gets the month from server date
+    var currentMonth = now.getMonth() + 1; 
+    //Gets the year from server date
+    var currentYear = now.getFullYear(); 
+    
+    //Validation for not allowing users to select future month & year
+    if(RallyMonth > currentMonth && RallyYear == currentYear)
+    {
+        alert('Sorry, you cannot select upcoming months.');
+        
+        $(".ddRallyMonths").val(currentMonth);
+        $(".ddRallyYears").val(currentYear);
+        RallyMonth = currentMonth;
+        RallyYear =  currentYear;          
+        // return False;
+    }
+    //Loading symbol to refresh data on the month and year value change
+    $("#USCompletedCount").html('<img src="{!URLFOR($Resource.ODS_Assets,'images/blue-num-loading.gif')}"/>');
+    $("#USInProgressCount").html('<img src="{!URLFOR($Resource.ODS_Assets,'images/num-loading.gif')}"/>');
+    
+    if(AccountID == 'All' || ServiceID == 'All'){           
+        hideValues();   
+        return;
+    }
+    debugger;
+    if(AgileType == 'Rally')
+    {
+        if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+            hideValues();   
+            return;
+        }
+        //Javascript remoting to retrieve the user stories based on selected account, service, month, year.
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ODS_DashboardController.GetRallyRelatedDetails}', AccountID, ServiceID, RallyMonth, RallyYear, 
+        function(result, event)    { 
+          debugger;
+          if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+              hideValues();   
+              return;
+          }
+          if(result == 'No-Rally')    {
+              $(".outpnlRallyMsg").show();
+              $(".outpnlTAM").show();
+              $(".outpnlDisplayErrorMsg").hide();
+              $(".outpnlRallyValues").hide();
+              
+              if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+                  hideValues();   
+                  return;
+              }
+              
+          }
+          else if(result == 'Error')  {               
+              $(".outpnlDisplayErrorMsg").show();
+              $(".outpnlTAM").show();                    
+              $(".outpnlRallyMsg").hide();
+              $(".outpnlRallyValues").hide();
+              
+              if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+                  hideValues();  
+                  return;
+              }              
+          }
+          else {
+              $(".outpnlRallyValues").show();
+              $(".outpnlTAM").show();
+              $(".outpnlDisplayErrorMsg").hide();
+              $(".outpnlRallyMsg").hide();
+              $("#rallydiv").show();
+              $("#jiradiv").hide();
+              
+              var count = result.split(',');
+              //$("#USCompletedCount").html(count[0]); 
+              //$("#USInProgressCount").html(count[1]);
+              //$("#FYCompletedCount").html(count[2]);
+              if(count[3]!= 'null')
+              {
+                  $("#AvgSprintGaps").html(count[3]);
+              }
+              else
+              {
+                  $("#AvgSprintGaps").html('0.00 day(s)');
+              }
+              fnBindUserStoriesByMonthYear();
+              if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+                  hideValues();
+                  return;
+              }
+                  
+              }
+          // $("#divLoader").css("display","none");
+        }, 
+        { buffer: false, escape: true }); 
+        
+    }     
+    else if(AgileType == 'JIRA')
+    { 
+        
+        $(".outpnlDisplayErrorMsg").hide();
+        $(".outpnlRallyValues").show();
+        fnBindUserStoriesByMonthYear();
+        if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+            hideValues(); 
+            return;
+        }        
+    }    
+    else if(AgileType == 'null')
+    {
+        
+        $(".outpnlAgileMsg").show();
+        $(".outpnlRallyValues").hide();
+        completedUserStoriesArray = '';
+        ReloadUserstoryCompletedChartData();
+        if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+            hideValues(); 
+            return;
+        }
+    }    
+    }
+    
+//Function to bind the count of completed, in progress, life time user stories based on the selected month and year
+function fnBindUserStoriesByMonthYear(){
+    var AccountId = $(".ddlstAccount").val();
+    var ServiceId = $(".ddlstService").val();
+    var Year = $('.ddRallyYears').val();
+    var Month = $('.ddRallyMonths').val();
+    var now = new Date('{!CurrentDateTime}'); // To get server date
+    var currentMonth = now.getMonth() + 1; //months from 1-12
+    var currentYear = now.getFullYear(); 
+    var completedUserStoryCount = 0;
+    var inprogressUserStoryCount = 0;
+    
+    //Validation for not allowing users to select future month & year
+    if(Month > currentMonth && Year == currentYear)
+    {
+        alert('Sorry, you cannot select upcoming months.');
+        $(".ddRallyMonths").val(currentMonth);
+        $(".ddRallyYears").val(currentYear);
+        Month = currentMonth;
+        Year =  currentYear;   
+        //SelectedMonthDates = getDaysInMonth(currentChartMonth - 1, currentChartYear);        
+        // return False;
+    }
+    
+    if(AgileType == 'Rally')
+    {
+        //Checks if need to display overall user stories in a year if month value is 'ALL'
+        if(Month == 0){
+            //Gets all the month in a year and loops through each month and checks if the status is completed or in progress
+            var SelectedMonthInYear = getMonthInYear();            
+            $.each(SelectedMonthInYear,function(key,value){
+                //sums up the completed user story in each month
+                completedUserStoryCount += GetCompletedUserStoryInMonthJson(parseInt(SelectedMonthInYear[key]), parseInt(Year));
+                //sums up the in progress user story in each month
+                inprogressUserStoryCount += GetInprogressUserStoryInMonthJson(parseInt(SelectedMonthInYear[key]), parseInt(Year));
+            });
+        }
+        //For other selected month values other than 'ALL'
+        else{
+            //Gets completed user story count based on the selected month and year
+            completedUserStoryCount = GetCompletedUserStoryInMonthJson(parseInt(Month), parseInt(Year));
+            //Gets inprogress user story count based on the selected month and year
+            inprogressUserStoryCount = GetInprogressUserStoryInMonthJson(parseInt(Month), parseInt(Year));
+        }
+        
+        //Assigns count value to completed, inprogress and life time div.
+        $("#FYCompletedCount").html(GetLifeTimeCompletedUSCount());
+        $("#USCompletedCount").html(completedUserStoryCount);
+        $("#USInProgressCount").html(inprogressUserStoryCount);
+    }
+    
+    else if(AgileType == 'JIRA')
+    {
+        $(".outpnlDisplayErrorMsg").hide();
+        
+        Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.ODS_DashboardController.GetMonthlyCompletedUserStories}', 
+            AccountId, ServiceId,Month,Year, 
+            
+            function(result, event)   
+            { 
+                if(result === 'error')
+                {
+                    $(".outpnlDisplayErrorMsg").show();
+                    $(".outpnlRallyValues").hide();
+                    if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+                        hideValues(); 
+                        return;
+                    }
+                }                
+                else
+                {
+                    var CompletedUSCount = result;
+                    $("#USCompletedCount").html(CompletedUSCount);
+                    $(".outpnlDisplayErrorMsg").hide();
+                    $(".outpnlRallyValues").show();
+                    $("#rallydiv").hide();
+                    $("#jiradiv").show();
+                }                
+            }, 
+            {escape: true}
+        );  
+        
+        
+        Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.ODS_DashboardController.GetSelectedMonthInProgressUS}', 
+            AccountId, ServiceId, Month,Year,
+            function(result, event)   
+            { 
+                
+                if(result === 'error')
+                {
+                    $(".outpnlDisplayErrorMsg").show();
+                    $(".outpnlRallyValues").hide();
+                    if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+                        hideValues(); 
+                        return;
+                    }
+                }                
+                else
+                {
+                    var InprogressUSCount = result;
+                    //alert(InprogressUSCount);
+                    $("#USInProgressCount").html(InprogressUSCount);
+                    $(".outpnlDisplayErrorMsg").hide();
+                    $(".outpnlRallyValues").show();
+                    $("#rallydiv").hide();
+                    $("#jiradiv").show();
+                }
+            }, 
+            {escape: true}
+        );  
+    }
+    else if(AgileType == 'null')
+    {
+        $(".outpnlAgileMsg").show();
+        $(".outpnlRallyValues").hide();
+        completedUserStoriesArray = '';
+        ReloadUserstoryCompletedChartData();
+    }
+}
+
+//Function to load completed user stories chart and resource utilization chart  
+function fnLoadChartData() {
+    var AccountID = $(".ddlstAccount").val();
+    var ServiceID = $(".ddlstService").val();   
+   
+    utilizationHurs = 0.0;
+    if(AccountID === 'All' || ServiceID === 'All'){
+        $(".outpnlRallyValues").hide();
+        $(".outpnlTAM").hide();
+        $("#compUSDiv").hide();
+        $("#resUtilDiv").removeClass('cli-dash-res2');  
+        <!--    $('.ddlstUSMonths').val(0).change();   -->
+    }   
+        
+        var jResponse = $('#hdnChartValue').val();
+        //Parse the response returned by javascript remoting
+        timeshtArray = $.parseJSON(jResponse);
+        LoadInitiativeChart();
+        if(EngagementType == 'ODS'){
+            //Loads the resource utilization chart data
+            ReloadChartData();  
+            //Loads the completed user stories chart data
+            ReloadUserstoryCompletedChartData(); 
+        }
+        else if (EngagementType == 'Other')
+        {
+            //Loads the completed user stories chart data
+            ReloadUserstoryCompletedChartData(); 
+            $('#compUSDiv').addClass('cli-dash-res3');
+        }
+        
+        
+        if(AccountID === 'All' || ServiceID === 'All'){  
+            var d = new Date();
+            var n = d.getMonth();
+            $(".outpnlRallyValues").hide();
+            $(".outpnlTAM").hide();
+            $("#compUSDiv").hide();
+            $("#resUtilDiv").removeClass('cli-dash-res2');      
+            $('.ddlstUSMonths').val(n+1).change();  
+        }
+        
+    }
+    
+    //Function to get all the completed user stories irrespective of the month and year.
+    function fnGetCompletedUserStories() {
+        var AccountId = $(".ddlstAccount").val();
+        var ServiceId = $(".ddlstService").val();
+        
+        //Gets the server date
+        var now = new Date('{!CurrentDateTime}'); 
+        //Gets the month from server date
+        var currentMonth = now.getMonth() + 1; 
+        //Gets the year from server date
+        var currentYear = now.getFullYear(); 
+        
+        //Loading symbol to refresh data on the month and year value change
+        $("#USCompletedCount").html('<img src="{!URLFOR($Resource.ODS_Assets,'images/blue-num-loading.gif')}"/>');
+        $("#USInProgressCount").html('<img src="{!URLFOR($Resource.ODS_Assets,'images/num-loading.gif')}"/>');
+        
+        if(AgileType == 'Rally')
+        {
+            
+            //Javascript remoting to get all the completed user stories in a rally account based on the selected account and service.
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.ODS_DashboardController.GetWorkspaceIdByAccountServiceId}',
+                AccountId, ServiceId, 
+                function(result, event){
+                    if (event.type === 'exception') {
+                        // $(".outpnlRallyMsg").show();
+                        $(".outpnlDisplayErrorMsg").show();
+                        $(".outpnlRallyValues").hide();
+                        $("#rallydiv").show();
+                        $("#jiradiv").hide();
+                        if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+                            hideValues(); 
+                            return;
+                        }
+                    }
+                    
+                    
+                    else{
+                        //console.log(result); 
+                        completedUserStoriesArray = result;
+                        //reloads the completed user story chart data
+                        ReloadUserstoryCompletedChartData();
+                    } //else {
+                    //document.getElementById("responseErrors").innerHTML = event.message;
+                    //}
+                    
+                }, 
+                {escape: true}
+            );        
+            //ReloadUserstoryCompletedChartData();
+            
+        }
+        
+        else if(AgileType == 'JIRA') 
+        {
+            var Year = $('.ddRallyYears').val();
+            var Month = $('.ddRallyMonths').val();
+            
+            $(".outpnlDisplayErrorMsg").hide();
+            
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.ODS_DashboardController.GetMonthlyCompletedUserStories}', 
+                AccountId, ServiceId,currentMonth,currentYear, 
+                function(result, event)   
+                { 
+                    if (result === 'error') 
+                    {
+                        
+                        // $(".outpnlRallyMsg").show();
+                        $(".outpnlDisplayErrorMsg").show();
+                        $(".outpnlRallyValues").hide();
+                        if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+                            hideValues(); 
+                            return;
+                        }
+                    }
+                    
+                    
+                    else
+                    {
+                        var CompletedUSCount = result;
+                        $("#USCompletedCount").html(CompletedUSCount);
+                        $(".outpnlDisplayErrorMsg").hide();
+                        $(".outpnlRallyValues").show();
+                        $("#rallydiv").hide();
+                        $("#jiradiv").show();
+                        ReloadUserstoryCompletedChartData();
+                    }
+                    
+                }, 
+                {escape: true}
+            );  
+            
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.ODS_DashboardController.GetLifeTimeUS}', 
+                AccountId, ServiceId, 
+                
+                function(result, event)   
+                { 
+                    if (event.type === 'error') 
+                    {
+                        $(".outpnlDisplayErrorMsg").show();
+                        $(".outpnlRallyValues").hide();
+                        $("#FYCompletedCount").val("0");
+                        if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+                            hideValues(); 
+                            return;
+                        }
+                    }
+                    
+                    
+                    else
+                    {
+                        var LifeTimeCompletedUSCount = result;
+                        $("#FYCompletedCount").html(LifeTimeCompletedUSCount);
+                        $("#rallydiv").hide();
+                        $("#jiradiv").show();
+                    }
+                    
+                    
+                }, 
+                {escape: true}
+            );
+            
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.ODS_DashboardController.GetAverageSprintGap}', 
+                AccountId, ServiceId, 
+                
+                function(result, event)   
+                { 
+                    if (event.type === 'error') 
+                    {
+                        $(".outpnlDisplayErrorMsg").show();
+                        $(".outpnlRallyValues").hide();
+                        if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+                            hideValues(); 
+                            return;
+                        }
+                    }
+                    
+                    
+                    
+                    else
+                    {
+                        var AverageSprintGap = result + ' day(s)';
+                        $("#AvgSprintGaps").html(AverageSprintGap);
+                        $("#rallydiv").hide();
+                        $("#jiradiv").show();
+                        //alert(AverageSprintGap);
+                    }
+                    
+                }, 
+                {escape: true}
+            );
+            
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.ODS_DashboardController.GetTotalCompletedUSWithDate}', 
+                AccountId, ServiceId, Month,Year,
+                
+                function(result, event)   
+                { 
+                    
+                    completedUserStoriesArray = result;
+                    ReloadUserstoryCompletedChartData();
+                    $("#rallydiv").hide();
+                    $("#jiradiv").show();
+                    //alert(AverageSprintGap);
+                    
+                    
+                }, 
+                {escape: true}
+            );
+            
+        }
+        
+            else if(AgileType == 'null')
+            {
+                $(".outpnlAgileMsg").show();
+                $(".outpnlRallyValues").hide();
+                completedUserStoriesArray = '';
+                ReloadUserstoryCompletedChartData();                
+            }
+    }
+    
+    //Function to get all the inprogress user stories irrespective of the month and year.
+    function fnGetInprogressUserStories() {
+        var AccountId = $(".ddlstAccount").val();
+        var ServiceId = $(".ddlstService").val();
+        
+        //Gets the server date
+        var now = new Date('{!CurrentDateTime}'); 
+        //Gets the month from server date
+        var currentMonth = now.getMonth() + 1; 
+        //Gets the year from server date
+        var currentYear = now.getFullYear();
+        
+        //Loading symbol to refresh data on the month and year value change
+        $("#USCompletedCount").html('<img src="{!URLFOR($Resource.ODS_Assets,'images/blue-num-loading.gif')}"/>');
+        $("#USInProgressCount").html('<img src="{!URLFOR($Resource.ODS_Assets,'images/num-loading.gif')}"/>');
+        
+        if(AgileType == 'Rally')
+        {
+            //Javascript remoting to get all the inprogress user stories in a rally account based on the selected account and service.
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.ODS_DashboardController.GetInprogressUserStories}',
+                AccountId, ServiceId, 
+                function(result, event){
+                    if (event.type === 'exception') {
+                        $(".outpnlRallyMsg").show();
+                    }
+                    
+                    else{
+                        //console.log(result);                        
+                        InprogressUserStoriesArray = result;     
+                        $("#rallydiv").show();
+                        $("#jiradiv").hide();
+                    }
+                    
+                }, 
+                {escape: true}
+            );  
+            
+        } 
+        
+        else if(AgileType == 'JIRA')
+        {
+            $(".outpnlDisplayErrorMsg").hide();
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.ODS_DashboardController.GetSelectedMonthInProgressUS}', 
+                AccountId, ServiceId, currentMonth,currentYear,
+                function(result, event)   
+                { 
+                    if (event.type === 'error') 
+                    {
+                        // $(".outpnlRallyMsg").show();
+                        $(".outpnlDisplayErrorMsg").show();
+                        $(".outpnlRallyValues").hide();
+                        if( $(".ddlstAccount").val() == 'All' ||  $(".ddlstService").val() == 'All'){           
+                            hideValues(); 
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        var InprogressUSCount = result;
+                        //alert(InprogressUSCount);
+                        $("#USInProgressCount").html(InprogressUSCount);
+                        $(".outpnlDisplayErrorMsg").hide();
+                        $(".outpnlRallyValues").show();
+                        $("#rallydiv").hide();
+                        $("#jiradiv").show();
+                    }
+                    
+                }, 
+                {escape: true}
+            );
+            
+        }
+        else if(AgileType == 'null')
+        {
+            $(".outpnlAgileMsg").show();
+            $(".outpnlRallyValues").hide();
+            completedUserStoriesArray = '';
+            ReloadUserstoryCompletedChartData();
+            
+        }
+        
+        
+    }
+    
+    //Function to display the submit button to customer
+    function displaySubmitBtn() {
+        var IsCustomer = {!isCustomer};
+        if (IsCustomer) {
+            $("#enableSubmitBtn").css("display", "block");
+        } else {
+            $("#disableSubmitBtn").css("display", "block");
+        }
+    }
+    
+    //Function to validate the query submitted by customer and then based on validation success inserts the data
+    function validateQuery() {
+        var Query = $(".ClientQueryTxtArea").val();
+        Query = Query.trim();
+        if (Query == "") {
+            alert('Please enter your message');
+            return false;
+        } else if (Query.length <= 25 || Query.length >= 255) {
+            alert('Email content should contain a minimum of 25 Characters and a maximum of 255 characters, please validate and resubmit');
+            return false;
+        } else {
+            InsertQueriesFromAction(Query);
+        }
+    }
+    
+    //Function to load the user stories completed chart data based on the selected month and year.
+    function ReloadUserstoryCompletedChartData() {
+        var AccountID = $(".ddlstAccount").val();
+        var ServiceID = $(".ddlstService").val();
+        if(AccountID === 'All' || ServiceID === 'All'){
+            $(".outpnlRallyValues").hide();
+            $(".outpnlTAM").hide();
+        }
+        var chartData = [];
+        var Year = $('.ddlstUSYears').val();
+        var Month = $('.ddlstUSMonths').val();
+        //Gets all the month in an year
+        var SelectedMonthInYear = getMonthInYear();        
+        UserStoriesArray = completedUserStoriesArray;
+        var now = new Date('{!CurrentDateTime}'); // To get server date
+        var currentChartMonth = now.getMonth() + 1; //months from 1-12
+        var currentChartYear = now.getFullYear();
+        
+        //Validation for not allowing users to select future month & year
+        if(Month > currentChartMonth && Year == currentChartYear)
+        {
+            alert('Sorry, you cannot select upcoming months.');
+            $(".ddlstUSMonths").val(currentChartMonth );
+            $(".ddlstUSYears").val(currentChartYear);
+            SelectedMonthDates = getDaysInMonth(currentChartMonth - 1, currentChartYear);            
+            return ReloadUserstoryCompletedChartData();
+            
+        }
+        
+        //Checks if the selected month value is 'ALL'        
+        if(Month == 0){
+            $.each(SelectedMonthInYear,function(key,value){
+                //Loops through all the months and gets the completed user story count in each month.
+                var formatedMonth = formatMonth(SelectedMonthInYear[key]); 
+                var CompletedUserStory = '';
+                if(AgileType == 'Rally'){
+                    CompletedUserStory = GetCompletedUserStoryInMonthJson(SelectedMonthInYear[key], Year);
+                }
+                
+                else if(AgileType == 'JIRA')
+                {
+                    CompletedUserStory = GetCompletedUserStoryInMonthJson(SelectedMonthInYear[key], Year);
+                }
+                //Builds an array of each month and count of completed user story for related month
+                chartData.push({
+                    date: formatedMonth,
+                    hours: CompletedUserStory
+                });
+            });
+        }
+        else{
+            //Displays all the dates in a selected month and the related completed user story count
+            var SelectedMonthDates = getDaysInMonth(Month - 1, Year);
+            //Loops through each date in a month
+            $.each(SelectedMonthDates, function(key, value) {
+                var formatedDate = formatDate(SelectedMonthDates[key]);
+                //Retrieves the number of hours in a completed user story for each date.    
+                var HoursWorked = GetCompletedUserStoryInJson(formatedDate);
+                
+                var newDate = new Date(formatedDate)
+                //Builds the array of each date and hours worked in each date
+                chartData.push({
+                    date: newDate,
+                    hours: HoursWorked
+                });
+            });
+        }      
+        
+        //Binds the chart with data from built array
+        var chart = AmCharts.makeChart("userstorychartdiv", {
+            "theme": "light",
+            "type": "serial",
+            "marginRight": 80,
+            "autoMarginOffset": 20,
+            "marginTop": 20,
+            "dataProvider": chartData,
+            "valueAxes": [{
+                "id": "v1",
+                "axisAlpha": 0.1
+            }],
+            "graphs": [{
+                
+                "balloonText": "[[category]]<br><b>User Stories: [[value]]</b>",
+                "bullet": "round",
+                "bulletBorderAlpha": 1,
+                "bulletBorderColor": "#FFFFFF",
+                "hideBulletsCount": 50,
+                "lineThickness": 2,
+                "lineColor": "#0083c0",
+                "negativeLineColor": "#0083c0",
+                "valueField": "hours"
+            }],
+            "chartScrollbar": {
+                "scrollbarHeight": 5,
+                "selectedBackgroundAlpha": 0.1,
+                "selectedBackgroundColor": "#888888",
+                
+                "color": "#AAAAAA"
+            },
+            "chartCursor": {
+                "valueLineEnabled": true,
+                "valueLineBalloonEnabled": true
+            },
+            "categoryField": "date",
+            "categoryAxis": {
+                "parseDates": true,
+                "axisAlpha": 0,
+            },
+            "export": {
+                "enabled": true
+            }
+        });
+        chart.dataProvider = chartData;
+        //If month value selected is 'ALL', then the chart property of parse date is set to false as date is not populated on the x axis.
+        if(Month == 0){
+            chart.categoryAxis.parseDates = false;
+        }                      
+        chart.validateData();
+    }
+    
+    //Function to get the completed user stories based on the month and year value.
+    function GetCompletedUserStoryInMonthJson(value, yearVal) {
+        var result = [];
+        //console.log(completedUserStoriesArray);        
+        var CompletedUserStory = 0;
+        for(var key in UserStoriesArray){
+            if(UserStoriesArray.hasOwnProperty(key)){
+                //Split teh user story array of each record to get the month, year and date value
+                //console.log(key + "->" + UserStoriesArray[key]);
+                var compUSMonthYearSplitArr = key.match(/.{1,4}/g);
+                var compUSMonthDateSplitArr = (compUSMonthYearSplitArr[1]).match(/.{1,2}/g);
+                var compUSDate = parseInt(compUSMonthDateSplitArr[1]);
+                var compUSMonth = parseInt(compUSMonthDateSplitArr[0]);
+                var compUSYear = parseInt(compUSMonthYearSplitArr[0]);
+                if((compUSMonth === value) && (compUSYear == yearVal)){
+                    CompletedUserStory += UserStoriesArray[key];
+                    //delete UserStoriesArray[key];
+                    //break;
+                }
+            }
+        }  
+        return (CompletedUserStory);
+    }
+    
+    //Function to get all completed user story irrespective of the month and year.
+    function GetCompletedUserStoryInJson(value) {
+        var result = [];
+        //console.log(completedUserStoriesArray);        
+        var CompletedUserStory = 0;
+        for(var key in UserStoriesArray){
+            if(UserStoriesArray.hasOwnProperty(key)){
+                //console.log(key + "->" + UserStoriesArray[key]);
+                var compUSMonthYearSplitArr = key.match(/.{1,4}/g);
+                var compUSMonthDateSplitArr = (compUSMonthYearSplitArr[1]).match(/.{1,2}/g);
+                var compUSDate = parseInt(compUSMonthDateSplitArr[1]);
+                var compUSMonth = parseInt(compUSMonthDateSplitArr[0]);
+                var compUSYear = parseInt(compUSMonthYearSplitArr[0]);
+                var compUSFullDate = compUSMonth +'/'+ compUSDate +'/'+compUSYear ;
+                if(compUSFullDate === value){
+                    CompletedUserStory += UserStoriesArray[key];
+                    //delete UserStoriesArray[key];
+                    //break;
+                }
+            }
+        }  
+        return (CompletedUserStory);
+    }
+    
+    //Function to get the inprogress user stories based on the month and year value.
+    function GetInprogressUserStoryInMonthJson(value, yearVal) {
+        var result = [];
+        //console.log(InprogressUserStoriesArray);        
+        var InprogressUserStory = 0;
+        for(var key in InprogressUserStoriesArray){
+            if(InprogressUserStoriesArray.hasOwnProperty(key)){
+                //console.log(key + "->" + InprogressUserStoriesArray[key]);
+                var inprogUSMonthYearSplitArr = key.match(/.{1,4}/g);
+                var inprogUSMonth = parseInt(inprogUSMonthYearSplitArr[1]);
+                var inprogUSYear = parseInt(inprogUSMonthYearSplitArr[0]);
+                if((inprogUSMonth === value) && (inprogUSYear == yearVal)){
+                    InprogressUserStory = InprogressUserStoriesArray[key];
+                    //delete UserStoriesArray[key];
+                    break;
+                }
+            }
+        }  
+        return (InprogressUserStory);
+    }
+    
+    //Function to get all the life time completed user stories irrespective of the month and year value.
+    function GetLifeTimeCompletedUSCount(){
+        var result = [];
+        //console.log(completedUserStoriesArray);        
+        var LifeTimeUserStory = 0;
+        for(var key in completedUserStoriesArray){
+            if(completedUserStoriesArray.hasOwnProperty(key)){
+                // console.log(key + "->" + completedUserStoriesArray[key]);
+                var compUSMonthYearSplitArr = key.match(/.{1,4}/g);
+                var compUSMonthDateSplitArr = (compUSMonthYearSplitArr[1]).match(/.{1,2}/g);
+                var compUSDate = parseInt(compUSMonthDateSplitArr[1]);
+                var compUSMonth = parseInt(compUSMonthDateSplitArr[0]);
+                var compUSYear = parseInt(compUSMonthYearSplitArr[0]);
+                LifeTimeUserStory += completedUserStoriesArray[key];
+            }
+        }
+        return LifeTimeUserStory;
+    }
+    
+    //Function to load the resource utilization chart data based on the selected month and year.
+    function ReloadChartData() {
+        
+        
+        var chartData = [];
+        var Year = $('.ddlstUSYears').val();
+        var Month = $('.ddlstUSMonths').val();
+        
+        var now = new Date('{!CurrentDateTime}'); // To get server date
+        var currentChartMonth = now.getMonth() + 1; //months from 1-12
+        var currentChartYear = now.getFullYear();
+        if(Month > currentChartMonth && Year == currentChartYear)
+        {
+            alert('Sorry, you cannot select upcoming months.');
+            $(".ddlstUSMonths").val(currentChartMonth );
+            $(".ddlstUSYears").val(currentChartYear);
+            SelectedMonthDates = getDaysInMonth(currentChartMonth - 1, currentChartYear);            
+            //return false;
+        }
+        
+        //Checks if the selected month value is 'ALL'    
+        if(Month == 0){
+            var SelectedMonthInYear = getMonthInYear();
+            $.each(SelectedMonthInYear,function(key,value){
+                //Loops through all the months and gets the resource utilization count in each month.
+                var formatedMonth = formatMonth(SelectedMonthInYear[key]);     
+                var HoursWorked = GetHoursWorkedInMonthJson(SelectedMonthInYear[key], Year);
+                //Builds an array of each month and count of hours worked for related month
+                chartData.push({
+                    date: formatedMonth,
+                    hours: HoursWorked
+                });
+            });        
+        }
+        else{
+            //Displays all the dates in a selected month and the related resource utilization hours
+            var SelectedMonthDates = getDaysInMonth(Month - 1, Year);
+            //Loops through each date in a month
+            $.each(SelectedMonthDates, function(key, value) {
+                
+                var formatedDate = formatDate(SelectedMonthDates[key]);
+                //Retrieves the number of hours utilized for each date. 
+                var HoursWorked = GetHoursWorkedInJson(formatedDate);
+                
+                var newDate = new Date(formatedDate)
+                //Builds the array of each date and hours worked in each date
+                chartData.push({
+                    date: newDate,
+                    hours: HoursWorked
+                });
+            });
+        }
+        
+        //Binds the chart with data from built array
+        var chart = AmCharts.makeChart("chartdiv", {
+            "theme": "light",
+            "type": "serial",
+            "marginRight": 80,
+            "autoMarginOffset": 20,
+            "marginTop": 20,
+            "dataProvider": chartData,
+            "valueAxes": [{
+                "id": "v1",
+                "axisAlpha": 0.1
+            }],
+            "graphs": [{
+                
+                "balloonText": "[[category]]<br><b>Hours: [[value]]</b>",
+                "bullet": "round",
+                "bulletBorderAlpha": 1,
+                "bulletBorderColor": "#FFFFFF",
+                "hideBulletsCount": 50,
+                "lineThickness": 2,
+                "lineColor": "#0083c0",
+                "negativeLineColor": "#0083c0",
+                "valueField": "hours"
+            }],
+            "chartScrollbar": {
+                "scrollbarHeight": 5,
+                "selectedBackgroundAlpha": 0.1,
+                "selectedBackgroundColor": "#888888",
+                
+                "color": "#AAAAAA"
+            },
+            "chartCursor": {
+                "valueLineEnabled": true,
+                "valueLineBalloonEnabled": true
+            },
+            "categoryField": "date",
+            "categoryAxis": {
+                "parseDates": true,
+                "axisAlpha": 0,
+            },
+            "export": {
+                "enabled": true
+            }
+        });
+        chart.dataProvider = chartData;
+        //If month value selected is 'ALL', then the chart property of parse date is set to false as date is not populated on the x axis.
+        if(Month == 0){
+            chart.categoryAxis.parseDates = false;
+        }               
+        chart.validateData();
+    }
+    
+    //Function to display success message upon submitting the query
+    function fnPostSuccessOfQuery() {
+        alert('You have submitted your query successfully!!');
+        $(".ClientQueryTxtArea").val('');
+    }
+    
+    //Function to get hours worked based on the month and year selected.
+    function GetHoursWorkedInMonthJson(value, yearVal) {
+        var result = [];
+        result = $.grep(timeshtArray, function(element, index) {
+            return (((new Date(element.ChartDate__c).getMonth()+1) === value) && ((new Date(element.ChartDate__c).getFullYear()) == yearVal)); 
+        });
+        var HoursWorked = 0;    
+        if (result != '') {
+            $.each(result, function(key, value){
+                HoursWorked += result[key].HoursWorked;
+            });            
+        }
+        return (HoursWorked);
+        
+    }
+    
+    //Function to get all the hours worked irrespective of month and year
+    function GetHoursWorkedInJson(value) {
+        var result = $.grep(timeshtArray, function(element, index) {
+            return (element.ChartDate__c === value); 
+        });
+        var HoursWorked = 0;     
+        
+        if (result != '') {
+            HoursWorked = result[0].HoursWorked;
+        }
+        return (HoursWorked);
+    }
+    
+    function hideValues(){
+        $('.outpnlRallyValues').hide();  
+        $('.outpnlTAM').hide();   
+        $('.outpnlRallyMsg').hide();   
+        $('.outpnlAgileMsg').hide();   
+        $('.outpnlDisplayErrorMsg').hide();
+        $('#ChartWrapper').hide();
+    }
+    
+    //Function to get the number of days in a month
+    function getDaysInMonth(month, year) {
+        // Since no month has fewer than 28 days
+        var date = new Date(year, month, 1);
+        var days = [];
+        while (date.getMonth() === month) {
+            days.push(new Date(date));
+            date.setDate(date.getDate() + 1);
+        }
+        return days;
+    }
+    
+    // function to get all the month values
+    function getMonthInYear(){
+        var Months = [1,2,3,4,5,6,7,8,9,10,11,12];
+        //Months.push(1);
+        return Months;
+    }
+    
+    //Function to get the month name based on the month number
+    function formatMonth(monthNumber){
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return months[monthNumber - 1];
+    }
+    
+    //Function to format date in MM/dd/YYYY format
+    function formatDate(date) {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+        return [month, day, year].join('/');
+    }
+    
+    //Function to get the total hours and total amount utilized in current month and previous month
+    function getHoursAmount(value){
+        if(value == 'Amount'){            
+            getAmountFromAction();
+        }
+        else{
+            getHoursFromAction();
+        }
+    }
+    
+    //Center aligns the bulletin content
+    function make_center(){
+        var dhit = $('.bulltn_title').height();
+        $('.bulltn_title span').css('line-height',dhit+'px');
+    }
+    $(window).resize(function(){ make_center(); });    
+    
+    function LoadInitiatives(){
+        debugger;
+        var initiativeValue = $(".ddlInitiatives").val();        
+        Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.ODS_DashboardController.get_Consumed_Hours}', 
+            initiativeValue, 
+        function(result, event)   
+        {
+            if(result != null)
+            {                    
+               utilizationHurs = result;
+            }
+        });        
+    }    
+    
+    function LoadInitiativeChart(){
+        var chart = AmCharts.makeChart("chartdivs", {
+            "theme": "light",
+            "type": "gauge",
+            "axes": [{
+                "topTextFontSize":15,
+                "topTextYOffset": 70,
+                "axisColor": "#31d6ea",
+                "axisThickness": 1,
+                "endValue": 100,
+                "gridInside": true,
+                "inside": true,
+                "radius": "50%",
+                "valueInterval": 10,
+                "tickColor": "#67b7dc",
+                "startAngle": -90,
+                "endAngle": 90,
+                "unit": "%",
+                "bandOutlineAlpha": 0,
+                "bands": [{
+                    "color": "#4ECAF4 ",
+                    "endValue": 100,
+                    "innerRadius": "105%",
+                    "radius": "130%",
+                    "gradientRatio": [0, 0, 0],
+                    "startValue": 0
+                }, {
+                    "color": "#dadada",
+                    "endValue": 0,
+                    "innerRadius": "105%",
+                    "radius": "130%",
+                    "gradientRatio": [0.5, 0, -0.5],
+                    "startValue": 0
+                }]
+            }],
+            "arrows": [{
+                "alpha": 1,
+                "innerRadius": "30%",
+                "nailRadius": 0,
+                "radius": "130%"
+            }]
+            
+        });
+        
+        setInterval(randomValue, 50);
+        function randomValue() {
+            var value = utilizationHurs;
+            chart.arrows[0].setValue(value);
+            chart.axes[0].setTopText(value + " %");
+            chart.axes[0].bands[1].setEndValue(value);
+        } 
+    
+    } 
+    
+    </script>
+    <apex:form id="formId">   
+        <c:ODS_HeaderComponent /> 
+        <html>
+            <body>
+                <style>
+                    ul.bulltn_list li:first-child{display:block!important;}
+                    #myDiv{position:relative; z-index:10000;}
+                    .white-bg {
+                        width: 49%;
+                        float: left;
+                        background: #f4f4f4;
+                        margin-top: 25px;
+                        margin-right:2%;
+                        overflow: hidden;
+                        box-shadow: 0px 0px 3px #888888;}
+                        #chartdivs {
+                        width: 120%;
+                        height: 560px;
+                        float: left;
+                        display: inline-block;
+                        margin: -65px -55px -112px;
+                        }
+                    .innerwrapper
+                    { 
+                        width: 49%;
+                        display: inline-block;
+                        float: right;
+                    }
+                    .tech-manager-bg{margin-left:0px;}
+                    @media (max-width:1024px)
+                    {
+                        .tech-manager-bg  ul{margin-top:15px}
+                        .tech-manager-bg .user-icon-wid img{width:90px;height:95px}
+                        .user-stories-bg h2 label{width:100%;}
+                    }
+                </style>
+                <apex:actionStatus id="statusSaveTrip" stopText="">
+                    <apex:facet name="start">
+                        <div>
+                            <div class="popupBackground" />
+                            <div class="PopupPanel">
+                                <table border="0" width="100%" height="100%">
+                                    <tr>
+                                        <td align="center"><b>Please Wait</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center"><img src="{!$Resource.ODS_Statussign}"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </apex:facet>
+                </apex:actionStatus>
+                <div id="divLoader" style="display:none;" >
+                    <div class="popupBackground" />
+                    <div class="PopupPanel">
+                        <table border="0" width="100%" height="100%">
+                            <tr>
+                                <td align="center"><b>Please Wait</b></td>
+                            </tr>
+                            <tr>
+                                <td align="center"><img src="{!$Resource.ODS_Statussign}"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <apex:actionFunction name="ApplySearchAction" action="{!GetDashboardByAccountServiceID}" status="statusSaveTrip" 
+                        rerender="outptPanl,outPnlDashboard,noSearchRec,outPnlDisplayRallyDetails,outPnlRallyErrorMsg,ODSDashboardPanel,ResUtilChartPanel" 
+                        oncomplete=" fnLoadChartData(); displaySubmitBtn();fnGetCompletedUserStories();fnGetInprogressUserStories();fnGetUserStoriesByMonthYear();LoadInitiatives(); ">
+                    <apex:param name="AccountId" value="" assignTo="{!AccountId}"/>
+                    <apex:param name="ServiceID" value="" assignTo="{!ServiceID}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="ApplyTMSearchAction" action="{!GetDashboardByAccountServiceID}" status="statusSaveTrip" 
+                        rerender="outptPanl,outPnlDashboard,noSearchRec,outPnlDisplayRallyDetails,outPnlRallyErrorMsg,ODSDashboardPanel,ResUtilChartPanel" 
+                        oncomplete=" fnLoadChartData(); displaySubmitBtn();fnGetCompletedUserStories();fnGetInprogressUserStories();fnGetUserStoriesByMonthYear();LoadInitiatives();">
+                    <apex:param name="AccountId" value="" assignTo="{!AccountId}"/>
+                    <apex:param name="ServiceID" value="" assignTo="{!ServiceID}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="ApplySearchAllAction" action="{!GetDashboardByAccountServiceID}" status="statusSaveTrip" 
+                        rerender="outptPanl,ODSDashboardPanel,ResUtilChartPanel" 
+                        oncomplete="fnLoadChartData();displaySubmitBtn();hideValues();">
+                    <apex:param name="AccountId" value="" assignTo="{!AccountId}"/>
+                    <apex:param name="ServiceID" value="" assignTo="{!ServiceID}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="InsertQueriesFromAction" action="{!insertQueries}"  oncomplete="fnPostSuccessOfQuery();"> 
+                    apex:param name="clientQueries" value="" assignTo="{!clientQueries}"/>
+                </apex:actionFunction> 
+                <apex:actionFunction name="getAmountFromAction" action="{!LoadTimeSheetAmountPanel}" status="statusSaveTrip" reRender="HoursAmountPanel">
+                </apex:actionFunction>
+                <apex:actionFunction name="getHoursFromAction" action="{!LoadTimeSheetHrsPanel}" status="statusSaveTrip" reRender="HoursAmountPanel"/>
+
+                <apex:outputPanel id="outptPanl"> 
+                    <apex:outputPanel id="outPnlDashboard" rendered="{!ShowRecOutptPnl}">
+                        <div class="clr"></div>
+                        <div class="mid-bg">
+                            <apex:outputPanel id="NotificationPanel" rendered="{!(notification.size!=0 && notification!=null ) }">
+                                <div class="ods_bulletins row">
+                                    <div class="bulltn_title">
+                                        <span>Bulletins</span>
+                                    </div>
+                                    <div class="bulltn_content col-md-11">
+                                        <apex:dataList value="{!notification}" var="noti" styleClass="bulltn_list">
+                                            <apex:outputText value="{!noti.Key_data_Points__c}" styleClass="default"/>
+                                        </apex:dataList>              
+                                    </div>
+                                    <div class="bulltn_control col-md-1">
+                                        <span class="bexpnd" onclick="bulletin_expand();"> + Expand</span>
+                                        <span class="bclose" onclick="bulletin_close();"> - Close</span>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <input type='hidden' id='hdnChartValue' value='{!TimeshtJSONtoBind}'/>
+                            <input type='hidden' id='hdnCompletedUSChartValue' value='{!CompletedUSJSONToBind}'/>
+
+                            <div class="sub-warp dashboard_cus"> 
+                                <h1></h1>
+                                <apex:outputPanel id="ODSDashboardPanel" rendered="{!ShowTMDashboard}">
+                                    <div class="cli-dash-blue">
+                                        <h2>Your Savings on ODs <span class="info-text">*</span></h2>
+                                        <div class="clr"></div>
+                                        <!-- This Month -->         
+                                        <div class="cli-blue-box">
+                                            <p>This Month</p>
+                                            <div class="cli-blue-boxbg"> 
+                                                <h3>
+                                                    <apex:outputtext value="{!OdsFormattedSavingCost}"/>
+                                                </h3>                 
+                                            </div> 
+                                        </div>
+                                        <!-- Last Month -->  
+                                        <div class="cli-blue-box">
+                                            <p>Last Month</p>
+                                            <div class="cli-blue-boxbg">
+                                                <h3>             
+                                                    <apex:outputtext value="{!OdsFmtdLstMthSavingCost}"/>
+                                                </h3>
+                                            </div>
+                                        </div>  
+                                        <!-- This Year -->   
+                                        <div class="cli-blue-box">
+                                            <p>Life Time</p>
+                                            <div class="cli-blue-boxbg">                
+                                                <h3>
+                                                    <apex:outputtext value="{!YearFmtdSavingCost}"/> 
+                                                </h3>  
+                                            </div>
+                                        </div> 
+                                        <div class="clr"></div>
+                                        <div class="blue-box-text"><i>*For more information please contact your ODS Customer Success Manager</i></div>
+                                    </div>
+                                    <!-- Current Month For ODS Timesheet-->   
+                                    <apex:outputPanel id="HoursAmountPanel">
+                                        <div class="cli-dash-blue cli-dash-white">
+                                            <h2>
+                                                <apex:outputLabel >
+                                                    <a style="cursor: pointer;"  onclick="getHoursAmount('Hours')" title="Click here to view Hours">Hours |  </a>
+                                                </apex:outputLabel>
+                                                <apex:outputLabel > 
+                                                    <a style="cursor: pointer; color:#4ecaf4;" onclick="getHoursAmount('Amount')" title="Click here to view Amount">Amount</a>
+                                                </apex:outputLabel> 
+                                                <apex:outputText rendered="{!HrsWaitingforApproval != '0'}">
+                                                    <span class="waiting-approvalText">Waiting for Approval: 
+                                                        <span  class="waiting-approvalCount"> 
+                                                            <apex:commandLink value="{!HrsWaitingforApproval}  Hrs" action="{!NavigateToViewTimesheetById}" title="Click here to view Timesheet"/> 
+                                                        </span>
+                                                    </span> 
+                                                </apex:outputText>
+                                            </h2>
+                                            <div class="cli-white-boxbg">
+                                                <p style="color:#000000;">This Month</p>
+                                                <div class="cli-white-box"> 
+                                                    <h3>                                                  
+                                                        <apex:outputtext value="{!OdsThisMonthHours}" style="white-space: pre;font-size:30px;" escape="false"/>  
+                                                    </h3> 
+                                                    <span>
+                                                        <apex:outputtext value="{!CurrentMonthDate }">  
+                                                        </apex:outputText> 
+                                                    </span>  
+                                                </div>
+                                            </div>
+                                            <!-- Last Month For ODS Timesheet-->  
+                                            <div class="cli-white-boxbg">
+                                                <p>Last Month</p>
+                                                <div class="cli-white-box cli-white-boxbg-bor">
+                                                    <h3><apex:outputtext value="{!OdsLastMonthHours }" style="white-space: pre;font-size:30px;" escape="false"/> </h3>
+                                                    <span>
+                                                        <apex:outputtext value="{!LastMonthDate }"> 
+                                                        </apex:outputText>  
+                                                    </span>   
+                                                </div>
+                                            </div>
+                                            <!-- Current Year For ODS Timesheet--> 
+                                            <div class="cli-white-boxbg"> 
+                                                <p>Life Time</p>
+                                                <div class="cli-white-box cli-white-boxbg-gray">
+                                                    <h3>
+                                                        <apex:outputtext value="{!thisYearTmeSht}" style="white-space: pre;font-size:30px;" escape="false"/> 
+                                                    </h3>    
+                                                    <span>
+                                                        <apex:outputtext value=" Till Date"/>
+                                                    </span> 
+                                                </div> 
+                                            </div> 
+                                        </div> 
+                                    </apex:outputPanel>
+                                    <script src="{!URLFOR($Resource.ODS_Assets,'guagejs/gauge.js')}"></script>
+                                    <apex:outputPanel >
+                                        <div class="clr">
+                                        </div>
+                                        <style>
+                                            .chart-label h2{    font-size: 16px;
+                                            text-transform: uppercase;
+                                            color: #333;
+                                            margin: 0 0 15px 20px;
+                                            padding: 0px 0 8px 0;
+                                            font-weight: 600;
+                                            font-family: 'Open Sans', sans-serif;
+                                            float: left;}
+                                            .chart-label{width:100%:flaot:left;border-bottom:1p solid #a6b8c1}
+                                            #mySelect{    padding: 2px;
+                                            font-family: 'Open Sans', sans-serif;
+                                            font-size: 12px;
+                                            text-transform: uppercase;
+                                            font-weight: normal;
+                                            border-radius: 3px;
+                                            margin-left: 5px;
+                                            margin-top: -5px;}
+                                        </style>
+                                        <div id="ChartWrapper" class="white-bg">
+                                            <br/>
+                                            <div  id="myDiv" class="chart-label">
+                                                <h2>Initiatives</h2> &nbsp; &nbsp;
+                                                <apex:selectList styleClass="ddlInitiatives" onchange="LoadInitiatives();" value="{!slctdInitiative}" size="1" rendered="{!(Initiatives.size!=0 && Initiatives!=null ) }">
+                                                    <apex:selectOptions value="{!Initiatives}" />
+                                                </apex:selectList> &nbsp; &nbsp; &nbsp;
+                                                <apex:outputLabel style="color:red; font-size:11px;" rendered="{!(Initiatives.size==0 || Initiatives==null ) }">*No active initiatives associated with this account</apex:outputLabel>
+                                            </div>
+                                            <!--<apex:outputPanel id="pnlInitiativeChart" rendered="{!ShowInitiativeChart}">-->
+                                                <div id="chartdivs" ></div>
+                                            <!--</apex:outputPanel>
+                                            <apex:outputPanel rendered="{!ShowInitiativeChart}">
+                                                <div class="cli-dash-blue cli-dash-white no-rally">
+                                                    <h3> No Initiatives related to this Account !! </h3>
+                                                </div>
+                                            </apex:outputPanel>-->
+                                        </div>
+                                    </apex:outputPanel>
+                                </apex:outputPanel>
+                                <apex:outputPanel styleClass="outpnlTAM" >
+                                    <div class="tech-manager-bg">
+                                        <div class="left-side">
+                                            <h2>Customer Success Manager (CSM)</h2>
+                                            <div class="user-icon-wid">                
+                                                <apex:image value="{!URLFOR($Resource.ODS_Assets,'images/tech_pic.jpg')}" rendered="{!Photo =='' && Photo ==null}" styleClass="dash-img" />
+                                                <apex:image url="/servlet/servlet.FileDownload?file={!Photo}" rendered="{!Photo !='' && Photo !=null}" styleClass="dash-img" />
+                                            </div>
+                                            <div class="user-text">                                                
+                                                <ul>
+                                                    <li><span>Name:</span> <span><apex:outputField value="{!tamLst[0].Technical_Account_manager__r.Name}" /></span></li>
+                                                    <li><span>Email:</span> <span><apex:outputField value="{!tamLst[0].Technical_Account_manager__r.Email}" /></span></li>
+                                                    <li><span>Mobile:</span> <span><apex:outputField value="{!tamLst[0].Technical_Account_manager__r.Phone}" /></span></li>
+                                                </ul>                                                
+                                            </div>
+                                        </div>
+                                        <div class="cli-liblue">
+                                            <h2>CONTACT YOUR CSM </h2>
+                                            <apex:inputTextarea value="{!clientQueries}" html-placeholder="Enter your comments..." styleClass="ClientQueryTxtArea" title="Max 255 Chars"/>
+                                            <input type="button" Id="enableSubmitBtn"  value="Submit" onclick="return validateQuery();" style="display: none;"/> 
+                                            <input type="button" id="disableSubmitBtn" value="Submit" disabled="disabled" style="display: none;"/> 
+                                        </div>
+                                    </div>
+                                </apex:outputPanel>  
+                                <!--<div class="clr"></div>--> 
+                                <apex:outputPanel id="outPnlDisplayRallyMsg" styleClass="outpnlRallyMsg" style="display:none;">
+                                    <div class="cli-dash-blue cli-dash-white no-rally">
+                                        <h3> No Rally related to this Account !! </h3>
+                                    </div>
+                                </apex:outputPanel>
+                                <apex:outputPanel id="outPnlDisplayAgileMsg" styleClass="outpnlAgileMsg" style="display:none;">
+                                    <div class="cli-dash-blue cli-dash-white no-rally">
+                                        <h3> No Agile Tool related to this Account !! </h3>
+                                    </div>
+                                </apex:outputPanel>
+                                <apex:outputPanel id="outPnlRallyErrorMsg" styleClass="outpnlDisplayErrorMsg" style="display:none;">
+                                    <div class="cli-dash-blue cli-dash-white no-rally">
+                                        <h3> Oops! Something went wrong in fetching user story details. Please contact your Technical Account Manager. </h3>
+                                    </div>
+                                </apex:outputPanel> 
+                                <!-- Display Rally details-->
+                                <apex:outputPanel id="outPnlDisplayRallyDetails" styleClass="outpnlRallyValues">
+                                    <div class="cli-dash-blue cli-dash-white user-stories-bg" >
+                                        <h2><label>User Stories</label> 
+                                            <apex:selectList styleClass="ddRallyYears" id="picklistYear" onchange="fnGetUserStoriesByMonthYear()" value="{!slctdRallyYear}" size="1">
+                                                <apex:selectOptions value="{!Years}" />
+                                            </apex:selectList>
+                                            <apex:selectList styleClass="ddRallyMonths"  id="picklistMonth" onchange="fnGetUserStoriesByMonthYear()"  value="{!slctdRallyMonth}" size="1">
+                                                <apex:selectOptions value="{!Months}" />
+                                            </apex:selectList>
+                                        </h2>
+                                        <div class="cli-white-boxbg user-stories-wid">
+                                            <div class="cli-white-box">
+                                                <h3 id="USCompletedCount" class="blue-stories"> </h3> 
+                                                <span><img src="{!URLFOR($Resource.ODS_Assets,'images/completed-icon.png')}" /> Completed</span>  
+                                            </div>
+                                        </div>
+                                        <div class="cli-white-boxbg  user-stories-wid">
+                                            <div class="cli-white-box cli-white-boxbg-bor">
+                                                <h3 id="USInProgressCount" class="white-stories"> </h3>
+                                                <span><img src="{!URLFOR($Resource.ODS_Assets,'images/inprogress-icon.png')}"/> In progress</span>  
+                                            </div>
+                                        </div>
+                                        <div class="clr"></div>
+                                        <div id="rallydiv" style="display:none;">
+                                            <a target="_blank" href="https://rally1.rallydev.com" class="create-new-link">Create New User Story</a>
+                                        </div>
+                                        <div id="jiradiv" style="display:none;">
+                                            <a target="_blank" href="https://{!JiraDomainName}" class="create-new-link">Create New User Story</a>
+                                        </div>
+                                    </div> 
+                                    <div class="cli-white-box cli-white-boxbg-gray user-stories-gray">
+                                        <h2><label>User Stories</label><br/> <span>Life Time</span></h2>
+                                        <h3 id="FYCompletedCount"> </h3>    
+                                        <span class="position-said">COMPLETED</span>
+                                        <!--<span class="position-said FY-text"><apex:outputtext value="{!strFinancialYear}"/></span>      -->
+                                    </div> 
+                                    <div class="asd-bg">
+                                        <h2>AVERAGE SPRINT GAPS </h2> 
+                                        <!--<img src="{!URLFOR($Resource.ODS_Assets,'images/asd-icon.png')}"  />--><br/>
+                                        <h3 id="AvgSprintGaps" class="ads-headingTxt">  </h3>    
+                                        <!--<span class="FY-text"><apex:outputtext value="{!strFinancialYear}"/></span>-->
+                                    </div>
+                                </apex:outputPanel>
+                                <!-- Completed User story -->
+                                <!--<div class="clr"></div>--> 
+                                <div class="cli-dash-res cli-dash-res1" >
+                                    <div class="cli-dash-res1">
+                                        <apex:selectList styleClass="ddlstUSYears" onchange="ReloadUserstoryCompletedChartData();ReloadChartData();" value="{!slctdYear}" size="1">
+                                            <apex:selectOptions value="{!Years}" />
+                                        </apex:selectList>
+                                        <apex:selectList styleClass="ddlstUSMonths" onchange="ReloadUserstoryCompletedChartData();ReloadChartData();" value="{!slctdMonth}" size="1">
+                                            <apex:selectOptions value="{!Months}" />
+                                        </apex:selectList>
+                                    </div> 
+                                    <apex:outputPanel id="ResUtilChartPanel" rendered="{!ShowTMDashboard}">
+                                        <div class="cli-dash-res2" id="resUtilDiv">
+                                            <h2>resource utilization </h2>
+                                            <div class="clr"></div>
+                                            <div style="text-align:center ; padding: 16px 0;"><div id="chartdiv"></div>    </div>
+                                        </div>
+                                    </apex:outputPanel>
+                                    <div class="cli-dash-res2" id="compUSDiv">
+                                        <h2>Completed user stories</h2>
+                                        <div class="clr"></div>
+                                        <div style="text-align:center ; padding: 16px 0;"><div id="userstorychartdiv"></div></div>
+                                    </div>
+                                </div>   
+                            </div>
+                        </div>
+                    </apex:outputPanel>
+                    <apex:outputPanel id="noSearchRec" rendered="{!ShowNoRedOutptPnl}">
+                        <div class="wrap">
+                            <div class="login">
+                                <div class="forgot-text" style="color:#419b1d; font-size:18px; text-align:center; width:450px; padding-top:0; ">
+                                    <apex:image value="{!URLFOR($Resource.ODS_Assets,'images/sad-icon.png')}"/><br/><br/>
+                                    <strong>
+                                        OOPS! Sorry no account has been assigned to you yet. Please contact Administrator
+                                    </strong>
+                                </div>
+                            </div> 
+                        </div>
+                    </apex:outputpanel>
+                    <c:ODS_FooterComponent /> 
+                </apex:outputPanel>
+            </body>
+        </html> 
+    </apex:form> 
+</apex:page>

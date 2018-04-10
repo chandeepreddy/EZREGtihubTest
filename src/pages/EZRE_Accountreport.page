@@ -1,0 +1,184 @@
+<!--
+ - @author           Lavanya Aningi
+ - @version          1.0 
+ - @date             03/04/2016
+ - @description      VF page to generate custom Account Report
+-->
+
+<apex:page standardController="Account" extensions="EZRE_AccountReportExtnsnCntrllr" sidebar="false" showHeader="false" >
+
+<apex:form >
+    <script src="{!URLFOR($Resource.Jtreeview,'Jquerytreeview/jquery.js')}" type="text/javascript"></script>
+    <script src="{!URLFOR($Resource.Jtreeview,'Jquerytreeview/jquery.treeview.js')}" type="text/javascript"></script>
+    <link rel="stylesheet" href="{!URLFOR($Resource.Jtreeview,'Jquerytreeview/jquery.treeview.css')}"/>    
+    <script src="{!URLFOR($Resource.Jtreeview,'Jquerytreeview/jquery.cookie.js')}" type="text/javascript"></script>
+    
+
+<script type="text/javascript">
+        $(function() {
+            $("#tree").treeview({
+                collapsed: true,
+                animated: "fast",
+                control:"#sidetreecontrol"                
+            });
+        })
+</script>
+
+<apex:pageBlock >
+    <center>
+        <apex:commandButton action="{!exportAsPDF}" value="Export as PDF"/>
+    </center>
+</apex:pageBlock>
+
+<apex:pageBlock title="Hello {!$User.FirstName} {!$User.LastName}!">
+You are viewing the details of <b> {!Account.name}</b>!<apex:outputText value="{!Account.Logo__c}" escape="false" ></apex:outputText>
+    <apex:pageBlocksection title="Account Details 1:">
+        <apex:outputField value="{!Account.AnnualRevenue}"/>    &nbsp;
+        <apex:outputField value="{!Account.NumberOfEmployees}"/> &nbsp; 
+        <apex:outputField value="{!Account.Industry}"/>  &nbsp;
+        <apex:outputField value="{!Account.isActive__c}"/>  &nbsp;
+        <apex:outputField value="{!Account.BillingCity}"/>  &nbsp;
+        <apex:outputField value="{!Account.BillingState}"/>  &nbsp;
+    </apex:pageBlocksection>
+    
+    
+    <apex:pageBlocksection title=" Account Details 2:">  
+        <apex:outputField value="{!Account.OwnerId}" /> &nbsp;  
+        <apex:outputField value="{!Account.Client_Partner__c}"/> &nbsp;        
+        <apex:outputField value="{!Account.Executive_Summary__c}"/> &nbsp;
+        <apex:outputField value="{!Account.Key_Competitors__c}"/> &nbsp;
+        <apex:outputField value="{!Account.Info_From_10K__c}"/> &nbsp;
+        <apex:outputField value="{!Account.Ownership}"/> &nbsp;
+        <apex:outputField value="{!Account.Technical_Environment__c}"/> &nbsp;
+        <apex:outputField value="{!Account.Current_Vendors__c}"/> &nbsp;        
+    </apex:pageBlocksection>
+</apex:pageBlock>
+
+
+<apex:pageBlock title="Strategic Initiatives">
+    <apex:outputPanel id="noSearchRes" rendered="{!(initveLst.size == 0 && initveLst !=null)}"> No Initiatives are found!
+    </apex:outputPanel>
+    
+    <apex:repeat var="in" value="{!Account.Initiatives__r}" >
+        <apex:pageBlockSection >
+            <apex:outputField value="{!in.Name}"/><br/>
+            <apex:outputField value="{!in.Description__c}"/><br/> 
+            <apex:outputField value="{!in.Source_of_that_Information__c}"/><br/>
+            <apex:outputField value="{!in.What_we_know__c}"/><br/>
+            <apex:outputField value="{!in.What_we_need_to_know__c}"/><br/>
+            <apex:outputText value=""></apex:outputText>
+        </apex:pageBlockSection>
+    </apex:repeat>
+</apex:pageBlock> 
+
+
+<apex:pageBlock Title="Contacts Hierarchy" >
+<div class="treeheader" style="height:0px;"> </div>
+<ul id='tree'>
+    <apex:repeat value="{!HrchyWrppr}" var="parent1">
+        <li><strong>
+            <apex:outputLink style="color:black;" value="/{!parent1.gpCntct.id}" rendered="{!parent1.gpCntct != null}">{!parent1.gpCntct.Name}</apex:outputLink>
+            </strong>
+             <ul>
+                 <apex:repeat value="{!parent1.prntCntct}" var="child1">
+                    <li>
+                        <span class="formattextcon">
+                        <apex:outputLink style="color:black;" value="/{!child1.id}" rendered="{!child1.id != null}">{!child1.Name}</apex:outputLink>
+                        </span>
+                        <ul>
+                         <apex:repeat value="{!parent1.chldCntct[child1.id]}" var="child2" rendered="{!child1.id != null}" >
+                            <li>
+                            <span class="formattextcon">
+                                <apex:outputLink style="color:black;" value="/{!child2.id}" rendered="{!child2.id != null}">{!child2.Name}</apex:outputLink>
+                            </span>      
+                                <ul>
+                                   <apex:repeat value="{!parent1.grndChldCntct[child2.id]}" var="child3" rendered="{!child2.id != null}" >
+                                     <li>
+                                     <span class="formattextcon">
+                                        <apex:outputLink style="color:black;" value="/{!child3.id}" rendered="{!child3.id != null}">{!child3.Name}</apex:outputLink>
+                                    </span>
+                                       <ul>
+                                            <apex:repeat value="{!parent1.grndChldCntct[child3.id]}" var="child4" rendered="{!child3.id != null}" >
+                                           <li>
+                                            <span class="formattextcon">
+                                                <apex:outputLink style="color:black;" value="/{!child4.id}" rendered="{!child4.id != null}">{!child4.Name}</apex:outputLink>                                   
+                                            </span>
+                                           </li>    
+                                           </apex:repeat>
+                                       </ul>
+                                     </li>
+                                </apex:repeat>
+                               </ul>
+                            </li>                 
+                            </apex:repeat>
+                        </ul> 
+                        </li>             
+                    </apex:repeat>                    
+             </ul>                             
+        </li>
+    </apex:repeat>
+</ul>
+</apex:pageBlock>
+
+<apex:pageBlock title="Contacts">
+    <apex:outputPanel id="noSearchRes" rendered="{!(cntctLst.size == 0 && cntctLst !=null)}"> No contacts are found!
+    </apex:outputPanel>
+    <apex:repeat var="con" value="{!Account.contacts}" >
+        <apex:pageBlockSection >
+            <apex:outputField value="{!con.Name}"/><br/>
+            <apex:outputField value="{!con.Title}"/><br/> 
+            <apex:outputField value="{!con.Relationship_Strength__c}"/><br/>
+            <apex:outputField value="{!con.ReportsToId}" id="reportToId"/><br/>
+            <apex:outputText value=""></apex:outputText>
+        </apex:pageBlockSection>
+    </apex:repeat>
+</apex:pageBlock>
+
+
+
+<apex:pageBlock title="Opportunities">
+    <apex:outputPanel id="noSearchRes" rendered="{!(oppLst.size==0 && oppLst!=null)}"> No Opportunities are found!
+    </apex:outputPanel>
+    <apex:pageBlockTable value="{!oppLst}" var="opp"  style="width:700px;" rendered="{!(oppLst.size != 0)}">
+        <apex:column headerValue="Opportunity Name" >
+        <apex:outputlink value="/{!opp.Id}">{!opp.Name}</apex:outputlink><br/>
+        </apex:column>
+        <apex:column headerValue="Stage" value="{!opp.StageName}"/>
+        <apex:column headerValue="Amount" value="{!opp.Amount}"/>
+        <apex:column headerValue="Execution Partner" value="{!opp.Execution_Partner__c}"/>        
+    </apex:pageBlockTable>
+</apex:pageBlock>
+
+
+
+
+<apex:pageBlock title="Activities">
+    <apex:outputPanel id="noSearchRes" rendered="{!(lstWrppr.size==0 && lstWrppr!=null)}"> No Activities are found!
+    </apex:outputPanel>
+                
+    <apex:pageBlockTable value="{!lstWrppr}" var="wrppr" style="width:700px" rendered="{!(lstWrppr.size != 0)}">
+    <apex:column headerValue="Subject" >
+        <apex:outputlink value="/{!wrppr.recrdId}" >{!wrppr.Subject}</apex:outputlink><br/>
+    </apex:column>
+
+    <apex:column headerValue="Name">
+        <apex:outputLink value="/{!wrppr.WhoId}">{!wrppr.name}</apex:outputLink>
+    </apex:column>
+    
+    <apex:column headerValue="Date">
+    <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+        <apex:param value="{!wrppr.ActivityDate}" />
+    </apex:outputText> 
+    </apex:column>
+    <apex:column headerValue="Owner Name" >
+        <apex:outputLink value="/{!wrppr.ownerName}" >{!wrppr.ownerName}</apex:outputLink>
+    </apex:column>
+</apex:pageBlockTable>
+
+</apex:pageBlock>
+
+
+
+
+</apex:form>
+</apex:page>

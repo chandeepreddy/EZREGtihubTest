@@ -1,0 +1,1 @@
+https://my.insideview.com/iv/showSfHomePage.do?session={!API.Session_ID}&server={!API.Enterprise_Server_URL_70}&user_id={!User.Id}&org_id={!Organization.Id}&version=v30

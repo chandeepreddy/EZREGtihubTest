@@ -1,0 +1,28 @@
+<aura:component access="public">
+	<aura:attribute name="start" type="integer" default="1" access="public"/>
+	<aura:attribute name="end" type="integer" default="5" access="public"/>
+	<aura:attribute name="isLastPage" type="Boolean" access="public"/>
+	<aura:attribute name="isFirstPage" type="Boolean" access="public"/>
+	<aura:registerEvent name="EngagementHistoryPageChange" type="pi:EngagementHistoryPageChange" />
+
+	<aura:method name="indexChange" action="{!c.indexChange}"
+	  description="This method will change the indices when page changes" access="PUBLIC" >
+		<aura:attribute name="start" type="integer" access="public"/>
+		<aura:attribute name="end" type="integer" access="public"/>
+		<aura:attribute name="isLastPage" type="Boolean" access="public"/>
+		<aura:attribute name="isFirstPage" type="Boolean" access="public"/>
+	</aura:method>
+
+	<aura:method name="setShowPaginator" action="{!c.setShowPaginator}"
+	  description="This method will show hide paginator based on number of records" access="PUBLIC" >
+		<aura:attribute name="showPaginator" type="Boolean" access="public"/>
+	</aura:method>
+
+	<div aura:id="container" class="slds-hide slds-align_absolute-center">
+		<a aura:id="firstPageLink" class="disable-click" onclick="{!c.firstPage}"><span>&laquo;&nbsp;</span>First</a>
+		<span>&nbsp;&nbsp;|&nbsp;&nbsp;Showing&nbsp;&nbsp;{!v.start}&nbsp;-&nbsp;{!v.end}&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+		<a aura:id="previousPageLink" class="disable-click" onclick="{!c.previousPage}"><span>&laquo;&nbsp;</span>Previous 5</a>
+		<span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+		<a aura:id="nextFiveLink" onclick="{!c.nextPage}">Next 5<span>&nbsp;&raquo;</span></a>
+	</div>
+</aura:component>

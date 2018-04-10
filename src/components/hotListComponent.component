@@ -1,0 +1,30 @@
+<apex:component controller="HotListClass" access="global">
+    <apex:dataTable value="{!candidates}" var="proj" border="2">
+        <apex:column width="30%" style="align:left">
+            <apex:facet name="header">First Name</apex:facet>
+            {!proj.Name}            
+        </apex:column>
+        <apex:column width="30%" style="align:left">
+            <apex:facet name="header">Last Name</apex:facet>
+            {!proj.Last_Name__c}
+        </apex:column>
+        <apex:column width="40%" style="halign:left">
+            <apex:facet name="header">Skills</apex:facet>
+            {!proj.Skills__c}
+        </apex:column>
+        <apex:column width="30%" style="halign:left">
+            <apex:facet name="header">Location</apex:facet>
+            {!proj.Current_City__c}
+        </apex:column>
+        <apex:column width="30%" style="halign:left">
+            <apex:facet name="header">Relocation</apex:facet>
+            {!proj.Relocation__c}
+        </apex:column>
+        <apex:column width="40%" style="halign:left">
+            <apex:facet name="header">Availability</apex:facet>
+            {!proj.Availability__c}
+        </apex:column>
+
+        
+    </apex:dataTable>
+</apex:component>

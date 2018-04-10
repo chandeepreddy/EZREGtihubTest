@@ -1,0 +1,32 @@
+.THIS .bold {
+	font-weight: 700;
+	color: rgb(22, 50, 92);
+}
+
+.THIS span.slds-media__figure {
+	margin-top: 0em !important;
+}
+
+.THIS .slds-icon {
+	fill: rgb(21, 137, 238);
+}
+
+.THIS .slds-media__figure {
+	min-width: 1.2em;
+}
+
+.THIS .divider {
+	color: rgb(84, 105, 141);
+}
+
+.THIS svg[data-key=new_contact], .THIS svg[data-key=new_lead] {
+	fill: white;
+	width: .8em;
+}
+
+.THIS span.slds-icon-action-new-contact, .THIS span.slds-icon-action-new-lead {
+	padding: 0em .1em 0em .1em;
+	margin-left: .216em;
+	line-height: .1em;
+	width: 1.04em;
+}

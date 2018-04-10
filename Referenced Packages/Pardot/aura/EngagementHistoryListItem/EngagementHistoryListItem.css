@@ -1,0 +1,42 @@
+.THIS .slds-media__body.timeline-item {
+	position: relative;
+}
+
+.THIS .activity-row .activity-name-container {
+	float: left;
+	text-align: left;
+	background: inherit;
+	max-width: 50%;
+	top: -4px;
+}
+
+.THIS .activity-age {
+	float: right;
+	text-align: right;
+	margin-left: .8em;
+}
+
+.THIS .activity-row {
+	overflow: hidden;
+}
+
+.THIS .activity-row:after {
+	content:'';
+	border-bottom: 1px dashed #d8dde6;
+	display:block;
+	overflow:hidden;
+	height:0.8em;
+}
+
+.THIS .activity-name {
+	font-weight: bold;
+	color: #16325c;
+	display: inline-block;
+	vertical-align: bottom;
+	max-width: 97%;
+}
+
+.THIS .warning-icon {
+	vertical-align: 3px;
+	margin-left: 2px;
+}

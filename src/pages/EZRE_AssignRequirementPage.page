@@ -1,0 +1,29 @@
+<!--
+ - @author           Soumya
+ - @version          1.0 
+ - @date             20/11/2014
+ - @description      New Assign Requirement creation page
+-->
+<apex:page standardController="RequirementAssignment__c" extensions="EZRE_AssignRequirementCntrl">
+<apex:sectionHeader title="Assign Requirement Edit" subtitle="New Assign Requirement"/>
+<apex:form id="frmId">
+<apex:actionFunction name="Save" action="{!Save}"/>
+<apex:actionFunction name="SaveAndNew" action="{!SaveAndNew}"/>
+<apex:actionFunction name="Cancel" action="{!Cancel}"/>
+
+ <apex:pageMessages /> 
+ <apex:pageblock mode="edit">
+    <apex:pageBlockButtons >
+     <apex:commandButton id="btnSave" action="{!Save}" value="Save" />
+     <apex:commandButton id="btnSaveAndNew" action="{!SaveAndNew}" value="Save & New" />
+     <apex:commandButton id="btnCancel" action="{!Cancel}" value="Cancel" />
+    </apex:pageBlockButtons>
+    
+     <apex:pageblockSection title="Information" columns="1" id="pgblksecId">
+         <apex:inputField value="{!RequirementAssignment__c.Requirement__c}"/>
+        <apex:inputField value="{!RequirementAssignment__c.Recruiter__c}"/> 
+    <apex:inputField value="{!RequirementAssignment__c.Lead_Recruiter__c}"/> 
+     </apex:pageblockSection>
+    </apex:pageBlock>
+ </apex:form>
+</apex:page>

@@ -1,0 +1,8 @@
+<apex:page controller="EZRE_DuplicateCandidateDwnLoadController" > 
+ <apex:form >
+<apex:pageBlock >
+<apex:outputLabel style="font-weight:bold" >Please click the button to Export Duplicate Candidates</apex:outputLabel>&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:commandButton value="Export DupliCate Candidates" action="{!exportDuplicateCandidates}"/>
+</apex:pageBlock>
+</apex:form>
+</apex:page>

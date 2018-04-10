@@ -1,0 +1,121 @@
+.THIS {
+    background-color: inherit;
+    clear: both;
+    margin-top: -5px;
+}
+
+.THIS table {
+    margin-top: 10px;
+}
+
+.THIS .hide {
+    display: none;
+}
+
+.THIS .link-button {
+    background: none;
+    border: none;
+    padding: 0 5px;
+    cursor: pointer;
+    margin: 0;
+    text-decoration: none;
+}
+
+.THIS .link-button:focus {
+    outline: none;
+    box-shadow: none;
+    background-color: transparent;
+}
+
+.THIS .link-button:hover {
+    text-decoration: underline;
+    background-color: transparent;
+}
+
+.THIS .elliptic {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+
+.THIS .pv-spinner {
+    text-align: center;
+}
+
+.THIS .pv-loading-icon {
+    margin-right: 0.75rem;
+}
+
+.THIS table.tableSection {
+    display: table;
+    width: 100%;
+    background: none;
+}
+.THIS table.tableSection thead {
+    float: left;
+    width: 100%;
+}
+
+.THIS table.tableSection tbody {
+    float: left;
+    width: 100%;
+    overflow-y: auto;
+    max-height: 200px;
+}
+
+.THIS table.tableSection tr {
+    width: 100%;
+    display: table;
+    text-align: left;
+}
+.THIS table.tableSection th {
+    text-align: left;
+    padding-left: 0;
+}
+
+.THIS table.tableSection td {
+    max-width: 6vw;
+    text-align: left;
+    padding-left: 0px;
+}
+
+.THIS table.tableSection td wrap {
+    text-overflow:ellipsis;
+    overflow:hidden;
+    white-space:nowrap;
+}
+
+.THIS table.hide {
+    display: none;
+}
+
+.THIS tr .first-cell {
+    width: 70%;
+}
+
+.THIS tr:hover {
+    background-color: inherit;
+}
+
+.THIS .link-button span {
+    font-size: .75rem;
+    color: #0070d2;
+}
+
+.THIS .uiButton--default {
+    font-weight: normal;
+    box-shadow: none;
+    text-shadow: none;
+    text-align: inherit;
+    border-radius: initial;
+}
+
+.THIS .uiButton--default:hover .label {
+    color: #005fb2;
+}
+
+.THIS .uiButton--default:focus .label {
+    color: #005fb2;
+}

@@ -1,0 +1,57 @@
+<apex:page controller="EZRE_InsideSalesDailyWorkAllocation" sidebar="false" readOnly="true" id="pg">
+<style type="text/css">
+    .col1 { text-align:right; font-weight: bold;}
+    .col2 {text-align:left; padding-right:50px;}
+           
+</style>
+
+<apex:form >
+
+<apex:pageblock title="Daily Call List">
+ <apex:panelGrid columns="7" columnClasses="col1, col2,col1, col2, col1,col2">
+
+ <apex:outputtext styleclass="font-weight:bold" value="Rep Name"/>
+ <apex:selectList value="{!SelectedRepName}" multiselect="false" size="1" >
+                <apex:selectOptions value="{!RepNames}"/>
+                
+ </apex:selectList>
+ 
+ <apex:outputLabel >Time Zone </apex:outputLabel>
+ <apex:selectList value="{!SelectedTimeZone}" multiselect="false" size="1" label="Time Zone"  >
+                <apex:selectOption itemLabel="All" itemValue="null" />
+                <apex:selectOption itemLabel="CST" itemValue="CST" />
+                <apex:selectOption itemLabel="EST" itemValue="EST" />
+                <apex:selectOption itemLabel="MST" itemValue="MST" />
+                <apex:selectOption itemLabel="PST" itemValue="PST" />
+                <apex:selectOption itemLabel="Other" itemValue="Other" />
+                <apex:selectOption itemLabel="None" itemValue="None" />
+ </apex:selectList>
+ <apex:outputLabel >Filter</apex:outputLabel>
+ <apex:selectList value="{!SelectedFilter}" multiselect="false" size="1" label="Filter"  >              
+                 <apex:selectOption itemLabel="Not Called" itemValue="false" />
+                 <apex:selectOption itemLabel="Called" itemValue="true" />
+                 <apex:selectOption itemLabel="All" itemValue="None" />
+ </apex:selectList>
+ <apex:commandButton action="{!filterAccounts}"  Value="Show"/>
+            </apex:panelGrid>      
+</apex:pageblock>
+
+<apex:pageblock id="PB">
+<apex:outputText rendered="{!Not(acctsLst.size >0)}">No Records found with this Creteria</apex:outputText>
+<apex:pageBlockButtons location="Top" Rendered="{!acctsLst.size>0}" >
+<apex:commandbutton value="Export To Excel" Action="{!exportToExcel}" style="margin-left:160PX;" reRender="pg"/>
+</apex:pageBlockButtons>
+ <apex:pageBlockTable value="{!acctsLst}" var="Con" title="Call List" id="pbtable" Rendered="{!acctsLst.size>0}">
+ <apex:column headerValue="Called" value="{!Con.Worked__c}"/>
+ <apex:column headerValue="Account Name" >
+ <apex:outputLink value="/{!Con.Account_Name__c}">{!Con.account_Name__r.name}</apex:outputLink>
+ </apex:column>
+ <apex:column headerValue="Comments" value="{!Con.Comments__c}"/> 
+ <apex:column headerValue="Status" value="{!Con.Status__c}"/>
+ <apex:column headerValue="Rep Name" value="{!Con.Name}" />
+ <apex:column headerValue="Time Zone" value="{!Con.TimeZone__c}" style="{!IF(Con.TimeZone__c ='CST','background-color:#5FE85A;',IF(Con.TimeZone__c ='EST','background-color:yellow;',IF(Con.TimeZone__c ='MST','background-color:#5AE8DA;',IF(Con.TimeZone__c ='PST','background-color:#F5BCF3;',IF(Con.TimeZone__c ='None','background-color:red;','background-color:orange;')))))}"/>
+ 
+ </apex:pageBlockTable>
+ </apex:pageblock>
+ </apex:form>
+</apex:page>

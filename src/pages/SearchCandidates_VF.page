@@ -1,0 +1,135 @@
+<apex:page controller="SearchCandidates">  
+<head> 
+<script type = "text/javascript">
+function checkAll(obj, receivedInputID) {
+    var inputCheckBox = document.getElementsByTagName("input");
+    for (var i = 0; i < inputCheckBox.length; i++) {
+        if (inputCheckBox[i].id.indexOf(receivedInputID) != -1) {
+            inputCheckBox[i].checked = obj.checked;
+        }
+    }
+} 
+ 
+function changeFont() {
+
+         var tale = document.getElementById("j_id0:myForm:pageBlock:pageblocktable");
+                 var Emails="" ; 
+                for (var i = 1, row; row = tale.rows[i]; i++) 
+                {                                    
+                  if(row.children[0].children[0].checked!= undefined)
+                    if(row.children[0].children[0].checked == true)
+                    {
+                         Emails = Emails + row.cells[7].innerText+";"  
+                    }
+                  
+                } 
+       
+       if(Emails != "")
+        {     
+            var body = escape(window.document.title); 
+            var subject = "Sub:";
+            var EmailsTo= "{!UserEmail}";  
+            window.location.href =  "mailto:"+EmailsTo+"?bcc="+Emails   
+            //return false;        
+        }
+        else
+         {
+             alert('Please check the checkbox for Email');
+         }
+        }  
+</script> 
+</head>   
+<apex:form id="myForm"> 
+<apex:pagemessages ></apex:pagemessages>
+<table> 
+<tr><td> <h2> Candidate Search </h2>    </td></tr>
+</table>
+<table id="phHeader" class="phHeader brandZeronaryBgr" border="0" cellspacing="0"
+            cellpadding="0">
+            <tbody>
+                <tr>
+                    <td class="searchCell">
+                        <div id="phSearchContainer" class="headerSearchContainer">
+                            <div class="headerSearchLeftRoundedCorner">
+                                <div class="searchBoxClearContainer">
+                                    <apex:inputtext value="{!inputValue}" id="theTextInput" style="border-color:White;" /> 
+                                    <a style="visibility: hidden" id="phSearchClearButton"
+                                            class="headerSearchClearButton" title="Clear search terms" href="javascript: void(0);"
+                                            name="phSearchClearButton"></a>   
+                                </div>
+                                <div id="searchButtonContainer" class="headerSearchRightRoundedCorner">
+                                
+                                    <apex:commandbutton action="{!search}" id="phSearchButton" value="Search" style="border-color:White;"/>
+                                
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+ 
+ <table> <tr> <td>
+            
+<apex:pageBlock id="pageBlock" rendered="{!AND(NOT(ISNULL(candidates)),(srch_wrap.size != 0))}" >
+<apex:pageBlockTable value="{!srch_wrap}" var="proj1" first="{!currentPage}" rows="{!pageSize}" id="pageblocktable">
+<apex:column >
+<apex:facet name="header">
+        <apex:inputCheckBox id="ChkAll"  onclick="checkAll(this,'CheckBoxId');"> 
+        </apex:inputCheckBox>
+ </apex:facet>            
+<apex:inputCheckbox id="CheckBoxId" value="{!myCheckbox}"   > </apex:inputCheckbox>
+</apex:column>
+<apex:column HeaderValue="Candidate Name" >   
+<apex:outputLink value="/{!proj1.candate.id}"  id="eventlink">{!proj1.candate.Name}</apex:outputLink>  
+</apex:column> 
+<!--<apex:column value="{!proj.Id}"></apex:column>-->
+<!--<apex:column value="{!proj1.candate.Name}"></apex:column> --> 
+<!--<apex:column value="{!proj1.candate.Last_Name__c}" headerValue="LastName"></apex:column>-->       
+<apex:column value="{!proj1.candate.Skills__c}" headerValue="Skills"></apex:column>
+<apex:column value="{!proj1.candate.Visa_Type__c}" headerValue="Candidate Visa Type"></apex:column>  
+<apex:column value="{!proj1.candate.Employer_Name__c}" headerValue="Employer Name"></apex:column>      
+<apex:column value="{!proj1.candate.Mobile_Phone_No__c}" headerValue="Mobile Number"></apex:column>
+<apex:column value="{!proj1.candate.Cost__c}" headerValue="Candidate Cost"></apex:column>  
+<apex:column value="{!proj1.candate.Email__c}" headerValue="Email"></apex:column> 
+ <apex:column >
+              <apex:facet name="header"></apex:facet>
+                <div ><apex:image value="{!$Resource.WordIcon}" /></div>
+                           </apex:column>
+<apex:column HeaderValue="Resume" >
+ <apex:outputLink value="/{!proj1.candate.Content__r[0].ContentDocumentID}" rendered="{!proj1.contentListSize}">{!proj1.candate.Content__r[0].ContentDocument.Title}</apex:outputLink>
+<apex:outputText value="{!proj1.contentNilString}" rendered="{!NOT(proj1.contentListSize)}"/> 
+</apex:column>  
+<apex:column HeaderValue="File" >
+ <apex:outputLink value="/{!proj1.contdoc[0].ContentDocumentId}" rendered="{!proj1.contentFileSize}">{!proj1.contdoc[0].ContentDocument.Title}</apex:outputLink>
+<apex:outputText value="{!proj1.contentNilString}" rendered="{!NOT(proj1.contentFileSize)}"/> 
+ </apex:column>
+ <!--<apex:column value="{!proj1.contdoc[0].ContentDocumentId}" headerValue="File">           
+                 
+ </apex:column> !-->
+ 
+  
+</apex:pageBlockTable>
+
+<center>
+        <apex:commandButton value="First" action="{!showFirst}" rerender="pageBlock" disabled="{!!showPrevious}"/>
+        <apex:commandButton value="Previous" action="{!showPrevious}" rerender="pageBlock" disabled="{!!showPrevious}"/>
+        <apex:commandButton value="Next" action="{!showNext}" rerender="pageBlock" disabled="{!!showNext}"/>
+        <apex:commandButton value="Last" action="{!showLast}" rerender="pageBlock" disabled="{!!showNext}"/>
+        </center>
+        <apex:outputText value="{!currentPageInfo}"/>
+
+
+
+<apex:pageBlockButtons id="phEmailCheckedCommand" title="Email">
+<!--<apex:commandbutton id="phEmailButtonCommand" value="Email Checked" onclick="changeFont();"   style="border-color:White;" />  -->
+<input type="button" value="EmailChecked" onclick="changeFont();"/>  
+</apex:pageBlockButtons>
+</apex:pageBlock>            
+
+          </td></tr> 
+</table>
+
+      
+</apex:form>  
+</apex:page>

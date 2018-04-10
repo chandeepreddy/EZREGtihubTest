@@ -1,0 +1,3 @@
+<apex:page standardController="Account" tabStyle="Account">
+<apex:iframe src="https://apps.firstrain.com/salesforce/001/dynamic/sf.do?sessionId={!$Api.Session_ID}&serverURL={!$Api.Partner_Server_URL_180}&accountId={!Account.id}&accountName={!URLENCODE(Account.name)}&userId={!$User.Id}&type=account&sfticker={!URLENCODE(Account.TickerSymbol)}&uln={!URLENCODE($User.LastName)}&ufn={!URLENCODE($User.FirstName)}&org={!URLENCODE($Organization.Name)}" height="250px" id="firstrainIframe"/>
+</apex:page>

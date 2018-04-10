@@ -1,0 +1,25 @@
+<apex:page Controller="EZRE_ExportContactController" contentType="application/vnd.ms-excel#contact.xls">
+<apex:pageblock >
+<apex:pageblocksection >
+<apex:pageBlockTable value="{!lstCon}" var="con"> 
+<apex:column value="{!con.Salutation}"/>
+<apex:column value="{!con.FirstName}"/>
+<apex:column value="{!con.LastName}"/>
+<apex:column value="{!con.Inside_Sales_Rep__c}"/>
+<apex:column value="{!con.Title}"/>
+<apex:column value="{!con.MailingStreet}"/>
+<apex:column value="{!con.MailingCity}"/>
+<apex:column value="{!con.MailingState}"/>
+<apex:column value="{!con.MailingPostalCode}"/>
+<apex:column value="{!con.MailingCountry}"/>
+<apex:column value="{!con.phone}"/>
+<apex:column value="{!con.MobilePhone}"/>
+<apex:column value="{!con.Fax}"/>
+<apex:column value="{!con.Email}"/>
+<apex:column value="{!con.Department}" headerValue="Account Owner Name"/>
+<apex:column value="{!con.AssistantName}" headerValue="Account Name"/>
+<apex:column value="{!con.Id}"/>                                                 
+</apex:pageBlockTable>
+</apex:pageblocksection>
+</apex:pageblock>
+ </apex:page>

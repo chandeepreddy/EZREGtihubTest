@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>b2bma_c4s_oauth</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <modules>
+        <module>
+            <label>b2bma_c4s_oauth</label>
+            <moduleDependencies>
+                <moduleRef>
+                    <name>b2bma_c4s_oauth_c4s</name>
+                    <namespacePrefix>b2bma</namespacePrefix>
+                    <version>6.0</version>
+                </moduleRef>
+            </moduleDependencies>
+            <moduleType>connected</moduleType>
+            <name>b2bma_c4s_oauth</name>
+            <types>
+                <members>b2bma_c4s_oauth_devConfig</members>
+                <name>ConnectivityDevConfigMetadata</name>
+            </types>
+            <types>
+                <members>b2bma__b2bma_c4s_oauth</members>
+                <name>Module</name>
+            </types>
+            <version>6.0</version>
+        </module>
+    </modules>
+    <namespacePrefix>b2bma</namespacePrefix>
+    <version>36.0</version>
+</Package>

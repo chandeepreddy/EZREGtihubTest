@@ -1,0 +1,41 @@
+<apex:page showHeader="false" controller="RK_LinkedIn.LinkedInOAuthCallbackController">
+	<meta http-equiv="p3p" content="CP='IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT'" />
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+	<script type="text/javascript" src="{!$Resource.LinkedInConnectorCookieLib_js}"></script>
+
+	<apex:form id="form">
+		<!--  Common OAuth Markup / javascript -->
+		<apex:actionFunction action="{!processCallbackParams}" name="processCallbackParams" reRender="OAuthValues" onComplete="storeTokenAndClose();" >
+			<apex:Param name="cookie" assignTo="{!tokenCookie}" value="" />
+		</apex:actionFunction>
+		<apex:panelGrid id="OAuthValues" columns="10">
+			<apex:inputHidden id="OAuthTokenCookie" value="{!tokenCookieReadOnly}"/>
+			<apex:inputHidden id="retUrl" value="{!retUrl}"/>
+		</apex:panelGrid>
+		<script type="text/javascript">
+			var DEBUG = false;
+			
+			$(document).ready(function() {setupController();} );
+			
+			function setupController(){
+				var rkLinkedInCookie = getCookie("RK_LinkedIn");
+				if (DEBUG) alert('in callback:'+document.location);
+				processCallbackParams(rkLinkedInCookie);
+			}	
+			function storeTokenAndClose(){
+				var cookieHidden = document.getElementById("{!$Component.OAuthTokenCookie}");
+				if (DEBUG) alert('setCookie:'+ cookieHidden.value);
+				setCookie("RK_LinkedIn", cookieHidden.value, 1461, "/");
+				if (DEBUG) alert('Cookie set');
+				document.location.href =  document.getElementById("{!$Component.retUrl}").value;
+				
+				//window.close();
+				//if (window.opener && !window.opener.closed) {
+				//	window.opener.parent.top.location.href =  document.getElementById("{!$Component.retUrl}").value;
+				//	//window.opener.location.href =  document.getElementById("{!$Component.retUrl}").value;
+				//}
+			}
+		</script>
+		<!--  END - Common OAuth Markup / javascript -->
+	</apex:form>
+</apex:page>

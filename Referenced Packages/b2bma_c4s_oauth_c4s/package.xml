@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>b2bma_c4s_oauth_c4s</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <modules>
+        <module>
+            <label>b2bma_c4s_oauth_c4s</label>
+            <moduleType>canvas</moduleType>
+            <name>b2bma_c4s_oauth_c4s</name>
+            <types>
+                <members>b2bma_c4s_oauth_c4sCanvas</members>
+                <name>CanvasMetadata</name>
+            </types>
+            <types>
+                <members>b2bma__b2bma_c4s_oauth_c4s</members>
+                <name>Module</name>
+            </types>
+            <version>6.0</version>
+        </module>
+    </modules>
+    <namespacePrefix>b2bma</namespacePrefix>
+    <version>36.0</version>
+</Package>

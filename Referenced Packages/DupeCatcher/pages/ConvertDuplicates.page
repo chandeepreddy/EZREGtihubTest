@@ -1,0 +1,578 @@
+<apex:page controller="SFSSDupeCatcher.ConvertDuplicatesController" sidebar="false">
+    <apex:stylesheet value="{!URLFOR($Resource.SFSSDupeCatcher__Styles, 'assets/styles/salesforce-lightning-design-system.min.css')}" /> 
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Verdana', 'Geneva', sans-serif; 
+            font-size: 130%;
+            margin:0px;
+            display:inline;
+        }
+    </style>
+    <style>
+        .dingoBkWhite{ background-color: #ffffff; }
+        .dingoGray{ color: #b8c3ce; }
+        .dingoLiGray:before{ color: #b8c3ce; }
+        .dingoBkGray{ background-color: #b8c3ce; }                
+        .dingoA{ background-color: #5a9cdd; }
+        .dingoBlue{ color: #5a9cdd; }                
+        .dingoLiBlue:before{ color: #5a9cdd; }
+        .dingoBkBlue{ background-color: #5a9cdd; }                
+        .dingoB{ background-color: #00c6b7; }
+        .dingoLightBlue{ color: #00c6b7; }                
+        .dingoLiLightBlue:before{ color: #00c6b7; }
+        .dingoBkLightBlue{ background-color: #00c6b7; }                
+        .dingoC{ background-color: #88c651; }
+        .dingoGreen{ color: #88c651; }                
+        .dingoLiGreen:before{ color: #88c651; }
+        .dingoBkGreen{ background-color: #88c651; }                
+        .dingoD{ background-color: #f39e58; }
+        .dingoOrange{ color: #f39e58; }                
+        .dingoLiOrange:before{ color: #f39e58; }
+        .dingoBkOrange{ background-color: #f39e58; }                
+        .dingoF{ background-color: #00c6b7; }
+        .dingoRed{ color: #ef6e64; }                
+        .dingoLiRed:before{ color: #ef6e64; }
+        .dingoBkRed{ background-color: #ef6e64; }
+        .dingoRedAlt{ color: rgb(194, 57, 52); }                
+        .dingoLiRedAlt:before{ color: rgb(194, 57, 52); }
+        .dingoBkRedAlt{ background-color: rgb(194, 57, 52); }
+        .dingoInactive{
+            background-color: rgb(194, 57, 52);
+        }                
+        .dingoActive{
+            background-color: rgb(75, 202, 129)
+        }
+        .dingoState {
+            border-radius: .25em;
+            color: #ffffff;
+            padding: 25px;
+            margin: 25px;
+            display: inline-block;
+            text-align: left;
+            width: 250px;
+            position: relative;
+            float:left;
+            height: 200px;
+        } 
+        .dingoStatusHldr{
+            border-radius: .25em;
+            padding: 25px;
+            margin: 25px;
+            display: inline-block;
+            text-align: left;
+            width: 250px;
+            position: relative;
+            float:left;                    
+        }
+        .dingoStatusLine{
+            float:left;
+            border-radius: .125rem;
+            height: 10px;
+            margin-right: 5px;
+            margin-left: 5px;
+            margin-bottom: 5px;
+            margin-top: 18px;
+            width: 50px;
+        }
+        .dingoCurrentState {                    
+            float:left;
+            border-radius: 50%;
+            padding: 15px;
+        } 
+        .dingoWorkList{
+        }
+        .dingoWorkList li{
+            height: 50px;
+            padding-top: 15px;
+        }
+        .cloudingoLink {
+            text-decoration: none !important;
+            font-weight: bold;
+        }
+        .cloudingoWork{
+            float:left; 
+            top: 25px; 
+            position: relative;
+            border: 1px solid rgb(216, 221, 230);
+            border-radius: .25em;
+        }
+        .cloudingoWork .slds-panel{
+            min-height: 200px;
+        }
+        .cloudingoWorkLiImg{
+            float:left;
+            margin-top:-10px;
+            padding-right:10px;
+        }
+        .cloudingoButton{
+            padding-left: 10px !important; 
+            padding-right: 10px !important; 
+            background: none !important;
+        }
+        .cloudingoButtonWhite{
+            padding-left: 10px !important; 
+            padding-right: 10px !important; 
+            background-color: #ffffff !important;
+            background-image: none !important;
+        }
+        .slds-table th, .slds-table td {
+            padding: .15rem;
+        }
+    </style>
+    <script>
+    var thenamespaceprefix = 'sfss_dupecatcher_';    
+    var globalConvertToDataTable = null;
+    var globalConvertingDataTable = null;
+    var globalConvertingIds = new Array(); 
+    var globalConvertToId = ''; 
+    var globalSourceRecordIds = null;
+    var globalTargetRecordIds = null;
+
+    function onSSEventSelectConvertToRadio(value)
+    {
+        // parse the value parm from the invoking item
+        var delim = value.indexOf(';');
+        var columnindex = Number(value.substr(0, delim));  
+        var recordId = value.substr(delim+1);
+        
+        globalConvertToId = recordId;
+    }
+
+    function onSSEventClickConvertingRecordSelect(value)
+    {
+        // parse the value parm from the invoking item
+        var delim = value.indexOf(';');
+        var columnindex = Number(value.substr(0, delim));  
+        var recordId = value.substr(delim+1); 
+               
+        var convertingselectcheckbox = document.getElementById('checkboxconvertingselect-' + columnindex.toString());;
+        
+        var value = 'unchecked';
+        if (convertingselectcheckbox.checked)
+            value = 'checked';
+
+        if (value == 'checked') 
+            enableLastUncheckedConvertingRecord();
+
+        // set this value after enabling last remaining checked
+        // but before disabling it
+        globalConvertingIds[recordId] = value;  
+        
+        if (value == 'unchecked') 
+            disableLastUncheckedConvertingRecord();
+    }
+    
+    function disableLastUncheckedConvertingRecord()
+    {
+        if (numberOfCheckedLeads() > 1)
+            return;
+            
+        var count = 0;
+        for (var id in globalConvertingIds)
+        {
+            var status = globalConvertingIds[id]
+            if (status == 'checked')
+            {
+                var convertingselectcheckbox = document.getElementById('checkboxconvertingselect-' + count.toString());
+                convertingselectcheckbox.disabled = true;
+                break;
+            }
+            count++;
+        }       
+    }
+    
+
+    function enableLastUncheckedConvertingRecord()
+    {
+        if (numberOfCheckedLeads() > 1)
+            return;
+            
+        var count = 0;
+        for (var id in globalConvertingIds)
+        {
+            var status = globalConvertingIds[id]
+            if (status == 'checked')
+            {
+                var convertingselectcheckbox = document.getElementById('checkboxconvertingselect-' + count.toString());
+                convertingselectcheckbox.disabled = false;
+                break;
+            }
+            count++;
+        }       
+    }
+    
+    function numberOfCheckedLeads()
+    {       
+        var count = 0;  
+        
+        for (var id in globalConvertingIds)
+        {
+            var status = globalConvertingIds[id]
+            if (status == 'checked')
+                count++;
+        }
+                    
+        return count;   
+    }
+
+
+    function initializeConvert()
+    {           
+        // initialize all records to be checked
+        for (var field in globalSourceRecordIds)
+        {
+            globalConvertingIds[globalSourceRecordIds[field]] = 'checked';
+        }
+        
+        // set the convert to ID to the first record;
+        globalConvertToId = globalTargetRecordIds[0];
+                
+    }       
+
+    function sfss_NextButtonPressed()
+    {
+        // convert IDs to string
+        var count = 0;
+        var idsforcontroller = '';
+        var value = '';
+        
+        idsforcontroller += 'masterid:' + globalConvertToId;
+        
+        for (var theid in globalConvertingIds)
+        {
+            value = globalConvertingIds[theid];
+
+            if (value != 'checked')
+                continue;
+
+            idsforcontroller += ';convertingid' + count.toString() + ':' + theid;
+            count++;
+        }
+        
+        sendConversionDataToController(idsforcontroller);
+    }
+
+    function sfss_CancelButtonPressed()
+    {
+        sendCancelToController();
+    }        
+
+    var dcConvertDuplicates = null;
+    var DCConvertDuplicatesModel = function(dcSourceObjectName, dcTargetObjectName,
+            sourceTableData, targetTableData, sourceDataTableSchema, targetDataTableSchema, 
+            sourceDataTableColumnDefinition, targetDataTableColumnDefinition){
+        var self = this;
+        
+        self.TargetTableId = 'convertto';
+        self.SourceTableId = 'leads';
+        
+        self.TargetObjectName = dcTargetObjectName;
+        self.SourceObjectName = dcSourceObjectName;
+        
+        self.SourceTableData = sourceTableData;
+        self.TargetTableData = targetTableData;
+        self.SourceDataTableSchema = sourceDataTableSchema;
+        self.TargetDataTableSchema = targetDataTableSchema;
+        self.SourceDataTableColumnDefinition = sourceDataTableColumnDefinition;
+        self.TargetDataTableColumnDefinition = targetDataTableColumnDefinition;
+        
+        self.SetWidthAndHeight = function(){
+            var sideObject = document.getElementsByClassName('sidebarCell').length > 0 ? document.getElementsByClassName('sidebarCell')[0] : null;             
+                
+            var width = window.innerWidth-((sideObject)? sideObject.clientWidth: 0)-125;  
+            
+            if(isNaN(width))
+                width=document.body.clientWidth;
+                      
+            document.getElementById('convertContainerDiv').setAttribute("style","max-width:"+width+"px;", 0);
+            document.getElementById('converttodiv').setAttribute("style","width:"+((width/2)-10)+"px;overflow-x:scroll;", 0);
+            document.getElementById('leadsdiv').setAttribute("style","width:"+((width/2)-10)+"px;overflow-x:scroll;", 0);            
+           
+        }
+        
+        self.CreateTables = function(){
+            self.SetWidthAndHeight();
+            
+            var targetTableDiv = document.getElementById(self.TargetTableId + 'div');
+        
+            targetTableDiv.innerHTML = "<table id='"+self.TargetTableId+"table' class='slds-table forceRecordLayout slds-table--header-fixed slds-table--bordered'></table>";
+            
+            var sourceTableDiv = document.getElementById(self.SourceTableId + 'div');
+        
+            sourceTableDiv.innerHTML = "<table id='"+self.SourceTableId+"table' class='slds-table forceRecordLayout slds-table--header-fixed slds-table--bordered'></table>";
+        }                
+        
+        self.BuildHeaders = function(){
+            var targetTableInstance = document.getElementById(self.TargetTableId + 'table');
+        
+            var thTargetLength = self.TargetDataTableColumnDefinition.length;
+            
+            if(thTargetLength > 0)
+            {
+                var th = targetTableInstance.createTHead();
+                var thRow = th.insertRow();            
+                for(var i=0; i<thTargetLength; i++)
+                {
+                    var th = document.createElement('th');            
+                    th.innerHTML = self.TargetDataTableColumnDefinition[i].label.toUpperCase();
+                    th.setAttribute("style", "color: rgb(22, 50, 92);", 0);
+                    thRow.appendChild(th);
+                }
+            }            
+            
+            var sourceTableInstance = document.getElementById(self.SourceTableId + 'table');
+        
+            var thSourceLength = self.SourceDataTableColumnDefinition.length;
+            
+            if(thSourceLength > 0)
+            {
+                var th = sourceTableInstance.createTHead();
+                var thRow = th.insertRow();            
+                for(var i=0; i<thSourceLength; i++)
+                {
+                    var th = document.createElement('th');
+                    th.innerHTML = self.SourceDataTableColumnDefinition[i].label.toUpperCase();
+                    th.setAttribute("style", "color: rgb(22, 50, 92);", 0);
+                    thRow.appendChild(th);
+                }
+            }
+        };
+        
+        self.BuildColumnsAndRows = function(){
+            var targetTableInstance = document.getElementById(self.TargetTableId + 'table');
+            
+            var targetRowLength = self.TargetTableData.userdata.length;
+            
+            var tbody = document.createElement('tbody');
+            targetTableInstance.appendChild(tbody);
+            
+            if(targetRowLength > 0)
+            {
+                for(var i=0; i<targetRowLength; i++)
+                {
+                    var tr = tbody.insertRow();
+                    var userDataItem = self.TargetTableData.userdata[i];
+                    
+                    var objectProperties = [];
+                    
+                    for(var property in userDataItem)
+                    {
+                        if(userDataItem.hasOwnProperty(property))
+                           objectProperties.push(property);
+                    }
+                    
+                    var propLength = objectProperties.length;
+                    
+                    for(var j=0; j<propLength; j++)
+                    {
+                        var trCell = tr.insertCell();
+                        trCell.setAttribute("id", "target_"+objectProperties[j]+"_"+i, 0);
+                        trCell.className = "slds-cell-edit";
+                        trCell.setAttribute("style", "color: rgb(22, 50, 92);", 0);
+                        trCell.innerHTML = userDataItem[objectProperties[j]];
+                    }
+                }                                               
+            } 
+            
+            var sourceTableInstance = document.getElementById(self.SourceTableId + 'table');
+            
+            var sourceRowLength = self.SourceTableData.userdata.length;
+            
+            var sbody = document.createElement('tbody');
+            sourceTableInstance.appendChild(sbody );
+            
+            if(sourceRowLength > 0)
+            {
+                for(var i=0; i<sourceRowLength; i++)
+                {
+                    var tr = sbody.insertRow();
+                    var userDataItem = self.SourceTableData.userdata[i];
+                    
+                    var objectProperties = [];
+                    
+                    for(var property in userDataItem)
+                    {
+                        if(userDataItem.hasOwnProperty(property))
+                           objectProperties.push(property);
+                    }
+                    
+                    var propLength = objectProperties.length;
+                    
+                    for(var j=0; j<propLength; j++)
+                    {
+                        var trCell = tr.insertCell();
+                        trCell.setAttribute("id", "source_"+objectProperties[j]+"_"+i, 0);
+                        trCell.className = "slds-cell-edit";
+                        trCell.setAttribute("style", "color: rgb(22, 50, 92);", 0);
+                        trCell.innerHTML = userDataItem[objectProperties[j]];
+                    }
+                }                                               
+            }           
+        };                            
+    };
+
+</script>
+
+    <apex:form rendered="{!ShowMergeScreen}"> 
+    
+        <div class="cloudingoWork" style="margin: 10px; top: 0px;">
+            <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap">
+                <div class="slds-form--stacked slds-grow slds-scrollable--y">
+                    <div id="mergeHeader" class="slds-panel__section slds-has-divider--bottom" style="background: rgb(247, 249, 251); color: rgb(22, 50, 92);">
+                        <div class="slds-media slds-tile">             
+                            <p class="tile__title slds-truncate slds-text-heading--medium">
+                                DupeCatcher Convert
+                            </p>
+                        </div>
+                        <div class="slds-media slds-tile">
+                            <p>
+                                First select the {!targetObjectType} record that you would like to
+                                convert Leads to. Then select the Lead records that you would like to
+                                convert. Press the "Next" button when done<br />
+                            </p>
+                        </div>
+                    </div>
+                    <div class="slds-panel__section">
+                        <div id="convertContainerDiv" style="display:table;">
+                            <div style="display:table-row;">
+                                <div style="display:table-cell; padding-right: 10px; border-right: 1px solid #d8dde6;">
+                                    <div class="slds-media slds-tile">             
+                                        <p class="tile__title slds-truncate slds-text-heading--small">
+                                            {!targetObjectType}
+                                        </p>
+                                    </div>
+                                    <div id="converttodiv" style="text-align:left;vertical-align:top;overflow-y: scroll;"></div>
+                                </div>
+                                <div style="display:table-cell; padding-left: 10px; ">
+                                    <div class="slds-media slds-tile">             
+                                        <p class="tile__title slds-truncate slds-text-heading--small">
+                                            {!sourceObjectType}
+                                        </p>
+                                    </div>
+                                    <div id="leadsdiv" style="text-align:left;vertical-align:top;overflow-y: scroll;"></div>
+                                </div>
+                            </div>                        
+                            <div style="display: table-row;">                            
+                              <div style="display: table-cell; margin-right:3px;">
+                                  <br />
+                                  <div id="sfssnextbutton" style="float:right;"></div>
+                              </div>
+                              <div style="display: table-cell; margin-left:3px;">
+                                  <br />
+                                  <div id="sfsscancelbutton" style="float:left;"></div>
+                              </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+       
+        <apex:actionFunction action="{!handleConversionData}"
+            name="sendConversionDataToController" rerender="">
+            <apex:param name="ConvertingIds" assignTo="{!ConvertingIds}"
+                value="firstParam" />
+        </apex:actionFunction>
+        <apex:actionFunction action="{!cancel}"
+            name="sendCancelToController" rerender="">
+        </apex:actionFunction>
+        
+        
+    </apex:form>
+    <apex:form rendered="{!showPageError}">
+        <div class="cloudingoWork" style="margin: 10px; top: 0px;">
+            <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap">
+                <div class="slds-form--stacked slds-grow slds-scrollable--y">
+                    <div class="slds-panel__section slds-has-divider--bottom" style="background: rgb(247, 249, 251); color: rgb(22, 50, 92);">
+                        <div class="slds-media slds-tile">             
+                            <p class="tile__title slds-truncate slds-text-heading--medium">
+                                DupeCatcher Lead Convert
+                            </p>
+                        </div>                
+                    </div>
+                    <div class="slds-panel__section">
+                        <p class="tile__title slds-truncate slds-text-heading--small">
+                            {!ErrorMessage}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <apex:commandButton action="{!deleteAlerts}" styleClass="btn cloudingoButton slds-button slds-button--neutral" value="Delete Alerts"/>
+         
+            <apex:commandButton action="{!cancel}" styleClass="btn cloudingoButton slds-button slds-button--neutral" value="Cancel"/>
+        </div>
+    </apex:form>
+
+    <apex:form rendered="{!showAccessError}">
+        <div class="cloudingoWork" style="margin: 10px; top: 0px;">
+            <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap">
+                <div class="slds-form--stacked slds-grow slds-scrollable--y">
+                    <div class="slds-panel__section slds-has-divider--bottom" style="background: rgb(247, 249, 251); color: rgb(22, 50, 92);">
+                        <div class="slds-media slds-tile">             
+                            <p class="tile__title slds-truncate slds-text-heading--medium">
+                                DupeCatcher Lead Convert
+                            </p>
+                        </div>                
+                    </div>
+                    <div class="slds-panel__section">
+                        <p class="tile__title slds-truncate slds-text-heading--small">
+                            Insufficient privileges to view all duplicates for this alert.   Please notify your administrator.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </apex:form>
+    
+<script>
+    globalSourceRecordIds = {!SourceRecordIds};
+	globalTargetRecordIds = {!TargetRecordIds};
+    
+    initializeConvert();
+
+    var sourceTableData = {!SourceTableData};
+	var sourceDataTableSchema = {!SourceDataTableSchema};
+	var sourceDataTableColumnDefinition = {!SourceColumnDefinition};
+ 
+	var targetTableData = {!TargetTableData};
+	var targetDataTableSchema = {!TargetDataTableSchema};
+	var targetDataTableColumnDefinition = {!TargetColumnDefinition};    
+    
+    var dcTargetObjectName = "{!targetObjectType}"; 
+    var dcSourceObjectName = "{!sourceObjectType}";
+    
+    dcConvertDuplicates = new DCConvertDuplicatesModel (dcSourceObjectName, dcTargetObjectName, sourceTableData, targetTableData, sourceDataTableSchema, targetDataTableSchema, 
+        sourceDataTableColumnDefinition, targetDataTableColumnDefinition);
+    dcConvertDuplicates.CreateTables();
+    dcConvertDuplicates.BuildHeaders();
+    dcConvertDuplicates.BuildColumnsAndRows();     
+    
+    var nextButtonDiv = document.getElementById('sfssnextbutton');
+    var cancelButtonDiv = document.getElementById('sfsscancelbutton');
+    
+    var globalNextButton = document.createElement("BUTTON"); 
+    var globalNextButtonText = document.createTextNode("Next");
+    globalNextButton.appendChild(globalNextButtonText);
+    globalNextButton.setAttribute('id', 'dcnextbutton', 0);
+    globalNextButton.className = 'btn cloudingoButton slds-button slds-button--neutral';
+    nextButtonDiv.appendChild(globalNextButton);
+    
+    var globalCancelButton = document.createElement("BUTTON"); 
+    var globalCancelButtonText = document.createTextNode("Cancel");
+    globalCancelButton.appendChild(globalCancelButtonText );
+    globalCancelButton.setAttribute('id', 'dccancelbutton', 0);
+    globalCancelButton.className = 'btn cloudingoButton slds-button slds-button--neutral';
+    cancelButtonDiv.appendChild(globalCancelButton);
+    
+    globalNextButton.setAttribute('onclick', 'sfss_NextButtonPressed()'); 
+    globalCancelButton.setAttribute('onclick', 'sfss_CancelButtonPressed()'); 
+    globalNextButton.setAttribute('type', 'button'); 
+    globalCancelButton.setAttribute('type', 'button');        
+</script>
+
+</apex:page>

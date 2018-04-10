@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <frameHeight>600</frameHeight>
+    <hasSidebar>false</hasSidebar>
+    <label>Jigsaw Build a List</label>
+    <mobileReady>false</mobileReady>
+    <motif>Custom26: Flag</motif>
+    <scontrol>Jigsaw_Build_a_List</scontrol>
+</CustomTab>

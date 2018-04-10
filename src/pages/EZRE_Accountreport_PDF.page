@@ -1,0 +1,265 @@
+<!--
+ - @author           Lavanya Aningi
+ - @version          1.0 
+ - @date             03/04/2016
+ - @description      VF page to generate custom Account Report
+-->
+
+<apex:page standardController="Account"  renderAs="pdf" extensions="EZRE_AccountReportExtnsnCntrllr" applyHtmlTag="false" applyBodyTag="false" sidebar="false" 
+            showHeader="false" standardStylesheets="false">
+ <!--<apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" />-->
+  <apex:includeScript value="{!URLFOR($Resource.EZRE_AccountReport,'Images/tree-arrow.png')}" />
+ 
+<head>
+
+<style type="text/css">
+
+ .tree,
+.tree ul {
+  margin:0 0 0 19px; 
+  padding:0;
+  list-style:none;
+  background: url('{!URLFOR($Resource.EZRE_AccountReport_line, '/line.png')}') repeat-y; 
+  color:#369;
+  
+  position:relative;
+}
+
+
+
+.tree li {
+  margin:0 ; 
+  padding:0; 
+  line-height:35px;  
+  font-weight:bold;
+  position:relative;
+  
+} 
+  
+ 
+.tree li:last-child{
+  background: #E06363;
+  height:auto;
+  top:2em;
+  bottom:0;
+}
+  
+      
+.tree li a
+{
+    border: 1px solid #369  ; 
+    padding: 5px;
+    font-color:#060000
+   
+}
+
+.tree li a:hover, .tree li a:hover+ul li a 
+{
+    background: #c8e4f8; color: #000; border: 1px solid #94a0b4;
+}
+
+.firstLevelColor
+{
+    background: #E06363;
+    
+}
+
+.secondLevelColor
+{
+    background:#8B8BFA;
+    
+}
+
+.thirdLevelColor
+{
+    background:#FFFF00;
+    
+}
+
+.fourthLevelColor
+{
+    background:#C60BEB;
+    
+    
+}
+
+.fifthLevelColor
+{
+    background:#44EF44;
+    
+}
+
+
+.tree li a:link    {color:#000;}  /* unvisited link  */
+.tree li a:visited {color:#000;}  /* visited link    */
+.tree li a:hover   {color:#000;}  /* mouse over link */
+.tree li a:active  {color:#000;}  /* selected link   */ 
+
+
+
+
+</style>
+
+ 
+
+</head>
+<body>
+<apex:form >
+<apex:pageBlock >
+    <center>
+        <apex:commandButton action="{!exportAsPDF}" value="Export as PDF"/>
+    </center>
+</apex:pageBlock>
+</apex:form>
+
+<apex:pageBlock title="Hello {!$User.FirstName} {!$User.LastName}!">
+You are viewing the details of <b> {!Account.name} </b>!<apex:outputText value="{!Account.Logo__c}" escape="false" ></apex:outputText><br/><br/>
+   <apex:pageBlocksection title="Account Details 1:">
+        <apex:outputField value="{!Account.AnnualRevenue}" style="font-color:red;" />    &nbsp;
+        <apex:outputField value="{!Account.NumberOfEmployees}"/> &nbsp; 
+        <apex:outputField value="{!Account.Industry}"/>  &nbsp;
+        <apex:outputField value="{!Account.isActive__c}"/>  &nbsp;
+        <apex:outputField value="{!Account.BillingCity}"/>  &nbsp;
+        <apex:outputField value="{!Account.BillingState}"/>  &nbsp;
+    </apex:pageBlocksection>
+    
+    
+    <apex:pageBlocksection title=" Account Details 2:">  
+        <apex:outputField value="{!Account.OwnerId}" /> &nbsp;  
+        <apex:outputField value="{!Account.Client_Partner__c}"/> &nbsp;        
+        <apex:outputField value="{!Account.Executive_Summary__c}"/> &nbsp;
+        <apex:outputField value="{!Account.Key_Competitors__c}"/> &nbsp;
+        <apex:outputField value="{!Account.Info_From_10K__c}"/> &nbsp;
+        <apex:outputField value="{!Account.Ownership}"/> &nbsp;
+        <apex:outputField value="{!Account.Technical_Environment__c}"/> &nbsp;
+        <apex:outputField value="{!Account.Current_Vendors__c}"/> &nbsp;        
+    </apex:pageBlocksection>
+</apex:pageBlock>
+
+
+<apex:pageBlock title="Strategic Initiatives" >
+    <apex:outputPanel id="noSearchRes" rendered="{!(initveLst.size == 0 && initveLst !=null)}"> No Initiatives are found!
+    </apex:outputPanel>
+    
+    <apex:repeat var="in" value="{!Account.Initiatives__r}" rows="1" >
+        <apex:pageBlockSection >
+            <apex:outputField value="{!in.Name}"/><br/>
+            <apex:outputField value="{!in.Description__c}"/><br/> 
+            <apex:outputField value="{!in.Source_of_that_Information__c}"/><br/>
+            <apex:outputField value="{!in.What_we_know__c}"/><br/>
+            <apex:outputField value="{!in.What_we_need_to_know__c}"/><br/>
+            <apex:outputText value=""> </apex:outputText>
+        </apex:pageBlockSection>
+    </apex:repeat>
+</apex:pageBlock> 
+
+
+<apex:pageBlock Title="Contacts Hierarchy" >
+
+<ul class='tree' id="tree">
+    <apex:repeat value="{!HrchyWrppr}" var="parent1">
+        <li><strong>  <img src="/resource/EZRE_AccountReport/Images/tree-arrow.png" alt="Print" />              
+            <apex:outputLink value="/{!parent1.gpCntct.id}" rendered="{!parent1.gpCntct != null}" id="grndPrnt" styleClass="firstLevelColor">{!parent1.gpCntct.Name}</apex:outputLink>
+            </strong>
+             <ul>
+                 <apex:repeat value="{!parent1.prntCntct}" var="child1">
+                    <li>  <img src="/resource/EZRE_AccountReport/Images/tree-arrow.png" alt="Print" /> 
+                                                              
+                        <apex:outputLink value="/{!child1.id}" rendered="{!child1.id != null}"  styleClass="secondLevelColor">{!child1.Name}</apex:outputLink>
+                       
+                        <ul>
+                         <apex:repeat value="{!parent1.chldCntct[child1.id]}" var="child2" rendered="{!child1.id != null}" >
+                            <li >   <img src="/resource/EZRE_AccountReport/Images/tree-arrow.png" alt="Print" />                         
+                                <apex:outputLink value="/{!child2.id}" rendered="{!child2.id != null}" styleClass="thirdLevelColor">{!child2.Name}</apex:outputLink>
+                             
+                                <ul>
+                                   <apex:repeat value="{!parent1.grndChldCntct[child2.id]}" var="child3" rendered="{!child2.id != null}" >
+                                     <li  >     <img src="/resource/EZRE_AccountReport/Images/tree-arrow.png" alt="Print" />                                
+                                        <apex:outputLink value="/{!child3.id}" rendered="{!child3.id != null}" styleClass="fourthLevelColor">{!child3.Name}</apex:outputLink>
+                                   
+                                       <ul >
+                                            <apex:repeat value="{!parent1.grndChldCntct[child3.id]}" var="child4" rendered="{!child3.id != null}" >
+                                           <li>  <img src="/resource/EZRE_AccountReport/Images/tree-arrow.png" alt="Print" />                                           
+                                                <apex:outputLink value="/{!child4.id}" rendered="{!child4.id != null}" styleClass="fifthLevelColor">{!child4.Name}</apex:outputLink>                                   
+                                           
+                                           </li>    
+                                           </apex:repeat>
+                                       </ul>
+                                     </li>
+                                </apex:repeat>
+                               </ul>
+                            </li>                 
+                            </apex:repeat>
+                        </ul> 
+                        </li>             
+                    </apex:repeat>                    
+             </ul>                             
+        </li>
+    </apex:repeat>
+</ul>
+
+</apex:pageBlock>
+
+<apex:pageBlock title="Contacts" >
+    <apex:outputPanel id="noSearchRes" rendered="{!(cntctLst.size == 0 && cntctLst !=null)}"> No contacts are found!
+    </apex:outputPanel>
+    <apex:repeat var="con" value="{!Account.contacts}" >
+        <apex:pageBlockSection >
+            <apex:outputField value="{!con.Name}"/><br/>
+            <apex:outputField value="{!con.Title}"/><br/> 
+            <apex:outputField value="{!con.Relationship_Strength__c}"/><br/>
+            <apex:outputField value="{!con.ReportsToId}" id="reportToId"/><br/>
+            <apex:outputText value=""></apex:outputText>
+        </apex:pageBlockSection>
+    </apex:repeat>
+</apex:pageBlock>
+
+
+
+
+
+<apex:pageBlock title="Opportunities">
+    <apex:outputPanel id="noSearchRes" rendered="{!(oppLst.size==0 && oppLst!=null)}"> No Opportunities are found!
+    </apex:outputPanel>
+    <apex:pageBlockTable value="{!oppLst}" var="opp"  style="width:700px;" rendered="{!(oppLst.size != 0)}">
+        <apex:column headerValue="Opportunity Name" >
+        <apex:outputlink value="/{!opp.Id}">{!opp.Name}</apex:outputlink><br/>
+        </apex:column>
+        <apex:column headerValue="Stage" value="{!opp.StageName}"/>
+        <apex:column headerValue="Amount" value="{!opp.Amount}"/>     
+        <apex:column headerValue="Execution Partner" value="{!opp.Execution_Partner__c}"/>        
+    </apex:pageBlockTable>
+</apex:pageBlock>
+
+
+
+
+<apex:pageBlock title="Activities">
+    <apex:outputPanel id="noSearchRes" rendered="{!(lstWrppr.size==0 && lstWrppr!=null)}"> No Activities are found!
+    </apex:outputPanel>
+                
+    <apex:pageBlockTable value="{!lstWrppr}" var="wrppr" style="width:700px" rendered="{!(lstWrppr.size != 0)}">
+    <apex:column headerValue="Subject" >
+        <apex:outputlink value="/{!wrppr.recrdId}" >{!wrppr.Subject}</apex:outputlink><br/>
+    </apex:column>
+
+    <apex:column headerValue="Name">
+        <apex:outputLink value="/{!wrppr.WhoId}">{!wrppr.name}</apex:outputLink>
+    </apex:column>
+    
+    <apex:column headerValue="Date">
+    <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+        <apex:param value="{!wrppr.ActivityDate}" />
+    </apex:outputText> 
+    </apex:column>
+    <apex:column headerValue="Owner Name" >
+        <apex:outputLink value="/{!wrppr.ownerName}" >{!wrppr.ownerName}</apex:outputLink>
+    </apex:column>
+</apex:pageBlockTable>
+
+</apex:pageBlock>
+
+
+</body>
+
+</apex:page>

@@ -1,0 +1,262 @@
+<apex:page controller="CandidateMapfromCandidatesEdit" id="Page" sidebar="true"> 
+ 
+<script>
+if('{showMessage}'=='True'){
+alert('your message！'); 
+} 
+</script> 
+
+<script type="text/javascript">  
+
+
+
+  function openLookup(baseURL, width, modified, searchParam){
+    //baseURL = "/apex/CandidateMapfromCandidates";
+    //baseURL="/apex/CustomAccountLookup";
+    //alert("base" + baseURL);
+    var originalbaseURL = baseURL;
+    var originalwidth = width;
+    var originalmodified = modified;
+    var originalsearchParam = searchParam;
+ 
+    var lookupType = baseURL.substr(baseURL.length-3, 3);
+    //alert('lookuptype:' +baseURL);
+    if (modified == '1') baseURL = baseURL + searchParam;
+ 
+    var isCustomLookup = false;
+ 
+    // Following "001" is the lookup type for Account object so change this as per your standard or custom object a09
+        
+    if(lookupType == "001" || lookupType=="a0k"){ 
+      var urlArr = baseURL.split("&");
+      var txtId = '';
+      if(urlArr.length > 2) {
+        urlArr = urlArr[1].split('=');
+        txtId = urlArr[1];
+        //alert('TxtId' + txtId);
+      }
+     
+
+      // Following is the url of Custom Lookup page. You need to change that accordingly
+        baseURL = "/apex/CustomAccountLookup?txt=" + txtId;
+            // Following is the id of apex:form control "myForm". You need to change that accordingly
+      baseURL = baseURL + "&frm=" + escapeUTF("{!$Component.myForm}");
+      if (modified == '1') {
+        baseURL = baseURL + "&lksearch=" + searchParam;
+        //alert('modified'+ baseURL );
+      }
+ 
+      // Following is the ID of inputField that is the lookup to be customized as custom lookup
+      if(txtId.indexOf('Account') > -1 ){
+        isCustomLookup = true;
+      }
+      if(txtId.indexOf('Candidate') > -1 ){
+        isCustomLookup = true;
+      }
+     
+   }
+ 
+    //alert('baseURL1' + baseURL);
+    if(isCustomLookup == true){
+      openPopup(baseURL, "lookup", 300, 480, "width="+width+",height=480,toolbar=no,status=no,directories=no,menubar=no,resizable=yes,scrollable=no", true);
+    }
+    else {
+      if (modified == '1') originalbaseURL = originalbaseURL + originalsearchParam;
+      openPopup(originalbaseURL, "lookup", 350, 480, "width="+originalwidth+",height=480,toolbar=no,status=no,directories=no,menubar=no,resizable=yes,scrollable=no", true);
+    } 
+  }
+  
+ function test()
+    {
+    
+    var message=document.getElementById("{!$Component.myForm.PageBlock.errMsg}").innerText;
+    alert(message);
+    
+    }
+    
+    function DynamicDatePicker(d_id)
+    {    
+    DatePicker.pickDate(true,d_id.id,true);
+    }
+    
+   function MailDisplay() 
+    {
+        var pa = document.getElementById("Page:myForm:PageBlock:j_id34:InterviewRequested");                                 
+        if(pa.value == "Yes")  
+        {    
+            var Emails ="";  
+            var body = escape(window.document.title); 
+            var subject = "Sub: Interview Requested for Candidate - " + "{!JSENCODE(subCandidate)}" ;
+            //var EmailsTo= "{JSENCODE(!uEmail)}";       
+            var EmailsTo = "{!JSENCODE(MREmail)}" + ";" + "{!JSENCODE(LREmail)}" + ";" + "{!JSENCODE(REmail)}";     
+            window.location.href = "mailto:"+EmailsTo+"?body="+body+"&subject="+subject+"&bcc="+Emails
+            return false;        
+        }        
+               
+        var currentLocation=window.location;var ur=currentLocation+"";
+        var recordId=ur.split(".com/")[1].split("/")[0];
+       } 
+       
+       function MailDisplay1() 
+    {
+        var pa = document.getElementById("Page:myForm:PageBlock:j_id34:InterviewAcceptedc");                      
+                
+        if(pa.value == "Yes")  
+        {    
+            var Emails ="";  
+            var body = escape(window.document.title); 
+            var subject = "Sub: CANDIDATE ACCEPTED INTERVIEW SCHEDULE - " + "{!JSENCODE(subCandidate)}" ;
+            //var EmailsTo= "{JSENCODE(!uEmail)}";       
+            var EmailsTo = "{!JSENCODE(MREmail)}" + ";" + "{!JSENCODE(LREmail)}" + ";" + "{!JSENCODE(REmail)}";     
+            window.location.href = "mailto:"+EmailsTo+"?body="+body+"&subject="+subject+"&bcc="+Emails
+            return false;        
+        }    
+        
+        if(pa.value == "No")  
+        {    
+            var Emails ="";  
+            var body = escape(window.document.title); 
+            var subject = "Sub: CANDIDATE DECLINED INTERVIEW SCHEDULE - " + "{!JSENCODE(subCandidate)}" ;
+            //var EmailsTo= "{JSENCODE(!uEmail)}";       
+            var EmailsTo = "{!JSENCODE(MREmail)}" + ";" + "{!JSENCODE(LREmail)}" + ";" + "{!JSENCODE(REmail)}";     
+            window.location.href = "mailto:"+EmailsTo+"?body="+body+"&subject="+subject+"&bcc="+Emails
+            return false;        
+        }       
+               
+        var currentLocation=window.location;var ur=currentLocation+"";
+        var recordId=ur.split(".com/")[1].split("/")[0];
+       } 
+       
+     
+   function test1()  
+     { 
+        var test12 = document.getElementById("Page:myForm:PageBlock:j_id32:MRStatus");  
+        if(test12.value == "Approved")
+        {
+           
+            divAddInfo.style.display = "block";
+        }        
+        else
+        {
+            divAddInfo.style.display = "none";
+        }      
+          
+     }     
+     
+      function contract(test)  
+         { 
+            var pa = document.getElementById("Page:myForm:PageBlock:j_id34:ClientInterviewedc"); 
+
+            if(pa.value == "Yes")
+                {
+                     divcontract.style.display = "block";
+                     return false;
+                }        
+            else
+                {
+                    divcontract.style.display = "none";
+                    return true;
+                }           
+        }  
+        
+
+
+if(pa.value == "Yes")
+                {
+                     divcontract.style.display = "block";
+                     return false;
+                }        
+            else
+                {
+                    divcontract.style.display = "none";
+                    return true;
+                }    
+</script>
+ 
+<apex:sectionHeader title="CandidateMappings Edit"  subtitle="New Candidate Mapping" />
+  <!-- <apex:pageBlock title="Variable values">
+        <c:editMode value="{!$CurrentPage.parameters.key}"/>
+    </apex:pageBlock> -->
+  <apex:form id="myForm" rendered="{!$CurrentPage.parameters.key = 'true'}"  >  
+    <apex:PageBlock id="PageBlock" >  
+          <apex:pagemessages id="errMsg" />
+          <apex:pageBlockButtons >
+                <apex:commandButton value="Save" action="{!save}" />               
+                <apex:commandButton value="Cancel" action="{!cancel}" immediate="true"/>
+          </apex:pageBlockButtons>
+          
+          <apex:pageBlockSection columns="1"  title="Candidate Mappings Edit">
+                <apex:inputField id="Candidate"  value="{!coa.Candidate__c}" style="width:300px;"   />
+                <apex:inputField id="Requirement" value="{!coa.Requirement__c}" style="width:300px;"  />
+                <apex:inputField id="RComments" value="{!coa.R_Comments__c}" style="width:940px;" />             
+                <apex:inputField id="EmailAuthorization" value="{!coa.Employer_s_Authorization__c}" required="true" label="Email Authorization" style="width:940px;"   />
+                <apex:inputField id="LRStatus" value="{!coa.LR_Status__c}" required="true" label="LR Status" style="width:300px;" />
+                <apex:inputtext value="{!coa.LR_Status_Date__c}" id="da1234" disabled="true" style="border:0px;width:250px; border-color:#f8f8f8;background-color:#f8f8f8"/>     
+                <apex:inputField id="LRComments" value="{!coa.LR_Comments__c}" style="width:940px;"  /> 
+                <apex:inputField id="ManagerEmailID" value="{!coa.Manager_Email_ID__c}" style="width:300px;" />
+                <apex:inputHidden id="hdnMRStatus" value="{!cm.MR_Status__c}"  /> 
+          </apex:pageBlockSection>
+          
+<div id ="div2">
+           <apex:pageblocksection columns="1" >
+                 <apex:inputField id="MRStatus" value="{!coa.MR_Status__c}" required="true" label="MR Status"  style="width:300px;" onchange="test1()"/> 
+                <apex:inputtext value="{!coa.MR_Status_date__c}" id="da13234" disabled="true" style="border:0px;width:250px; border-color:#f8f8f8;background-color:#f8f8f8"/>    
+                <apex:inputField id="MRComments" value="{!coa.MR_Comments__c}" style="width:940px;"  /> 
+           </apex:pageblocksection>
+</div>
+        
+         <!--<div <div id="plusimage_{!rList1.mId}"  > -->
+          <div id="divAddInfo" style="display:none;">      
+          <apex:pageblocksection title="Additional Info" columns="2" >
+                <apex:inputfield id="SubmittedtoClient" value="{!coa.Submitted_to_Client__c}" style="width:300px;"   />
+                <apex:inputtext value="{!coa.Submitted_to_Client_Date__c}" id="d1" disabled="true" style="border:0px;width:250px; border-color:#f8f8f8;background-color:#f8f8f8"/>
+                <apex:inputfield id="InterviewRequested" value="{!coa.Interview_Scheduled__c}" onchange="MailDisplay();" style="width:300px;"  />
+                <apex:inputtext value="{!coa.Interview_Scheduled_Date__c}" id="d12" disabled="true" style="border:0px;width:250px; border-color:#f8f8f8;background-color:#f8f8f8" />               
+                <apex:inputfield id="InterviewAcceptedc" value="{!coa.Interview_Accepted__c}" onchange="MailDisplay1();" style="width:300px;"   />
+                <apex:inputtext value="{!coa.Interview_Accepted_Date__c}" id="d123" disabled="true" style="border:0px;width:250px; border-color:#f8f8f8;background-color:#f8f8f8" />
+                <apex:inputfield id="ClientInterviewed" value="{!coa.Client_Interviewed__c}" style="width:300px;" />
+                <apex:inputtext value="{!coa.Client_Interview_Date__c}" id="d1232" disabled="true" style="border:0px;width:250px; border-color:#f8f8f8;background-color:#f8f8f8" />
+                <apex:inputfield id="CandidateStarted" value="{!coa.Client_Offered__c}" style="width:300px;"  />
+                <apex:inputtext value="{!coa.Client_Offer_Date__c}" id="d1234" disabled="true" style="border:0px;width:250px; border-color:#f8f8f8;background-color:#f8f8f8"/>
+              <!-- <apex:inputfield id="UpdatedOwnerEmail" value="{!coa.Updated_Owner_Email__c}"  /> -->
+
+                <apex:inputfield id="ClientInterviewedc" value="{!coa.Candidate_started__c}" onchange="return contract(this);" style="width:300px;" />
+                <apex:inputtext value="{!coa.started_date__c}" id="d123246" disabled="true" style="border:0px;width:250px; border-color:#f8f8f8;background-color:#f8f8f8"/>
+          </apex:pageBlockSection>  
+          </div>
+          <div id="divcontract" style="display:none;">
+          <apex:pageblocksection title="" showHeader="false">
+           <apex:InputField id="dContractEndDate" value="{!coa.Contract_End_Date__c}"  style=" width:230px;" />
+          </apex:pageblocksection>
+          </div>
+
+          <div>
+          <apex:pageblocksection title="" showHeader="false">
+              <apex:inputfield id="CandidateStartedw" value="{!coa.Comments__c}" style="width: 940px;
+                                            height: 120px;" />  
+          </apex:pageBlockSection>
+          </div>
+          
+    </apex:PageBlock>
+  </apex:form>
+<script type="text/javascript">  
+
+var contracttest = document.getElementById("Page:myForm:PageBlock:j_id34:ClientInterviewedc");
+var contracttest1 =document.getElementById("divcontract");
+
+if(contracttest.value =='Yes')
+{
+contracttest1.style.display = "block";    
+}
+
+var MRstatus= document.getElementById("Page:myForm:PageBlock:j_id32:MRStatus");
+var additionalinfo=document.getElementById("divAddInfo");
+
+if(MRstatus.value =='Approved')
+{
+additionalinfo.style.display = "block";    
+}
+
+</script> 
+
+</apex:page>

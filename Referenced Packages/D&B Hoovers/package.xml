@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>D%26B Hoovers</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <description>D&amp;B Hoovers sales acceleration platform leverages data and analytics to provide a faster path from prospect to profitable relationship. B2B sales professionals can use D&amp;B Hoovers directly within SFDC to engage faster with customers to grow their business.</description>
+    <namespacePrefix>iSell</namespacePrefix>
+    <types>
+        <members>AccountWidgetController</members>
+        <members>AppTabController</members>
+        <members>ContactWidgetController</members>
+        <members>ControllerTests</members>
+        <members>LeadWidgetController</members>
+        <members>OpportunityWidgetController</members>
+        <members>UrlUtils</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>Account_Quick_View</members>
+        <members>AventionApp</members>
+        <members>Contact_Quick_View</members>
+        <members>Lead_Quick_View</members>
+        <members>Opportunity_Quick_View</members>
+        <members>iSell_Account_Quick_Profile</members>
+        <members>iSell_Lead_Quick_Profile</members>
+        <members>iSell_Opportunity_Quick_Profile</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
+        <members>Account.OSKeyID__c</members>
+        <members>Contact.Avention_ID__c</members>
+        <members>Lead.OSKeyID__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Avention</members>
+        <members>iSell</members>
+        <name>CustomTab</name>
+    </types>
+    <types>
+        <members>iSell_for_Salesforce</members>
+        <name>Document</name>
+    </types>
+    <types>
+        <members>jquery</members>
+        <name>StaticResource</name>
+    </types>
+    <version>36.0</version>
+</Package>

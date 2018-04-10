@@ -1,0 +1,11 @@
+<!--
+ - @author           Indumathi & Soumya
+ - @version          1.0 
+ - @date             11/11/2014
+ - @description      LinkedIn Integration authorization Page
+-->
+<apex:page controller="EZRE_LinkedInIntegrationCntrl" action="{!Authorize}">
+  <!-- Begin Default Content REMOVE THIS --> 
+  Authorization complete!!!!!!!!!!!!
+  <!-- End Default Content REMOVE THIS -->
+</apex:page>

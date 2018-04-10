@@ -1,0 +1,15 @@
+.THIS .slds-timeline__title .slds-timeline__title-content {
+	background: inherit;
+}
+
+.THIS .slds-media__body .timeline-item-date {
+	background: inherit;
+}
+
+.THIS .slds-media--timeline .slds-timeline__icon {
+	border-color: transparent;
+}
+
+.THIS .slds-text-heading--small {
+	font-weight : 700;
+}
